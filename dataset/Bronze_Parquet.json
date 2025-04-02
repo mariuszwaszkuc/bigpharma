@@ -1,0 +1,39 @@
+{
+	"name": "Bronze_Parquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "mrgbigpharma-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"filename": {
+				"type": "string"
+			},
+			"foldername": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Targets_Bronze"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().filename",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@concat('Erp/',dataset().foldername)",
+					"type": "Expression"
+				},
+				"fileSystem": "bronze"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

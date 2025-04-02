@@ -1,0 +1,90 @@
+{
+	"name": "Notebook 2",
+	"properties": {
+		"folder": {
+			"name": "Load_Silver"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkpool32",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "b3b03d10-1c21-4913-8a55-325faa350670"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"synapse_widget": {
+				"version": "0.1"
+			},
+			"enableDebugMode": false,
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+				"name": "sparkpool32",
+				"type": "Spark",
+				"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"microsoft": {
+						"language": "python"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%pyspark\r\n",
+					"from pyspark.sql.functions import split\r\n",
+					"df = spark.read.format(\"csv\").option(\"delimiter\", \";\").option(\"inferSchema\",\"true\").load(\"abfss://bronze@bigpharma.dfs.core.windows.net/ExternalStatistics/inflation.csv\")\r\n",
+					"df1 =df.withColumn('Type', split(df['_c0'], ',').getItem(0))\\\r\n",
+					"       .withColumn('Type1', split(df['_c0'], ',').getItem(1))\\\r\n",
+					"       .withColumn('Type2', split(df['_c0'], ',').getItem(2))\\\r\n",
+					"       .withColumn('Type3', split(df['_c0'], ',').getItem(3))\\\r\n",
+					"       .withColumn('Type4', split(df['_c0'], ',').getItem(4))\r\n",
+					"\r\n",
+					"df2=df1.drop('_c0')\r\n",
+					"df2.show()\r\n",
+					"\r\n",
+					"import pandas as pd\r\n",
+					"\r\n",
+					"result_pdf = df2.select(\"*\").toPandas()\r\n",
+					"\r\n",
+					"\r\n",
+					"df4 = result_pdf.rename(columns=result_pdf.iloc[0]).loc[1:]\r\n",
+					"\r\n",
+					"\r\n",
+					"print(df4)"
+				],
+				"execution_count": 44
+			}
+		]
+	}
+}

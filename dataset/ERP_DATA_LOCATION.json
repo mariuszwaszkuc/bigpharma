@@ -1,0 +1,30 @@
+{
+	"name": "ERP_DATA_LOCATION",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "mrgbigpharma-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"TblName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().TblName",
+					"type": "Expression"
+				},
+				"folderPath": "Erp",
+				"fileSystem": "bronze"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

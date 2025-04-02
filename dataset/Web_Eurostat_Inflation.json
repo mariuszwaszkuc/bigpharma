@@ -1,0 +1,70 @@
+{
+	"name": "Web_Eurostat_Inflation",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "eceuropaeu_inflation",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Sources_Bronze"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation"
+			},
+			"columnDelimiter": "\t",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "freq,unit,s_adj,indic,geo\\TIME_PERIOD",
+				"type": "String"
+			},
+			{
+				"name": "2024-05 ",
+				"type": "String"
+			},
+			{
+				"name": "2024-06 ",
+				"type": "String"
+			},
+			{
+				"name": "2024-07 ",
+				"type": "String"
+			},
+			{
+				"name": "2024-08 ",
+				"type": "String"
+			},
+			{
+				"name": "2024-09 ",
+				"type": "String"
+			},
+			{
+				"name": "2024-10 ",
+				"type": "String"
+			},
+			{
+				"name": "2024-11 ",
+				"type": "String"
+			},
+			{
+				"name": "2024-12 ",
+				"type": "String"
+			},
+			{
+				"name": "2025-01 ",
+				"type": "String"
+			},
+			{
+				"name": "2025-02 ",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

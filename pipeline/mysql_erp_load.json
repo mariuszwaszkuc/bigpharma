@@ -1,0 +1,223 @@
+{
+	"name": "mysql_erp_load",
+	"properties": {
+		"activities": [
+			{
+				"name": "New Watermark List of Tabels",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "call GetMaxIdForAllTables();\n\nSELECT table_name, create_date, update_date, \n\nlast_date FROM logs;"
+					},
+					"dataset": {
+						"referenceName": "MySql_Erp_List_Tables",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "For Each Table",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "New Watermark List of Tabels",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('New Watermark List of Tabels').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@equals(item().table_name, 'logs') ",
+									"type": "Expression"
+								},
+								"ifFalseActivities": [
+									{
+										"name": "Export Table Copy",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "MySqlSource",
+												"query": {
+													"value": "@concat(\n    'SELECT * FROM ', \n    item().table_name,\n    ' WHERE \n    create_date <=  \n    (SELECT MAX(create_date) AS create_date  \n     FROM logs \n     WHERE table_name = ''', item().table_name, ''' )\n    AND create_date >= STR_TO_DATE(''', item().last_date, ''', ''%Y-%m-%dT%H:%i:%s'')\n    LIMIT 10;'\n)",
+													"type": "Expression"
+												}
+											},
+											"sink": {
+												"type": "ParquetSink",
+												"storeSettings": {
+													"type": "AzureBlobFSWriteSettings",
+													"copyBehavior": "FlattenHierarchy"
+												},
+												"formatSettings": {
+													"type": "ParquetWriteSettings"
+												}
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "MySql_Erp_Dynamic_Load",
+												"type": "DatasetReference"
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "Bronze_Parquet",
+												"type": "DatasetReference",
+												"parameters": {
+													"filename": {
+														"value": "@if( equals(item().table_name, 'logs') , \n     concat(item().table_name,'.parquet'),\n     concat(item().table_name,'_',formatDateTime(item().last_date,'yyyy-MM-dd'),'.parquet'))",
+														"type": "Expression"
+													},
+													"foldername": "@item().table_name"
+												}
+											}
+										]
+									}
+								],
+								"ifTrueActivities": [
+									{
+										"name": "Export Table Logs",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "MySqlSource",
+												"query": {
+													"value": "@concat(\n 'Select * from ',\n item().table_name)\n",
+													"type": "Expression"
+												}
+											},
+											"sink": {
+												"type": "ParquetSink",
+												"storeSettings": {
+													"type": "AzureBlobFSWriteSettings"
+												},
+												"formatSettings": {
+													"type": "ParquetWriteSettings"
+												}
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "MySql_Erp_Dynamic_Load",
+												"type": "DatasetReference"
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "Bronze_Parquet",
+												"type": "DatasetReference",
+												"parameters": {
+													"filename": {
+														"value": "@if( equals(item().table_name, 'logs') , \n     concat(item().table_name,'.parquet'),\n     concat(item().table_name,'_',formatDateTime(item().create_date,'yyyy-MM-ddTHH:mm:s'),'.parquet'))",
+														"type": "Expression"
+													},
+													"foldername": "@item().table_name"
+												}
+											}
+										]
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Setup Max Id",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "For Each Table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "call serwer296707_pharma.SetMaxIdForAllTables;\n\nSELECT table_name, create_date, update_date, \n\nlast_date FROM logs;"
+					},
+					"dataset": {
+						"referenceName": "MySql_Erp_List_Tables",
+						"type": "DatasetReference"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "Brozne"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-03-27T05:52:42Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

@@ -1,0 +1,21 @@
+{
+	"name": "MySql_Erp_List_Tables",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "MySqlErp",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"User": "serwer296707_pharma",
+				"Database": "serwer296707_pharma",
+				"Server": "sql133.lh.pl"
+			}
+		},
+		"folder": {
+			"name": "Sources_Bronze"
+		},
+		"annotations": [],
+		"type": "MySqlTable",
+		"schema": []
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

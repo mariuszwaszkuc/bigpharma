@@ -1,0 +1,173 @@
+{
+	"name": "D_CUSTOMERS_LOAD",
+	"properties": {
+		"folder": {
+			"name": "Load_Silver"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkpool32",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "32c89101-2b15-4436-b218-5e5f8fb12886"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"synapse_widget": {
+				"version": "0.1"
+			},
+			"enableDebugMode": false,
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+				"name": "sparkpool32",
+				"type": "Spark",
+				"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"# Zmiana nazw kolumn w join_bronze_df, aby uniknąć duplikacji nazw\r\n",
+					"from pyspark.sql.functions import col, max, coalesce, trunc\r\n",
+					"from pyspark.sql.window import Window\r\n",
+					"from pyspark.sql import functions as F\r\n",
+					"\r\n",
+					"\r\n",
+					"# Parametry S3 (MinIO)\r\n",
+					"bronze_bucket_name = \"abfss://bronze@bigpharma.dfs.core.windows.net/\"\r\n",
+					"bronze_prefix = \"Erp/\"\r\n",
+					"file_name = \"customers\"\r\n",
+					"\r\n",
+					"# Bucket dla warstwy Silver\r\n",
+					"silver_bucket_name = \"abfss://silver@bigpharma.dfs.core.windows.net/\"\r\n",
+					"silver_prefix = \"d_customers\"\r\n",
+					"\r\n",
+					"# Ścieżka dla warstwy Silver\r\n",
+					"silver_path =  f\"{silver_bucket_name}{silver_prefix}\"\r\n",
+					"\r\n",
+					"# Ścieżki do plików Parquet w MinIO\r\n",
+					"path =  f\"{bronze_bucket_name}{bronze_prefix}{file_name}/*.parquet\"\r\n",
+					"print(path )\r\n",
+					"\r\n",
+					"bronze_df = spark.read.load(path, format='parquet')\r\n",
+					"join_path = f\"{bronze_bucket_name}{bronze_prefix}countries/*.parquet\"\r\n",
+					"\r\n",
+					"join_bronze_df = spark.read.load(join_path, format='parquet')\r\n",
+					"\r\n",
+					"\r\n",
+					""
+				],
+				"execution_count": 29
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"\r\n",
+					"join_bronze_df = join_bronze_df.select(\r\n",
+					"    [col(c).alias(f\"{c}_right\") if c != \"country_id\" else col(c) for c in join_bronze_df.columns]\r\n",
+					")\r\n",
+					"\r\n",
+					"# Wykonanie JOIN po kolumnie \"country_id\"\r\n",
+					"joined_df = bronze_df.join(join_bronze_df, on=\"country_id\", how=\"inner\")  # Możesz zmienić \"inner\" na \"left\", \"right\" itp.\r\n",
+					"\r\n",
+					"# Wyświetlenie wyników\r\n",
+					"print(joined_df.columns)\r\n",
+					"\r\n",
+					"latest_bronze_df = joined_df.withColumn(\"max_order_date\", F.max(\"update_date\").over(Window.partitionBy(\"customer_id\"))).filter(F.col(\"update_date\") == F.col(\"max_order_date\"))\r\n",
+					"\r\n",
+					"# Wybór odpowiednich kolumn do zapisania w warstwie Silver\r\n",
+					"new_bronze_df = latest_bronze_df.select(\r\n",
+					"    \"customer_id\", \r\n",
+					"    \"company_name\", \r\n",
+					"    \"address\", \r\n",
+					"    \"country_id\", \r\n",
+					"    \"city\",\r\n",
+					"    \"region_description_right\",\r\n",
+					"    \"country_right\",\r\n",
+					"    \"cluster_right\"\r\n",
+					")\r\n",
+					"new_column_names = [col_name.replace(\"_right\", \"\") for col_name in latest_bronze_df.columns]\r\n",
+					"\r\n",
+					"# Przypisz nowe nazwy kolumn do DataFrame\r\n",
+					"new_bronze_df = latest_bronze_df.toDF(*new_column_names)\r\n",
+					"# Wybierz poprawione kolumny\r\n",
+					"new_bronze_df = new_bronze_df.select(\r\n",
+					"    \"customer_id\",\r\n",
+					"    \"country_id\", \r\n",
+					"    \"company_name\", \r\n",
+					"    \"address\", \r\n",
+					"    \"city\",\r\n",
+					"    \"region_description\",  # Poprawiona nazwa\r\n",
+					"    \"country\",  # Poprawiona nazwa\r\n",
+					"    \"cluster\"\r\n",
+					")\r\n",
+					"new_bronze_df.show()\r\n",
+					"# Sprawdzenie, czy tabela Silver już istnieje\r\n",
+					"try:\r\n",
+					"    silver_df = spark.read.parquet(silver_path)\r\n",
+					"    silver_exists = True\r\n",
+					"except:\r\n",
+					"    silver_exists = False\r\n",
+					"\r\n",
+					"\r\n",
+					"if silver_exists:\r\n",
+					"    silver_df = spark.read.parquet(silver_path)\r\n",
+					"    \r\n",
+					"    merged_df = silver_df.alias(\"silver\").join(\r\n",
+					"        new_bronze_df.alias(\"new_bronze_df\"),\r\n",
+					"        (F.col(\"silver.customer_id\") == F.col(\"new_bronze_df.customer_id\")),\r\n",
+					"        how=\"outer\"\r\n",
+					"        )\r\n",
+					"\r\n",
+					"        # Wybór kolumn, które mają zostać zaktualizowane lub dodane\r\n",
+					"    final_df = merged_df.select(\r\n",
+					"        F.coalesce(\"new_bronze_df.customer_id\", \"silver.customer_id\").alias(\"customer_id\"),\r\n",
+					"        F.coalesce(\"new_bronze_df.country_id\", \"silver.country_id\").alias(\"country_id\"),\r\n",
+					"        F.coalesce(\"new_bronze_df.company_name\", \"silver.company_name\").alias(\"company_name\"),\r\n",
+					"        F.coalesce(\"new_bronze_df.address\", \"silver.address\").alias(\"address\"),\r\n",
+					"        F.coalesce(\"new_bronze_df.city\", \"silver.city\").alias(\"city\"),\r\n",
+					"        F.coalesce(\"new_bronze_df.region_description\", \"silver.region_description\").alias(\"region_description\"),\r\n",
+					"        F.coalesce(\"new_bronze_df.country\", \"silver.country\").alias(\"country\"),\r\n",
+					"        F.coalesce(\"new_bronze_df.cluster\", \"silver.cluster\").alias(\"cluster\")\r\n",
+					"    )\r\n",
+					"    final_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
+					"else:\r\n",
+					"\r\n",
+					"    new_bronze_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
+					"    print(\"Inkrementalne ładowanie zakończone!\")   \r\n",
+					"\r\n",
+					"spark.stop()"
+				],
+				"execution_count": 30
+			}
+		]
+	}
+}

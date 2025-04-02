@@ -1,0 +1,43 @@
+{
+	"name": "MySqlErp",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"parameters": {
+			"User": {
+				"type": "String",
+				"defaultValue": "serwer296707_pharma"
+			},
+			"Database": {
+				"type": "String",
+				"defaultValue": "serwer296707_pharma"
+			},
+			"Server": {
+				"type": "String",
+				"defaultValue": "sql133.lh.pl"
+			}
+		},
+		"annotations": [],
+		"type": "MySql",
+		"typeProperties": {
+			"server": "@{linkedService().Server}",
+			"port": 3306,
+			"database": "@{linkedService().Database}",
+			"username": "@{linkedService().User}",
+			"sslMode": 1,
+			"useSystemTrustStore": 0,
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "MySqlPassword",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "mysqlpassword"
+			},
+			"driverVersion": "v2"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

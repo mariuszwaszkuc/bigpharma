@@ -1,0 +1,205 @@
+{
+	"name": "eurostat_load",
+	"properties": {
+		"activities": [
+			{
+				"name": "Inflation_load",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET",
+							"requestTimeout": ""
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "freq,unit,s_adj,indic,geo\\TIME_PERIOD",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "freq,unit,s_adj,indic,geo\\TIME_PERIOD",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "2024-05 ",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "2024-05 ",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "2024-06 ",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "2024-06 ",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "2024-07 ",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "2024-07 ",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "2024-08 ",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "2024-08 ",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "2024-09 ",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "2024-09 ",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "2024-10 ",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "2024-10 ",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "2024-11 ",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "2024-11 ",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "2024-12 ",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "2024-12 ",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "2025-01 ",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "2025-01 ",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "2025-02 ",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "2025-02 ",
+									"type": "String",
+									"physicalType": "String"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Web_Eurostat_Inflation",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "External_Inflation_Csv",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "Brozne"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-03-26T08:44:54Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

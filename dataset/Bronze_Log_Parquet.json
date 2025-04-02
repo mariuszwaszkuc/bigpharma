@@ -1,0 +1,38 @@
+{
+	"name": "Bronze_Log_Parquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "mrgbigpharma-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Sources_Bronze"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "logs.parquet",
+				"folderPath": "Erp/logs",
+				"fileSystem": "bronze"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "table_name",
+				"type": "UTF8"
+			},
+			{
+				"name": "create_date",
+				"type": "INT96"
+			},
+			{
+				"name": "update_date",
+				"type": "INT96"
+			}
+		]
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

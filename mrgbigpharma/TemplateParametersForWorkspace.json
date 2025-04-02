@@ -1,0 +1,30 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "mrgbigpharma"
+		},
+		"mrgbigpharma-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:mrgbigpharma.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"MySqlErp_properties_typeProperties_server": {
+			"value": "@{linkedService().Server}"
+		},
+		"MySqlErp_properties_typeProperties_database": {
+			"value": "@{linkedService().Database}"
+		},
+		"MySqlErp_properties_typeProperties_username": {
+			"value": "@{linkedService().User}"
+		},
+		"MySqlPassword_properties_typeProperties_baseUrl": {
+			"value": "https://keylakehouse.vault.azure.net/"
+		},
+		"eceuropaeu_inflation_properties_typeProperties_url": {
+			"value": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ei_cphi_m$defaultview/?format=TSV&compressed=false"
+		},
+		"mrgbigpharma-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://bigpharma.dfs.core.windows.net"
+		}
+	}
+}

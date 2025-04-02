@@ -1,0 +1,3028 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"type": "string",
+			"metadata": "Workspace name",
+			"defaultValue": "mrgbigpharma"
+		},
+		"mrgbigpharma-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'mrgbigpharma-WorkspaceDefaultSqlServer'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:mrgbigpharma.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"MySqlErp_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "@{linkedService().Server}"
+		},
+		"MySqlErp_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().Database}"
+		},
+		"MySqlErp_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "@{linkedService().User}"
+		},
+		"MySqlPassword_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://keylakehouse.vault.azure.net/"
+		},
+		"eceuropaeu_inflation_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ei_cphi_m$defaultview/?format=TSV&compressed=false"
+		},
+		"mrgbigpharma-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://bigpharma.dfs.core.windows.net"
+		}
+	},
+	"variables": {
+		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/Load_Silver')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "D_Customer_Load",
+						"type": "SynapseNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 2,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "D_CUSTOMERS_LOAD",
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "sparkpool32",
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": false
+							},
+							"driverSize": "Small",
+							"authentication": {
+								"type": "MSI"
+							}
+						}
+					},
+					{
+						"name": "D_Products",
+						"type": "SynapseNotebook",
+						"dependsOn": [
+							{
+								"activity": "D_Customer_Load",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "F_PRODUCT_LOAD",
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "sparkpool32",
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": false,
+								"spark.dynamicAllocation.minExecutors": 2,
+								"spark.dynamicAllocation.maxExecutors": 2
+							},
+							"driverSize": "Small",
+							"numExecutors": 2,
+							"authentication": {
+								"type": "UserAssignedManagedIdentity"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Brozne"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-04-02T06:40:26Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/notebooks/D_CUSTOMERS_LOAD')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/sparkpool32')]",
+				"[concat(variables('workspaceId'), '/notebooks/F_PRODUCT_LOAD')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/eurostat_load')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Inflation_load",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET",
+									"requestTimeout": ""
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "freq,unit,s_adj,indic,geo\\TIME_PERIOD",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "freq,unit,s_adj,indic,geo\\TIME_PERIOD",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "2024-05 ",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "2024-05 ",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "2024-06 ",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "2024-06 ",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "2024-07 ",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "2024-07 ",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "2024-08 ",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "2024-08 ",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "2024-09 ",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "2024-09 ",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "2024-10 ",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "2024-10 ",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "2024-11 ",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "2024-11 ",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "2024-12 ",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "2024-12 ",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "2025-01 ",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "2025-01 ",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "2025-02 ",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "2025-02 ",
+											"type": "String",
+											"physicalType": "String"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Web_Eurostat_Inflation",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "External_Inflation_Csv",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Brozne"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-03-26T08:44:54Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/Web_Eurostat_Inflation')]",
+				"[concat(variables('workspaceId'), '/datasets/External_Inflation_Csv')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/mysql_erp_load')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "New Watermark List of Tabels",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": "call GetMaxIdForAllTables();\n\nSELECT table_name, create_date, update_date, \n\nlast_date FROM logs;"
+							},
+							"dataset": {
+								"referenceName": "MySql_Erp_List_Tables",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "For Each Table",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "New Watermark List of Tabels",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('New Watermark List of Tabels').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "If Condition1",
+									"type": "IfCondition",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@equals(item().table_name, 'logs') ",
+											"type": "Expression"
+										},
+										"ifFalseActivities": [
+											{
+												"name": "Export Table Copy",
+												"type": "Copy",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "MySqlSource",
+														"query": {
+															"value": "@concat(\n    'SELECT * FROM ', \n    item().table_name,\n    ' WHERE \n    create_date <=  \n    (SELECT MAX(create_date) AS create_date  \n     FROM logs \n     WHERE table_name = ''', item().table_name, ''' )\n    AND create_date >= STR_TO_DATE(''', item().last_date, ''', ''%Y-%m-%dT%H:%i:%s'')\n    LIMIT 10;'\n)",
+															"type": "Expression"
+														}
+													},
+													"sink": {
+														"type": "ParquetSink",
+														"storeSettings": {
+															"type": "AzureBlobFSWriteSettings",
+															"copyBehavior": "FlattenHierarchy"
+														},
+														"formatSettings": {
+															"type": "ParquetWriteSettings"
+														}
+													},
+													"enableStaging": false,
+													"translator": {
+														"type": "TabularTranslator",
+														"typeConversion": true,
+														"typeConversionSettings": {
+															"allowDataTruncation": true,
+															"treatBooleanAsNumber": false
+														}
+													}
+												},
+												"inputs": [
+													{
+														"referenceName": "MySql_Erp_Dynamic_Load",
+														"type": "DatasetReference",
+														"parameters": {}
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "Bronze_Parquet",
+														"type": "DatasetReference",
+														"parameters": {
+															"filename": {
+																"value": "@if( equals(item().table_name, 'logs') , \n     concat(item().table_name,'.parquet'),\n     concat(item().table_name,'_',formatDateTime(item().last_date,'yyyy-MM-dd'),'.parquet'))",
+																"type": "Expression"
+															},
+															"foldername": "@item().table_name"
+														}
+													}
+												]
+											}
+										],
+										"ifTrueActivities": [
+											{
+												"name": "Export Table Logs",
+												"type": "Copy",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "MySqlSource",
+														"query": {
+															"value": "@concat(\n 'Select * from ',\n item().table_name)\n",
+															"type": "Expression"
+														}
+													},
+													"sink": {
+														"type": "ParquetSink",
+														"storeSettings": {
+															"type": "AzureBlobFSWriteSettings"
+														},
+														"formatSettings": {
+															"type": "ParquetWriteSettings"
+														}
+													},
+													"enableStaging": false,
+													"translator": {
+														"type": "TabularTranslator",
+														"typeConversion": true,
+														"typeConversionSettings": {
+															"allowDataTruncation": true,
+															"treatBooleanAsNumber": false
+														}
+													}
+												},
+												"inputs": [
+													{
+														"referenceName": "MySql_Erp_Dynamic_Load",
+														"type": "DatasetReference",
+														"parameters": {}
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "Bronze_Parquet",
+														"type": "DatasetReference",
+														"parameters": {
+															"filename": {
+																"value": "@if( equals(item().table_name, 'logs') , \n     concat(item().table_name,'.parquet'),\n     concat(item().table_name,'_',formatDateTime(item().create_date,'yyyy-MM-ddTHH:mm:s'),'.parquet'))",
+																"type": "Expression"
+															},
+															"foldername": "@item().table_name"
+														}
+													}
+												]
+											}
+										]
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Setup Max Id",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "For Each Table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": "call serwer296707_pharma.SetMaxIdForAllTables;\n\nSELECT table_name, create_date, update_date, \n\nlast_date FROM logs;"
+							},
+							"dataset": {
+								"referenceName": "MySql_Erp_List_Tables",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Brozne"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-03-27T05:52:42Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/MySql_Erp_List_Tables')]",
+				"[concat(variables('workspaceId'), '/datasets/MySql_Erp_Dynamic_Load')]",
+				"[concat(variables('workspaceId'), '/datasets/Bronze_Parquet')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Bronze_Csv')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "mrgbigpharma-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"filename": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Targets_Bronze"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().filename",
+							"type": "Expression"
+						},
+						"folderPath": "Erp",
+						"fileSystem": "bronze"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/mrgbigpharma-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Bronze_Log_Parquet')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "mrgbigpharma-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Sources_Bronze"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "logs.parquet",
+						"folderPath": "Erp/logs",
+						"fileSystem": "bronze"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "table_name",
+						"type": "UTF8"
+					},
+					{
+						"name": "create_date",
+						"type": "INT96"
+					},
+					{
+						"name": "update_date",
+						"type": "INT96"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/mrgbigpharma-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Bronze_Parquet')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "mrgbigpharma-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"filename": {
+						"type": "string"
+					},
+					"foldername": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Targets_Bronze"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().filename",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@concat('Erp/',dataset().foldername)",
+							"type": "Expression"
+						},
+						"fileSystem": "bronze"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/mrgbigpharma-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ERP_DATA_LOCATION')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "mrgbigpharma-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"TblName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().TblName",
+							"type": "Expression"
+						},
+						"folderPath": "Erp",
+						"fileSystem": "bronze"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/mrgbigpharma-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/External_Inflation_Csv')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "mrgbigpharma-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Targets_Bronze"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "inflation.csv",
+						"folderPath": "ExternalStatistics",
+						"fileSystem": "bronze"
+					},
+					"columnDelimiter": ";",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/mrgbigpharma-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/MySql_Erp_Dynamic_Load')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MySqlErp",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"User": "serwer296707_pharma",
+						"Database": "serwer296707_pharma",
+						"Server": "sql133.lh.pl"
+					}
+				},
+				"folder": {
+					"name": "Sources_Bronze"
+				},
+				"annotations": [],
+				"type": "MySqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MySqlErp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/MySql_Erp_List_Tables')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MySqlErp",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"User": "serwer296707_pharma",
+						"Database": "serwer296707_pharma",
+						"Server": "sql133.lh.pl"
+					}
+				},
+				"folder": {
+					"name": "Sources_Bronze"
+				},
+				"annotations": [],
+				"type": "MySqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MySqlErp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Web_Eurostat_Inflation')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "eceuropaeu_inflation",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Sources_Bronze"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation"
+					},
+					"columnDelimiter": "\t",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "freq,unit,s_adj,indic,geo\\TIME_PERIOD",
+						"type": "String"
+					},
+					{
+						"name": "2024-05 ",
+						"type": "String"
+					},
+					{
+						"name": "2024-06 ",
+						"type": "String"
+					},
+					{
+						"name": "2024-07 ",
+						"type": "String"
+					},
+					{
+						"name": "2024-08 ",
+						"type": "String"
+					},
+					{
+						"name": "2024-09 ",
+						"type": "String"
+					},
+					{
+						"name": "2024-10 ",
+						"type": "String"
+					},
+					{
+						"name": "2024-11 ",
+						"type": "String"
+					},
+					{
+						"name": "2024-12 ",
+						"type": "String"
+					},
+					{
+						"name": "2025-01 ",
+						"type": "String"
+					},
+					{
+						"name": "2025-02 ",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/eceuropaeu_inflation')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/MySqlErp')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"User": {
+						"type": "String",
+						"defaultValue": "serwer296707_pharma"
+					},
+					"Database": {
+						"type": "String",
+						"defaultValue": "serwer296707_pharma"
+					},
+					"Server": {
+						"type": "String",
+						"defaultValue": "sql133.lh.pl"
+					}
+				},
+				"annotations": [],
+				"type": "MySql",
+				"typeProperties": {
+					"server": "[parameters('MySqlErp_properties_typeProperties_server')]",
+					"port": 3306,
+					"database": "[parameters('MySqlErp_properties_typeProperties_database')]",
+					"username": "[parameters('MySqlErp_properties_typeProperties_username')]",
+					"sslMode": 1,
+					"useSystemTrustStore": 0,
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "MySqlPassword",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "mysqlpassword"
+					},
+					"driverVersion": "v2"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
+				"[concat(variables('workspaceId'), '/linkedServices/MySqlPassword')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/MySqlPassword')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('MySqlPassword_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/eceuropaeu_inflation')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('eceuropaeu_inflation_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/mrgbigpharma-WorkspaceDefaultSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('mrgbigpharma-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/mrgbigpharma-WorkspaceDefaultStorage')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('mrgbigpharma-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 0
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
+			"type": "Microsoft.Synapse/workspaces/credentials",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "CREATE EXTERNAL TABLE [dbo].[ExternalTable]\n(\n\t [Id] INT\n)\nWITH\n(\n\tLOCATION = '/folder/file',\n\tDATA_SOURCE = [DataSource1],\n\tFILE_FORMAT = [FileFormat1]\n)\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "Sql_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 10')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/logs/logs.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 11')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/logs/logs.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 12')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/customers/customers_2025-03-26T19:57:10.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 13')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/countries/countries_2025-03-26T21:34:23.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 14')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/countries/countries_2025-03-25T06:40:32.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 15')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/customers/customers_2025-03-26T21:34:23.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 16')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/countries/countries_2025-03-26T21:58:32.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 2')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/test.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 3')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/customers/customers_2025-03-26T14:34:29.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 4')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/countries/countries_2025-03-26T14:50:5.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 5')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/customers/customers_2025-03-25T06:41:12.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 6')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/logs/logs.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 7')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/customers/customers_2025-03-25T06:41:12.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 8')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/customers/customers_2025-03-26T19:57:10.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 9')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/customers/customers_2025-03-26T19:57:10.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/TEST_EXT')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseDelimitedTextFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseDelimitedTextFormat] \n\tWITH ( FORMAT_TYPE = DELIMITEDTEXT ,\n\t       FORMAT_OPTIONS (\n\t\t\t FIELD_TERMINATOR = ',',\n\t\t\t USE_TYPE_DEFAULT = FALSE,\n\t\t\t FIRST_ROW = 2 \n\t\t\t))\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'bronze_bigpharma_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [bronze_bigpharma_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://bronze@bigpharma.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE test2 (\n\ttest1 nvarchar(4000),\n\ttest2 nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'Test/test.csv',\n\tDATA_SOURCE = [bronze_bigpharma_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseDelimitedTextFormat]\n\t)\nGO\n\nCREATE EXTERNAL FILE FORMAT ParquetFileFormat\n    WITH (FORMAT_TYPE = PARQUET);\nGO\n\nCREATE EXTERNAL TABLE test_as_select WITH (\n\tLOCATION = '/Test/test',\n\tDATA_SOURCE = [bronze_bigpharma_dfs_core_windows_net],\n\tFILE_FORMAT = ParquetFileFormat\n\t) \nas\nSELECT TOP 100 * FROM test2\n\n\ndrop EXTERNAL DATA SOURCE [bronze_bigpharma_dfs_core_windows_net] \n\n\ninsert into test_as_select select *From test2\n\n\ndrop  EXTERNAL FILE FORMAT ParquetFileFormat\n\n\n\n\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "Sql_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/D_CUSTOMERS_LOAD')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "sparkpool32",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"runAsWorkspaceSystemIdentity": false,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "32c89101-2b15-4436-b218-5e5f8fb12886"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"synapse_widget": {
+						"version": "0.1"
+					},
+					"enableDebugMode": false,
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+						"name": "sparkpool32",
+						"type": "Spark",
+						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net",
+							"authHeader": null
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28,
+						"extraHeader": null
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"# Zmiana nazw kolumn w join_bronze_df, aby uniknąć duplikacji nazw\r\n",
+							"from pyspark.sql.functions import col, max, coalesce, trunc\r\n",
+							"from pyspark.sql.window import Window\r\n",
+							"from pyspark.sql import functions as F\r\n",
+							"\r\n",
+							"\r\n",
+							"# Parametry S3 (MinIO)\r\n",
+							"bronze_bucket_name = \"abfss://bronze@bigpharma.dfs.core.windows.net/\"\r\n",
+							"bronze_prefix = \"Erp/\"\r\n",
+							"file_name = \"customers\"\r\n",
+							"\r\n",
+							"# Bucket dla warstwy Silver\r\n",
+							"silver_bucket_name = \"abfss://silver@bigpharma.dfs.core.windows.net/\"\r\n",
+							"silver_prefix = \"d_customers\"\r\n",
+							"\r\n",
+							"# Ścieżka dla warstwy Silver\r\n",
+							"silver_path =  f\"{silver_bucket_name}{silver_prefix}\"\r\n",
+							"\r\n",
+							"# Ścieżki do plików Parquet w MinIO\r\n",
+							"path =  f\"{bronze_bucket_name}{bronze_prefix}{file_name}/*.parquet\"\r\n",
+							"print(path )\r\n",
+							"\r\n",
+							"bronze_df = spark.read.load(path, format='parquet')\r\n",
+							"join_path = f\"{bronze_bucket_name}{bronze_prefix}countries/*.parquet\"\r\n",
+							"\r\n",
+							"join_bronze_df = spark.read.load(join_path, format='parquet')\r\n",
+							"\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 29
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"\r\n",
+							"join_bronze_df = join_bronze_df.select(\r\n",
+							"    [col(c).alias(f\"{c}_right\") if c != \"country_id\" else col(c) for c in join_bronze_df.columns]\r\n",
+							")\r\n",
+							"\r\n",
+							"# Wykonanie JOIN po kolumnie \"country_id\"\r\n",
+							"joined_df = bronze_df.join(join_bronze_df, on=\"country_id\", how=\"inner\")  # Możesz zmienić \"inner\" na \"left\", \"right\" itp.\r\n",
+							"\r\n",
+							"# Wyświetlenie wyników\r\n",
+							"print(joined_df.columns)\r\n",
+							"\r\n",
+							"latest_bronze_df = joined_df.withColumn(\"max_order_date\", F.max(\"update_date\").over(Window.partitionBy(\"customer_id\"))).filter(F.col(\"update_date\") == F.col(\"max_order_date\"))\r\n",
+							"\r\n",
+							"# Wybór odpowiednich kolumn do zapisania w warstwie Silver\r\n",
+							"new_bronze_df = latest_bronze_df.select(\r\n",
+							"    \"customer_id\", \r\n",
+							"    \"company_name\", \r\n",
+							"    \"address\", \r\n",
+							"    \"country_id\", \r\n",
+							"    \"city\",\r\n",
+							"    \"region_description_right\",\r\n",
+							"    \"country_right\",\r\n",
+							"    \"cluster_right\"\r\n",
+							")\r\n",
+							"new_column_names = [col_name.replace(\"_right\", \"\") for col_name in latest_bronze_df.columns]\r\n",
+							"\r\n",
+							"# Przypisz nowe nazwy kolumn do DataFrame\r\n",
+							"new_bronze_df = latest_bronze_df.toDF(*new_column_names)\r\n",
+							"# Wybierz poprawione kolumny\r\n",
+							"new_bronze_df = new_bronze_df.select(\r\n",
+							"    \"customer_id\",\r\n",
+							"    \"country_id\", \r\n",
+							"    \"company_name\", \r\n",
+							"    \"address\", \r\n",
+							"    \"city\",\r\n",
+							"    \"region_description\",  # Poprawiona nazwa\r\n",
+							"    \"country\",  # Poprawiona nazwa\r\n",
+							"    \"cluster\"\r\n",
+							")\r\n",
+							"new_bronze_df.show()\r\n",
+							"# Sprawdzenie, czy tabela Silver już istnieje\r\n",
+							"try:\r\n",
+							"    silver_df = spark.read.parquet(silver_path)\r\n",
+							"    silver_exists = True\r\n",
+							"except:\r\n",
+							"    silver_exists = False\r\n",
+							"\r\n",
+							"\r\n",
+							"if silver_exists:\r\n",
+							"    silver_df = spark.read.parquet(silver_path)\r\n",
+							"    \r\n",
+							"    merged_df = silver_df.alias(\"silver\").join(\r\n",
+							"        new_bronze_df.alias(\"new_bronze_df\"),\r\n",
+							"        (F.col(\"silver.customer_id\") == F.col(\"new_bronze_df.customer_id\")),\r\n",
+							"        how=\"outer\"\r\n",
+							"        )\r\n",
+							"\r\n",
+							"        # Wybór kolumn, które mają zostać zaktualizowane lub dodane\r\n",
+							"    final_df = merged_df.select(\r\n",
+							"        F.coalesce(\"new_bronze_df.customer_id\", \"silver.customer_id\").alias(\"customer_id\"),\r\n",
+							"        F.coalesce(\"new_bronze_df.country_id\", \"silver.country_id\").alias(\"country_id\"),\r\n",
+							"        F.coalesce(\"new_bronze_df.company_name\", \"silver.company_name\").alias(\"company_name\"),\r\n",
+							"        F.coalesce(\"new_bronze_df.address\", \"silver.address\").alias(\"address\"),\r\n",
+							"        F.coalesce(\"new_bronze_df.city\", \"silver.city\").alias(\"city\"),\r\n",
+							"        F.coalesce(\"new_bronze_df.region_description\", \"silver.region_description\").alias(\"region_description\"),\r\n",
+							"        F.coalesce(\"new_bronze_df.country\", \"silver.country\").alias(\"country\"),\r\n",
+							"        F.coalesce(\"new_bronze_df.cluster\", \"silver.cluster\").alias(\"cluster\")\r\n",
+							"    )\r\n",
+							"    final_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
+							"else:\r\n",
+							"\r\n",
+							"    new_bronze_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
+							"    print(\"Inkrementalne ładowanie zakończone!\")   \r\n",
+							"\r\n",
+							"spark.stop()"
+						],
+						"outputs": [],
+						"execution_count": 30
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/D_DIM')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "sparkpool32",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"runAsWorkspaceSystemIdentity": false,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "3cfad5b5-5280-41b7-a089-4fef55ec9f94"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"synapse_widget": {
+						"version": "0.1"
+					},
+					"enableDebugMode": false,
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+						"name": "sparkpool32",
+						"type": "Spark",
+						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net",
+							"authHeader": null
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28,
+						"extraHeader": null
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"from pyspark.sql import SparkSession\r\n",
+							"from pyspark.sql import SparkSession\r\n",
+							"from pyspark.sql.functions import col, max, coalesce, trunc, lit, add_months\r\n",
+							"from pyspark.sql.window import Window\r\n",
+							"from pyspark.sql import functions as F\r\n",
+							"from pyspark.sql.functions import to_date\r\n",
+							"\r\n",
+							"# Tworzenie sesji Spark\r\n",
+							"spark = SparkSession.builder.appName(\"AzureSynapseMigration\").getOrCreate()\r\n",
+							"\r\n",
+							"# Parametry dla warstwy Silver (ADLS Gen2)\r\n",
+							"bucket_name_silver = \"abfss://silver@bigpharma.dfs.core.windows.net/\"\r\n",
+							"\r\n",
+							"# Parametry dla warstwy Gold (ADLS Gen2)\r\n",
+							"bucket_name_gold = \"abfss://gold@bigpharma.dfs.core.windows.net/\"\r\n",
+							"\r\n",
+							"# Ścieżki do plików Parquet w ADLS Gen2 dla warstwy Silver\r\n",
+							"d_products_silver_path = f\"{bucket_name_silver}/d_products\"\r\n",
+							"d_regions_silver_path = f\"{bucket_name_silver}/d_customers\"\r\n",
+							"\r\n",
+							"# Załaduj dane z warstwy Silver\r\n",
+							"d_products = spark.read.parquet(d_products_silver_path)\r\n",
+							"d_regions = spark.read.parquet(d_regions_silver_path)\r\n",
+							"\r\n",
+							"# Ścieżki do plików Parquet w ADLS Gen2 dla warstwy Gold\r\n",
+							"d_products_gold_path = f\"{bucket_name_gold}/d_products\"\r\n",
+							"d_regions_gold_path = f\"{bucket_name_gold}/d_regions\"\r\n",
+							"\r\n",
+							"# Można również załadować dane do warstwy Gold, jeśli konieczne\r\n",
+							"d_products = spark.read.parquet(d_products_silver_path)\r\n",
+							"d_regions = spark.read.parquet(d_regions_silver_path)\r\n",
+							"\r\n",
+							"\r\n",
+							"d_products.write.mode(\"overwrite\").parquet(d_products_gold_path)\r\n",
+							"\r\n",
+							"selected_columns = d_regions[[\"country_id\", \"cluster\", \"region_description\", \"country\"]]\r\n",
+							"\r\n",
+							"# Usunięcie duplikatów\r\n",
+							"unique_d_regions = selected_columns.drop_duplicates()\r\n",
+							"unique_d_regions.write.mode(\"overwrite\").parquet(d_regions_gold_path)\r\n",
+							"\r\n",
+							"\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 3
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/D_POS_LOAD')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "sparkpool32",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"runAsWorkspaceSystemIdentity": false,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "c0dc7a32-d352-4467-9f83-b1998b99dbc5"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"synapse_widget": {
+						"version": "0.1"
+					},
+					"enableDebugMode": false,
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+						"name": "sparkpool32",
+						"type": "Spark",
+						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net",
+							"authHeader": null
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28,
+						"extraHeader": null
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"from pyspark.sql import SparkSession\r\n",
+							"from pyspark.sql.functions import col, max, coalesce, trunc\r\n",
+							"from pyspark.sql.window import Window\r\n",
+							"from pyspark.sql import functions as F\r\n",
+							"\r\n",
+							"\r\n",
+							"spark = SparkSession.builder.appName(\"AzureSynapseMigration\").getOrCreate()\r\n",
+							"\r\n",
+							"# Parametry dla warstwy Bronze (ADLS Gen2)\r\n",
+							"bronze_bucket_name = \"abfss://bronze@bigpharma.dfs.core.windows.net/\"\r\n",
+							"bronze_prefix = \"Erp/\"\r\n",
+							"file_name = \"inventory_pos_history_details\"\r\n",
+							"\r\n",
+							"# Parametry dla warstwy Silver (ADLS Gen2)\r\n",
+							"silver_bucket_name = \"abfss://silver@bigpharma.dfs.core.windows.net/\"\r\n",
+							"silver_prefix = \"f_pos_data/\"\r\n",
+							"\r\n",
+							"# Ścieżki do plików Parquet w ADLS Gen2\r\n",
+							"path = f\"{bronze_bucket_name}{bronze_prefix}{file_name}\"\r\n",
+							"\r\n",
+							"# Ścieżka do warstwy Silver\r\n",
+							"silver_path = f\"{silver_bucket_name}{silver_prefix}\"\r\n",
+							"\r\n",
+							"# Załaduj dane z ADLS (tabela inventory_pos_history_details)\r\n",
+							"bronze_df = spark.read.parquet(path)\r\n",
+							"\r\n",
+							"# Wyświetlenie pierwszych wierszy dla weryfikacji\r\n",
+							"bronze_df.show(5)\r\n",
+							"\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"\r\n",
+							"bronze_df = spark.read.parquet(path)\r\n",
+							"\r\n",
+							"latest_bronze_df = bronze_df.withColumn(\"max_order_date\", F.max(\"update_date\").over(Window.partitionBy(\"product_id\", \"country_id\",\"update_date\"))).filter(F.col(\"update_date\") == F.col(\"max_order_date\"))\r\n",
+							"\r\n",
+							"new_bronze_df = latest_bronze_df.select(\r\n",
+							"    \"product_id\",\r\n",
+							"    \"country_id\", \r\n",
+							"    \"transaction_date\", \r\n",
+							"    \"unit_price\", \r\n",
+							"    \"pos_sell_out_quantity\",\r\n",
+							"    \"pos_open_quantity\",  # Poprawiona nazwa\r\n",
+							"    \"pos_end_quantity\"\r\n",
+							")\r\n",
+							"\r\n",
+							"new_bronze_df = new_bronze_df.withColumn(\r\n",
+							"    \"transaction_date\", trunc(\"transaction_date\",\"month\"))\r\n",
+							"\r\n",
+							"aggregated_bronze_df = new_bronze_df.groupBy(\"product_id\", \"country_id\", \"transaction_date\").agg(\r\n",
+							"                                    # Summing quantity, discount, and amount\r\n",
+							"                                     F.sum(\"pos_sell_out_quantity\").alias(\"pos_sell_out_quantity\"),\r\n",
+							"                                     F.sum(\"pos_open_quantity\").alias(\"pos_open_quantity\"),\r\n",
+							"                                     F.sum(\"pos_end_quantity\").alias(\"pos_end_quantity\"),\r\n",
+							"                                     F.round(F.sum(F.col(\"pos_sell_out_quantity\") * F.col(\"unit_price\")),2).alias(\"pos_sell_out_amount\"),\r\n",
+							"                                     F.round(F.sum(F.col(\"pos_open_quantity\") * F.col(\"unit_price\")),2).alias(\"pos_open_amount\"),\r\n",
+							"                                     F.round(F.sum(F.col(\"pos_end_quantity\") * F.col(\"unit_price\")),2).alias(\"pos_end_amount\"),\r\n",
+							"                                     F.round((F.sum(F.col(\"pos_sell_out_quantity\") * F.col(\"unit_price\")) / F.sum(\"pos_sell_out_quantity\")),2).alias(\"unit_price\"))\r\n",
+							"\r\n",
+							"\r\n",
+							"\r\n",
+							"# Sprawdzenie, czy tabela Silver już istnieje\r\n",
+							"try:\r\n",
+							"    silver_df = spark.read.parquet(silver_path)\r\n",
+							"    silver_exists = True\r\n",
+							"except:\r\n",
+							"    silver_exists = False\r\n",
+							"\r\n",
+							"\r\n",
+							"# Jeśli tabela Silver istnieje, wykonaj operację \"MERGE\" na podstawie DataFrame\r\n",
+							"if silver_exists:\r\n",
+							"    # Załaduj dane z tabeli Silver\r\n",
+							"    silver_df = spark.read.parquet(silver_path)\r\n",
+							"    \r\n",
+							"    # Połącz dane Silver z nowymi danymi (na podstawie order_id, customer_id, product_id)\r\n",
+							"    merged_df = silver_df.alias(\"silver\").join(\r\n",
+							"        aggregated_bronze_df.alias(\"new_pod\"),\r\n",
+							"        (F.col(\"silver.product_id\") == F.col(\"new_pod.product_id\")) & \r\n",
+							"        (F.col(\"silver.country_id\") == F.col(\"new_pod.country_id\")) & \r\n",
+							"        (F.col(\"silver.transaction_date\") == F.col(\"new_pod.transaction_date\")),\r\n",
+							"        how=\"outer\"\r\n",
+							"    )\r\n",
+							"\r\n",
+							"    # Wybór kolumn, które mają zostać zaktualizowane lub dodane\r\n",
+							"    final_df = merged_df.select(\r\n",
+							"        F.coalesce(\"new_pod.product_id\", \"silver.product_id\").alias(\"product_id\"),\r\n",
+							"        F.coalesce(\"new_pod.country_id\", \"silver.country_id\").alias(\"country_id\"),\r\n",
+							"        F.coalesce(\"new_pod.transaction_date\", \"silver.transaction_date\").alias(\"transaction_date\"),\r\n",
+							"        F.coalesce(\"new_pod.pos_sell_out_quantity\", \"silver.pos_sell_out_quantity\").alias(\"pos_sell_out_quantity\"),\r\n",
+							"        F.coalesce(\"new_pod.pos_open_quantity\", \"silver.pos_open_quantity\").alias(\"pos_open_quantity\"),\r\n",
+							"        F.coalesce(\"new_pod.pos_end_quantity\", \"silver.pos_end_quantity\").alias(\"pos_end_quantity\"),\r\n",
+							"        F.coalesce(\"new_pod.pos_sell_out_amount\", \"silver.pos_sell_out_amount\").alias(\"pos_sell_out_amount\"),\r\n",
+							"        F.coalesce(\"new_pod.pos_open_amount\", \"silver.pos_open_amount\").alias(\"pos_open_amount\"),\r\n",
+							"        F.coalesce(\"new_pod.pos_end_amount\", \"silver.pos_end_amount\").alias(\"pos_end_amount\"),\r\n",
+							"        F.coalesce(\"new_pod.unit_price\", \"silver.unit_price\").alias(\"unit_price\")\r\n",
+							"        )\r\n",
+							"    # Display or save the resulting DataFrame\r\n",
+							"    # Zapisanie zaktualizowanego DataFrame do warstwy Silver\r\n",
+							"    final_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
+							"\r\n",
+							"else:\r\n",
+							"    aggregated_bronze_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
+							"\r\n",
+							"# Zakończenie\r\n",
+							"print(\"Inkrementalne ładowanie zakończone!\")\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 3
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/F_FORCAST_LOAD')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "sparkpool32",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"runAsWorkspaceSystemIdentity": false,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "273ba41d-428d-4a40-8afc-eca651af25af"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"synapse_widget": {
+						"version": "0.1"
+					},
+					"enableDebugMode": false,
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+						"name": "sparkpool32",
+						"type": "Spark",
+						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net",
+							"authHeader": null
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28,
+						"extraHeader": null
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"from pyspark.sql import SparkSession\r\n",
+							"from pyspark.sql.functions import col, max, coalesce, trunc\r\n",
+							"from pyspark.sql.window import Window\r\n",
+							"from pyspark.sql import functions as F\r\n",
+							"\r\n",
+							"\r\n",
+							"# Definicja ścieżek dla warstwy Bronze (ADLS Gen2)\r\n",
+							"bronze_bucket_name = \"abfss://bronze@bigpharma.dfs.core.windows.net/\"\r\n",
+							"bronze_prefix = \"Erp/\"\r\n",
+							"file_name = \"forecast_details\"\r\n",
+							"\r\n",
+							"# Definicja ścieżek dla warstwy Silver (ADLS Gen2)\r\n",
+							"silver_bucket_name = \"abfss://silver@bigpharma.dfs.core.windows.net/\"\r\n",
+							"silver_prefix = \"f_forecast/\"\r\n",
+							"\r\n",
+							"silver_path = f\"{silver_bucket_name}{silver_prefix}\"\r\n",
+							"\r\n",
+							"# Ścieżki do plików Parquet w ADLS Gen2\r\n",
+							"path = f\"{bronze_bucket_name}{bronze_prefix}{file_name}\"\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"\r\n",
+							"bronze_df = spark.read.parquet(path)\r\n",
+							"\r\n",
+							"new_bronze_df = bronze_df.withColumn(\r\n",
+							"    \"forecast_date\", trunc(\"forecast_date\",\"month\")).withColumn(\r\n",
+							"    \"forecast_snapshot\", trunc(\"forecast_snapshot\",\"month\"))\r\n",
+							"\r\n",
+							"latest_bronze_df = new_bronze_df.withColumn(\"max_order_date\", F.max(\"update_date\").over(Window.partitionBy(\"product_id\", \"country_id\",\"forecast_date\",\"forecast_snapshot\"))).filter(F.col(\"update_date\") == F.col(\"max_order_date\"))\r\n",
+							"\r\n",
+							"new_bronze_df = latest_bronze_df.select(\r\n",
+							"    \"product_id\",\r\n",
+							"    \"country_id\", \r\n",
+							"    \"forecast_date\", \r\n",
+							"    \"forecast_snapshot\",\r\n",
+							"    \"unit_price\",\r\n",
+							"    \"quantity\",\r\n",
+							"    \"whrs_sell_in_quantity\",\r\n",
+							"    \"whrs_open_quantity\",\r\n",
+							"    \"whrs_end_quantity\",\r\n",
+							"    \"pos_sell_out_quantity\",\r\n",
+							"    \"pos_open_quantity\",\r\n",
+							"    \"pos_end_quantity\"\r\n",
+							")\r\n",
+							"\r\n",
+							"\r\n",
+							"aggregated_bronze_df = new_bronze_df.groupBy(\"product_id\", \"country_id\", \"forecast_date\",\"forecast_snapshot\").agg(\r\n",
+							"                                    # Summing quantity, discount, and amount\r\n",
+							"                                     F.sum(\"quantity\").alias(\"quantity\"),\r\n",
+							"                                     F.sum(\"whrs_sell_in_quantity\").alias(\"whrs_sell_in_quantity\"),\r\n",
+							"                                     F.sum(\"whrs_open_quantity\").alias(\"whrs_open_quantity\"),\r\n",
+							"                                     F.sum(\"whrs_end_quantity\").alias(\"whrs_end_quantity\"),\r\n",
+							"                                     F.sum(\"pos_sell_out_quantity\").alias(\"pos_sell_out_quantity\"),\r\n",
+							"                                     F.sum(\"pos_open_quantity\").alias(\"pos_open_quantity\"),\r\n",
+							"                                     F.sum(\"pos_end_quantity\").alias(\"pos_end_quantity\"),         \r\n",
+							"                                     F.round(F.sum(F.col(\"quantity\") * F.col(\"unit_price\")),2).alias(\"amount\"),                                                    \r\n",
+							"                                     F.round(F.sum(F.col(\"whrs_sell_in_quantity\") * F.col(\"unit_price\")),2).alias(\"whrs_sell_in_amount\"),\r\n",
+							"                                     F.round(F.sum(F.col(\"whrs_open_quantity\") * F.col(\"unit_price\")),2).alias(\"whrs_open_amount\"),\r\n",
+							"                                     F.round(F.sum(F.col(\"whrs_end_quantity\") * F.col(\"unit_price\")),2).alias(\"whrs_end_amount\"),                                                                     \r\n",
+							"                                     F.round(F.sum(F.col(\"pos_sell_out_quantity\") * F.col(\"unit_price\")),2).alias(\"pos_sell_out_amount\"),\r\n",
+							"                                     F.round(F.sum(F.col(\"pos_open_quantity\") * F.col(\"unit_price\")),2).alias(\"pos_open_amount\"),\r\n",
+							"                                     F.round(F.sum(F.col(\"pos_end_quantity\") * F.col(\"unit_price\")),2).alias(\"pos_end_amount\"),\r\n",
+							"                                     F.round((F.sum(F.col(\"quantity\") * F.col(\"unit_price\")) / F.sum(\"quantity\")),2).alias(\"unit_price\"))\r\n",
+							"\r\n",
+							"\r\n",
+							"\r\n",
+							"# Sprawdzenie, czy tabela Silver już istnieje\r\n",
+							"try:\r\n",
+							"    silver_df = spark.read.parquet(silver_path)\r\n",
+							"    silver_exists = True\r\n",
+							"except:\r\n",
+							"    silver_exists = False\r\n",
+							"\r\n",
+							"\r\n",
+							"# Jeśli tabela Silver istnieje, wykonaj operację \"MERGE\" na podstawie DataFrame\r\n",
+							"if silver_exists:\r\n",
+							"    # Załaduj dane z tabeli Silver\r\n",
+							"    silver_df = spark.read.parquet(silver_path)\r\n",
+							"    \r\n",
+							"    # Połącz dane Silver z nowymi danymi (na podstawie order_id, customer_id, product_id)\r\n",
+							"    merged_df = silver_df.alias(\"silver\").join(\r\n",
+							"        aggregated_bronze_df.alias(\"new_pod\"),\r\n",
+							"        (F.col(\"silver.product_id\") == F.col(\"new_pod.product_id\")) & \r\n",
+							"        (F.col(\"silver.forecast_snapshot\") == F.col(\"new_pod.forecast_snapshot\")) & \r\n",
+							"        (F.col(\"silver.country_id\") == F.col(\"new_pod.country_id\")) & \r\n",
+							"        (F.col(\"silver.forecast_date\") == F.col(\"new_pod.forecast_date\")),\r\n",
+							"        how=\"outer\"\r\n",
+							"    )\r\n",
+							"\r\n",
+							"    # Wybór kolumn, które mają zostać zaktualizowane lub dodane\r\n",
+							"    final_df = merged_df.select(\r\n",
+							"        F.coalesce(\"new_pod.product_id\", \"silver.product_id\").alias(\"product_id\"),\r\n",
+							"        F.coalesce(\"new_pod.country_id\", \"silver.country_id\").alias(\"country_id\"),\r\n",
+							"        F.coalesce(\"new_pod.forecast_date\", \"silver.forecast_date\").alias(\"forecast_date\"),\r\n",
+							"        F.coalesce(\"new_pod.forecast_snapshot\", \"silver.forecast_snapshot\").alias(\"forecast_snapshot\"),\r\n",
+							"   \r\n",
+							"        \r\n",
+							"        F.coalesce(\"new_pod.quantity\", \"silver.quantity\").alias(\"quantity\"),\r\n",
+							"        \r\n",
+							"        F.coalesce(\"new_pod.whrs_sell_in_quantity\", \"silver.whrs_sell_in_quantity\").alias(\"whrs_sell_in_quantity\"),\r\n",
+							"        F.coalesce(\"new_pod.whrs_open_quantity\", \"silver.whrs_open_quantity\").alias(\"whrs_open_quantity\"),\r\n",
+							"        F.coalesce(\"new_pod.whrs_end_quantity\", \"silver.whrs_end_quantity\").alias(\"whrs_end_quantity\"),  \r\n",
+							"        \r\n",
+							"        F.coalesce(\"new_pod.pos_sell_out_quantity\", \"silver.pos_sell_out_quantity\").alias(\"pos_sell_out_quantity\"),\r\n",
+							"        F.coalesce(\"new_pod.pos_open_quantity\", \"silver.pos_open_quantity\").alias(\"pos_open_quantity\"),\r\n",
+							"        F.coalesce(\"new_pod.pos_end_quantity\", \"silver.pos_end_quantity\").alias(\"pos_end_quantity\"),\r\n",
+							"        \r\n",
+							"        F.coalesce(\"new_pod.amount\", \"silver.amount\").alias(\"amount\"),\r\n",
+							"        \r\n",
+							"        F.coalesce(\"new_pod.whrs_sell_in_amount\", \"silver.whrs_sell_in_amount\").alias(\"whrs_sell_in_amount\"),\r\n",
+							"        F.coalesce(\"new_pod.whrs_open_amount\", \"silver.whrs_open_amount\").alias(\"whrs_open_amount\"),\r\n",
+							"        F.coalesce(\"new_pod.whrs_end_amount\", \"silver.whrs_end_amount\").alias(\"whrs_end_amount\"),\r\n",
+							"        \r\n",
+							"        F.coalesce(\"new_pod.pos_sell_out_amount\", \"silver.pos_sell_out_amount\").alias(\"pos_sell_out_amount\"),\r\n",
+							"        F.coalesce(\"new_pod.pos_open_amount\", \"silver.pos_open_amount\").alias(\"pos_open_amount\"),\r\n",
+							"        F.coalesce(\"new_pod.pos_end_amount\", \"silver.pos_end_amount\").alias(\"pos_end_amount\"),\r\n",
+							"\r\n",
+							"        \r\n",
+							"        F.coalesce(\"new_pod.unit_price\", \"silver.unit_price\").alias(\"unit_price\")\r\n",
+							"        )\r\n",
+							"    # Display or save the resulting DataFrame\r\n",
+							"    # Zapisanie zaktualizowanego DataFrame do warstwy Silver\r\n",
+							"    final_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
+							"\r\n",
+							"else:\r\n",
+							"    aggregated_bronze_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
+							"\r\n",
+							"# Zakończenie\r\n",
+							"print(\"Inkrementalne ładowanie zakończone!\")\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 4
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/F_PRODUCT_LOAD')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "sparkpool32",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"runAsWorkspaceSystemIdentity": false,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "5561afa6-8127-45dc-9c3b-2bf912807ca4"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"synapse_widget": {
+						"version": "0.1"
+					},
+					"enableDebugMode": false,
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+						"name": "sparkpool32",
+						"type": "Spark",
+						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net",
+							"authHeader": null
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28,
+						"extraHeader": null
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"from pyspark.sql import SparkSession\r\n",
+							"from pyspark.sql.functions import col, max, coalesce, trunc\r\n",
+							"from pyspark.sql.window import Window\r\n",
+							"from pyspark.sql import functions as F\r\n",
+							"\r\n",
+							"# Parametry dla warstwy Bronze (ADLS Gen2)\r\n",
+							"bronze_bucket_name = \"abfss://bronze@bigpharma.dfs.core.windows.net/\"\r\n",
+							"bronze_prefix = \"Erp/\"\r\n",
+							"file_name = \"products\"  # Zmieniamy na odpowiednią nazwę pliku\r\n",
+							"\r\n",
+							"# Parametry dla warstwy Silver (ADLS Gen2)\r\n",
+							"silver_bucket_name = \"abfss://silver@bigpharma.dfs.core.windows.net/\"\r\n",
+							"silver_prefix = \"d_products/\"\r\n",
+							"\r\n",
+							"# Ścieżki do plików Parquet w ADLS Gen2\r\n",
+							"path = f\"{bronze_bucket_name}{bronze_prefix}{file_name}\"\r\n",
+							"\r\n",
+							"# Ścieżka do warstwy Silver\r\n",
+							"silver_path = f\"{silver_bucket_name}{silver_prefix}\"\r\n",
+							"\r\n",
+							"# Załaduj dane z ADLS (tabela products)\r\n",
+							"products_df = spark.read.parquet(path)\r\n",
+							"\r\n",
+							"# Wyświetlenie pierwszych wierszy dla weryfikacji\r\n",
+							"products_df.show(5)\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": []
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"\r\n",
+							"#products_df.show()\r\n",
+							"\r\n",
+							"latest_products_df = products_df.withColumn(\"max_order_date\", F.max(\"update_date\").over(Window.partitionBy(\"product_id\"))).filter(F.col(\"update_date\") == F.col(\"max_order_date\"))\r\n",
+							"\r\n",
+							"\r\n",
+							"# Wybór odpowiednich kolumn do zapisania w warstwie Silver\r\n",
+							"new_products_df = latest_products_df.select(\r\n",
+							"    \"product_id\", \r\n",
+							"    \"product_name\", \r\n",
+							"    \"brand_name\", \r\n",
+							"    \"sub_brand_name\", \r\n",
+							"    \"category_name\")\r\n",
+							"\r\n",
+							"\r\n",
+							"# Sprawdzenie, czy tabela Silver już istnieje\r\n",
+							"try:\r\n",
+							"    silver_df = spark.read.parquet(silver_path)\r\n",
+							"    silver_exists = True\r\n",
+							"except:\r\n",
+							"    silver_exists = False\r\n",
+							"if silver_exists:\r\n",
+							"    silver_df = spark.read.parquet(silver_path)\r\n",
+							"    \r\n",
+							"    merged_df = silver_df.alias(\"silver\").join(\r\n",
+							"        new_products_df.alias(\"new_products\"),\r\n",
+							"        (F.col(\"silver.product_id\") == F.col(\"new_products.product_id\")),\r\n",
+							"        how=\"outer\"\r\n",
+							"        )\r\n",
+							"\r\n",
+							"        # Wybór kolumn, które mają zostać zaktualizowane lub dodane\r\n",
+							"    final_df = merged_df.select(\r\n",
+							"        F.coalesce(\"new_products.product_id\", \"silver.product_id\").alias(\"product_id\"),\r\n",
+							"        F.coalesce(\"new_products.product_name\", \"silver.product_name\").alias(\"product_name\"),\r\n",
+							"        F.coalesce(\"new_products.brand_name\", \"silver.brand_name\").alias(\"brand_name\"),\r\n",
+							"        F.coalesce(\"new_products.sub_brand_name\", \"silver.sub_brand_name\").alias(\"sub_brand_name\"),\r\n",
+							"        F.coalesce(\"new_products.category_name\", \"silver.category_name\").alias(\"category_name\")\r\n",
+							"    )\r\n",
+							"else:\r\n",
+							"\r\n",
+							"    new_products_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
+							"\r\n",
+							"# Zakończenie\r\n",
+							"print(\"Inkrementalne ładowanie zakończone!\")    \r\n",
+							"\r\n",
+							"\r\n",
+							"spark.stop()"
+						],
+						"outputs": []
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/F_Planning_Book')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "sparkpool32",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"runAsWorkspaceSystemIdentity": false,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "f9f1c294-1e49-4461-b5f2-63921e11738c"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"synapse_widget": {
+						"version": "0.1"
+					},
+					"enableDebugMode": false,
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+						"name": "sparkpool32",
+						"type": "Spark",
+						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net",
+							"authHeader": null
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28,
+						"extraHeader": null
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"from pyspark.sql import SparkSession\r\n",
+							"from pyspark.sql import SparkSession\r\n",
+							"from pyspark.sql.functions import col, max, coalesce, trunc, lit, add_months\r\n",
+							"from pyspark.sql.window import Window\r\n",
+							"from pyspark.sql import functions as F\r\n",
+							"from pyspark.sql.functions import to_date\r\n",
+							"\r\n",
+							"# Tworzenie sesji Spark\r\n",
+							"spark = SparkSession.builder.appName(\"AzureSynapseMigration\").getOrCreate()\r\n",
+							"\r\n",
+							"# Parametry dla warstwy Silver (ADLS Gen2)\r\n",
+							"bucket_name = \"abfss://silver@bigpharma.dfs.core.windows.net/\"\r\n",
+							"bucket_name_gold = \"abfss://gold@bigpharma.dfs.core.windows.net/\"\r\n",
+							"\r\n",
+							"# Ścieżki do plików Parquet w ADLS Gen2\r\n",
+							"f_sales_path = f\"{bucket_name}/f_sales\"\r\n",
+							"f_forecast_path = f\"{bucket_name}/f_forecast\"\r\n",
+							"f_pos_data_path = f\"{bucket_name}/f_pos_data\"\r\n",
+							"f_wh_data_path = f\"{bucket_name}/f_wh_data\"\r\n",
+							"\r\n",
+							"# Ścieżka do warstwy Gold (f_planning_book)\r\n",
+							"f_sales_path_gold = f\"{bucket_name_gold}/f_planning_book\"\r\n",
+							"\r\n",
+							"# Załaduj dane z ADLS (tabele f_sales, f_forecast, f_pos_data, f_wh_data)\r\n",
+							"f_sales = spark.read.parquet(f_sales_path)\r\n",
+							"f_forecast = spark.read.parquet(f_forecast_path)\r\n",
+							"f_pos_data = spark.read.parquet(f_pos_data_path)\r\n",
+							"f_wh_data = spark.read.parquet(f_wh_data_path)\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"\r\n",
+							"# Pobranie maksymalnej wartości forecast_snapshot z f_forecast\r\n",
+							"current_month_snapshot = f_forecast.agg(F.max(\"forecast_snapshot\")).collect()[0][0]\r\n",
+							"current_month_snapshot = to_date(lit(current_month_snapshot), \"yyyy-MM-dd\")\r\n",
+							"last_month_snapshot = F.add_months(F.lit(current_month_snapshot), -1)\r\n",
+							"\r\n",
+							"f_forecast_filtered = f_forecast.filter(F.col(\"forecast_snapshot\").isin(current_month_snapshot, last_month_snapshot))\r\n",
+							"\r\n",
+							"# Filtrowanie dla obecnego i poprzedniego miesiąca\r\n",
+							"f_forecast_max = f_forecast_filtered.filter((F.col(\"forecast_date\") >= current_month_snapshot) &(F.col(\"forecast_snapshot\") == current_month_snapshot))\r\n",
+							"f_forecast_last = f_forecast_filtered.filter((F.col(\"forecast_date\") >= last_month_snapshot) &  (F.col(\"forecast_snapshot\") == last_month_snapshot))\r\n",
+							"\r\n",
+							"# Filtrowanie f_sales\r\n",
+							"\r\n",
+							"f_sales_max = f_sales.filter(F.col(\"shipped_date\") < current_month_snapshot)\r\n",
+							"f_sales_last = f_sales.filter(F.col(\"shipped_date\") < last_month_snapshot)\r\n",
+							"\r\n",
+							"f_pos_data_max = f_pos_data.filter(F.col(\"transaction_date\") < current_month_snapshot)\r\n",
+							"f_pos_data_last = f_pos_data.filter(F.col(\"transaction_date\") < last_month_snapshot)\r\n",
+							"\r\n",
+							"f_wh_data_max = f_wh_data.filter(F.col(\"transaction_date\") < current_month_snapshot)\r\n",
+							"f_wh_data_last = f_wh_data.filter(F.col(\"transaction_date\") < last_month_snapshot)\r\n",
+							"\r\n",
+							"\r\n",
+							"# Ujednolicona lista kolumn\r\n",
+							"common_columns = [\r\n",
+							"    \"product_id\", \"country_id\", \"financial_date\", \"forecast_snapshot\",\r\n",
+							"    \"quantity\", \"amount\", \"unit_price\",\r\n",
+							"    \"whrs_sell_in_quantity\", \"whrs_open_quantity\", \"whrs_end_quantity\",\r\n",
+							"    \"whrs_sell_in_amount\", \"whrs_open_amount\", \"whrs_end_amount\",\r\n",
+							"    \"pos_sell_out_quantity\", \"pos_open_quantity\", \"pos_end_quantity\",\r\n",
+							"    \"pos_sell_out_amount\", \"pos_open_amount\", \"pos_end_amount\",\r\n",
+							"    \"discount\"\r\n",
+							"]\r\n",
+							"\r\n",
+							"# Normalizacja f_forecast (zachowuje oryginalny forecast_snapshot)\r\n",
+							"f_forecast_max_norm = f_forecast_max \\\r\n",
+							"    .withColumnRenamed(\"forecast_date\", \"financial_date\") \\\r\n",
+							"    .selectExpr(\r\n",
+							"        \"product_id\", \"country_id\", \"financial_date\", \"forecast_snapshot\",\r\n",
+							"        \"quantity\", \"amount\", \"unit_price\",\r\n",
+							"        \"whrs_sell_in_quantity\", \"whrs_open_quantity\", \"whrs_end_quantity\",\r\n",
+							"        \"whrs_sell_in_amount\", \"whrs_open_amount\", \"whrs_end_amount\",\r\n",
+							"        \"pos_sell_out_quantity\", \"pos_open_quantity\", \"pos_end_quantity\",\r\n",
+							"        \"pos_sell_out_amount\", \"pos_open_amount\", \"pos_end_amount\",\r\n",
+							"        \"0.0 as discount\"  # Jeżeli discount jest typu double\r\n",
+							"    )\r\n",
+							"\r\n",
+							"f_forecast_last_norm = f_forecast_last \\\r\n",
+							"    .withColumnRenamed(\"forecast_date\", \"financial_date\") \\\r\n",
+							"    .selectExpr(\r\n",
+							"        \"product_id\", \"country_id\", \"financial_date\", \"forecast_snapshot\",\r\n",
+							"        \"quantity\", \"amount\", \"unit_price\",\r\n",
+							"        \"whrs_sell_in_quantity\", \"whrs_open_quantity\", \"whrs_end_quantity\",\r\n",
+							"        \"whrs_sell_in_amount\", \"whrs_open_amount\", \"whrs_end_amount\",\r\n",
+							"        \"pos_sell_out_quantity\", \"pos_open_quantity\", \"pos_end_quantity\",\r\n",
+							"        \"pos_sell_out_amount\", \"pos_open_amount\", \"pos_end_amount\",\r\n",
+							"        \"0.0 as discount\"  # Jeżeli discount jest typu double\r\n",
+							"    )\r\n",
+							"\r\n",
+							"\r\n",
+							"\r\n",
+							"# Normalizacja f_sales\r\n",
+							"f_sales_max_norm = f_sales_max \\\r\n",
+							"    .withColumnRenamed(\"shipped_date\", \"financial_date\") \\\r\n",
+							"    .withColumn(\"forecast_snapshot\",  current_month_snapshot) \\\r\n",
+							"    .selectExpr(\r\n",
+							"        \"product_id\", \"country_id\", \"financial_date\", \"forecast_snapshot\",\r\n",
+							"        \"quantity\", \"amount\", \"unit_price\",\r\n",
+							"        \"0 as whrs_sell_in_quantity\", \"0 as whrs_open_quantity\", \"0 as whrs_end_quantity\",\r\n",
+							"        \"0 as whrs_sell_in_amount\", \"0 as whrs_open_amount\", \"0 as whrs_end_amount\",\r\n",
+							"        \"0 as pos_sell_out_quantity\", \"0 as pos_open_quantity\", \"0 as pos_end_quantity\",\r\n",
+							"        \"0 as pos_sell_out_amount\", \"0 as pos_open_amount\", \"0 as pos_end_amount\",\r\n",
+							"        \"discount\"\r\n",
+							"    )\r\n",
+							"\r\n",
+							"f_sales_last_norm = f_sales_last \\\r\n",
+							"    .withColumnRenamed(\"shipped_date\", \"financial_date\") \\\r\n",
+							"    .withColumn(\"forecast_snapshot\", last_month_snapshot) \\\r\n",
+							"    .selectExpr(\r\n",
+							"        \"product_id\", \"country_id\", \"financial_date\", \"forecast_snapshot\",\r\n",
+							"        \"quantity\", \"amount\", \"unit_price\",\r\n",
+							"        \"0 as whrs_sell_in_quantity\", \"0 as whrs_open_quantity\", \"0 as whrs_end_quantity\",\r\n",
+							"        \"0 as whrs_sell_in_amount\", \"0 as whrs_open_amount\", \"0 as whrs_end_amount\",\r\n",
+							"        \"0 as pos_sell_out_quantity\", \"0 as pos_open_quantity\", \"0 as pos_end_quantity\",\r\n",
+							"        \"0 as pos_sell_out_amount\", \"0 as pos_open_amount\", \"0 as pos_end_amount\",\r\n",
+							"        \"discount\"\r\n",
+							"    )\r\n",
+							"\r\n",
+							"# Normalizacja f_pos_data_path\r\n",
+							"f_pos_data_max_norm = f_pos_data_max \\\r\n",
+							"    .withColumnRenamed(\"transaction_date\", \"financial_date\") \\\r\n",
+							"    .withColumn(\"forecast_snapshot\", current_month_snapshot) \\\r\n",
+							"    .selectExpr(\r\n",
+							"        \"product_id\", \"country_id\", \"financial_date\", \"forecast_snapshot\",\r\n",
+							"        \"0 as quantity\", \"0 as amount\", \"unit_price\",\r\n",
+							"        \"0 as whrs_sell_in_quantity\", \"0 as whrs_open_quantity\", \"0 as whrs_end_quantity\",\r\n",
+							"        \"0 as whrs_sell_in_amount\", \"0 as whrs_open_amount\", \"0 as whrs_end_amount\",\r\n",
+							"        \"pos_sell_out_quantity\", \"pos_open_quantity\", \"pos_end_quantity\",\r\n",
+							"        \"pos_sell_out_amount\", \"pos_open_amount\", \"pos_end_amount\",\r\n",
+							"        \"0 as discount\"\r\n",
+							"    )\r\n",
+							"\r\n",
+							"f_pos_data_last_norm = f_pos_data_last \\\r\n",
+							"    .withColumnRenamed(\"transaction_date\", \"financial_date\") \\\r\n",
+							"    .withColumn(\"forecast_snapshot\", last_month_snapshot) \\\r\n",
+							"    .selectExpr(\r\n",
+							"        \"product_id\", \"country_id\", \"financial_date\", \"forecast_snapshot\",\r\n",
+							"        \"0 as quantity\", \"0 as amount\", \"unit_price\",\r\n",
+							"        \"0 as whrs_sell_in_quantity\", \"0 as whrs_open_quantity\", \"0 as whrs_end_quantity\",\r\n",
+							"        \"0 as whrs_sell_in_amount\", \"0 as whrs_open_amount\", \"0 as whrs_end_amount\",\r\n",
+							"        \"pos_sell_out_quantity\", \"pos_open_quantity\", \"pos_end_quantity\",\r\n",
+							"        \"pos_sell_out_amount\", \"pos_open_amount\", \"pos_end_amount\",\r\n",
+							"        \"0 as discount\"\r\n",
+							"    )\r\n",
+							"\r\n",
+							"# Normalizacja f_wh_data_path\r\n",
+							"f_wh_data_max_norm = f_wh_data_max \\\r\n",
+							"    .withColumnRenamed(\"transaction_date\", \"financial_date\") \\\r\n",
+							"    .withColumn(\"forecast_snapshot\",  current_month_snapshot) \\\r\n",
+							"    .selectExpr(\r\n",
+							"        \"product_id\", \"country_id\", \"financial_date\", \"forecast_snapshot\",\r\n",
+							"        \"0 as quantity\", \"0 as amount\", \"unit_price\",\r\n",
+							"        \"whrs_sell_in_quantity\", \"whrs_open_quantity\", \"whrs_end_quantity\",\r\n",
+							"        \"whrs_sell_in_amount\", \"whrs_open_amount\", \"whrs_end_amount\",\r\n",
+							"        \"0 as pos_sell_out_quantity\", \"0 as pos_open_quantity\", \"0 as pos_end_quantity\",\r\n",
+							"        \"0 as pos_sell_out_amount\", \"0 as pos_open_amount\", \"0 as pos_end_amount\",\r\n",
+							"        \"0 as discount\"\r\n",
+							"    )\r\n",
+							"\r\n",
+							"f_wh_data_last_norm = f_wh_data_last \\\r\n",
+							"    .withColumnRenamed(\"transaction_date\", \"financial_date\") \\\r\n",
+							"    .withColumn(\"forecast_snapshot\", last_month_snapshot) \\\r\n",
+							"    .selectExpr(\r\n",
+							"        \"product_id\", \"country_id\", \"financial_date\", \"forecast_snapshot\",\r\n",
+							"        \"0 as quantity\", \"0 as amount\", \"unit_price\",\r\n",
+							"        \"whrs_sell_in_quantity\", \"whrs_open_quantity\", \"whrs_end_quantity\",\r\n",
+							"        \"whrs_sell_in_amount\", \"whrs_open_amount\", \"whrs_end_amount\",\r\n",
+							"        \"0 as pos_sell_out_quantity\", \"0 as pos_open_quantity\", \"0 as pos_end_quantity\",\r\n",
+							"        \"0 as pos_sell_out_amount\", \"0 as pos_open_amount\", \"0 as pos_end_amount\",\r\n",
+							"        \"0 as discount\"\r\n",
+							"    )\r\n",
+							"\r\n",
+							"\r\n",
+							"# UNION wszystkich DataFrame'ów\r\n",
+							"\r\n",
+							"f_forecast_max_norm\r\n",
+							"f_forecast_last_norm\r\n",
+							"f_sales_max_norm \r\n",
+							"f_sales_last_norm\r\n",
+							"f_pos_data_max_norm\r\n",
+							"f_pos_data_last_norm\r\n",
+							"f_wh_data_max_norm\r\n",
+							"f_wh_data_last_norm\r\n",
+							"\r\n",
+							"final_df = f_forecast_max_norm.unionByName(f_forecast_last_norm, allowMissingColumns=True) \\\r\n",
+							"    .unionByName(f_sales_max_norm, allowMissingColumns=True) \\\r\n",
+							"    .unionByName(f_sales_last_norm, allowMissingColumns=True) \\\r\n",
+							"    .unionByName(f_pos_data_max_norm, allowMissingColumns=True) \\\r\n",
+							"    .unionByName(f_pos_data_last_norm, allowMissingColumns=True) \\\r\n",
+							"    .unionByName(f_wh_data_max_norm, allowMissingColumns=True) \\\r\n",
+							"    .unionByName(f_wh_data_last_norm, allowMissingColumns=True) \r\n",
+							"\r\n",
+							"\r\n",
+							"bucket_name_gold = \"gold\"\r\n",
+							"\r\n",
+							"# Load Data\r\n",
+							"f_sales_path = f\"s3a://{bucket_name}/f_planning_book\"\r\n",
+							"\r\n",
+							"aggregated_df = final_df.groupBy(\r\n",
+							"    \"product_id\", \"country_id\", \"financial_date\", \"forecast_snapshot\"\r\n",
+							").agg(\r\n",
+							"    # Suma dla kolumn liczbowych\r\n",
+							"    F.sum(\"quantity\").alias(\"quantity\"),\r\n",
+							"    F.sum(\"amount\").alias(\"amount\"),\r\n",
+							"    F.avg(\"unit_price\").alias(\"unit_price\"),\r\n",
+							"    \r\n",
+							"    # Suma dla innych kolumn\r\n",
+							"    F.sum(\"whrs_sell_in_quantity\").alias(\"whrs_sell_in_quantity\"),\r\n",
+							"    F.sum(\"whrs_open_quantity\").alias(\"whrs_open_quantity\"),\r\n",
+							"    F.sum(\"whrs_end_quantity\").alias(\"whrs_end_quantity\"),\r\n",
+							"    F.sum(\"whrs_sell_in_amount\").alias(\"whrs_sell_in_amount\"),\r\n",
+							"    F.sum(\"whrs_open_amount\").alias(\"whrs_open_amount\"),\r\n",
+							"    F.sum(\"whrs_end_amount\").alias(\"whrs_end_amount\"),\r\n",
+							"    \r\n",
+							"    F.sum(\"pos_sell_out_quantity\").alias(\"pos_sell_out_quantity\"),\r\n",
+							"    F.sum(\"pos_open_quantity\").alias(\"pos_open_quantity\"),\r\n",
+							"    F.sum(\"pos_end_quantity\").alias(\"pos_end_quantity\"),\r\n",
+							"    F.sum(\"pos_sell_out_amount\").alias(\"pos_sell_out_amount\"),\r\n",
+							"    F.sum(\"pos_open_amount\").alias(\"pos_open_amount\"),\r\n",
+							"    F.sum(\"pos_end_amount\").alias(\"pos_end_amount\"),\r\n",
+							"    \r\n",
+							"    # Agregacja dla discount (średnia)\r\n",
+							"    F.sum(\"discount\").alias(\"discount\")\r\n",
+							")\r\n",
+							"\r\n",
+							"\r\n",
+							"aggregated_df.write.mode(\"overwrite\").parquet(f_sales_path_gold)\r\n",
+							"\r\n",
+							"\r\n",
+							"\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 3
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/F_SALES_LOAD')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "sparkpool32",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"runAsWorkspaceSystemIdentity": false,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "728e7c2b-ced0-4e9d-aeef-0ffdc892a033"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"synapse_widget": {
+						"version": "0.1"
+					},
+					"enableDebugMode": false,
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+						"name": "sparkpool32",
+						"type": "Spark",
+						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net",
+							"authHeader": null
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"from pyspark.sql import SparkSession\r\n",
+							"from pyspark.sql.functions import col, max, coalesce, trunc\r\n",
+							"from pyspark.sql.window import Window\r\n",
+							"from pyspark.sql import functions as F\r\n",
+							"\r\n",
+							"\r\n",
+							"#dla warstwy Bronze (ADLS Gen2)\r\n",
+							"bronze_bucket_name = \"abfss://bronze@bigpharma.dfs.core.windows.net/\"\r\n",
+							"bronze_prefix = \"Erp/\"\r\n",
+							"\r\n",
+							"orders_path = f\"{bronze_bucket_name}{bronze_prefix}orders\"\r\n",
+							"order_details_path = f\"{bronze_bucket_name}{bronze_prefix}order_details\"\r\n",
+							"\r\n",
+							"# Definicja ścieżek dla warstwy Silver (ADLS Gen2)\r\n",
+							"silver_bucket_name = \"abfss://silver@bigpharma.dfs.core.windows.net/\"\r\n",
+							"silver_prefix = \"f_sales/\"\r\n",
+							"\r\n",
+							"silver_path = f\"{silver_bucket_name}{silver_prefix}\"\r\n",
+							"silver_customers = f\"{silver_bucket_name}d_customers\"\r\n",
+							"\r\n",
+							"# Załaduj dane z ADLS (tabele orders, order_details, customers)\r\n",
+							"orders_df = spark.read.parquet(orders_path)\r\n",
+							"order_details_df = spark.read.parquet(order_details_path)\r\n",
+							"customers_df = spark.read.parquet(silver_customers)\r\n",
+							"\r\n",
+							"# Wyświetlenie pierwszych wierszy dla weryfikacji\r\n",
+							"orders_df.show(5)\r\n",
+							"order_details_df.show(5)\r\n",
+							"customers_df.show(5)\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"join_bronze_df.show()"
+						],
+						"outputs": [],
+						"execution_count": 25
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"\r\n",
+							"\r\n",
+							"orders_df = orders_df.withColumn(\r\n",
+							"    \"order_date\", trunc(\"order_date\",\"month\")\r\n",
+							").withColumn(\r\n",
+							"    \"required_date\", trunc(\"required_date\",\"month\")\r\n",
+							").withColumn(\r\n",
+							"    \"shipped_date\", trunc(\"shipped_date\",\"month\")\r\n",
+							")\r\n",
+							"\r\n",
+							"\r\n",
+							"joined_df = orders_df.join(order_details_df, \"order_id\").join(customers_df,\"customer_id\")\r\n",
+							"\r\n",
+							"# Użycie okna do filtrowania najnowszych zamówień\r\n",
+							"latest_order_df = joined_df.withColumn(\r\n",
+							"    \"max_order_date\", F.max(\"order_date\").over(Window.partitionBy(\"order_id\"))\r\n",
+							").filter(F.col(\"order_date\") == F.col(\"max_order_date\"))\r\n",
+							"\r\n",
+							"# Wybór odpowiednich kolumn do zapisania w warstwie Silver\r\n",
+							"new_order_details_df = latest_order_df.select(\r\n",
+							"    \"country_id\",\r\n",
+							"    \"product_id\",  \r\n",
+							"    \"shipped_date\", \r\n",
+							"    \"unit_price\", \r\n",
+							"    \"quantity\", \r\n",
+							"    \"discount\"\r\n",
+							")\r\n",
+							"\r\n",
+							"\r\n",
+							"aggregated_df = new_order_details_df.groupBy(\"country_id\", \"product_id\", \"shipped_date\").agg(\r\n",
+							"                                     F.sum(\"quantity\").alias(\"quantity\"),\r\n",
+							"                                     F.sum(\"discount\").alias(\"discount\"),\r\n",
+							"                                     F.round(F.sum(F.col(\"quantity\") * F.col(\"unit_price\")),2).alias(\"amount\"),\r\n",
+							"                                     F.round((F.sum(F.col(\"quantity\") * F.col(\"unit_price\")) / F.sum(\"quantity\")),2).alias(\"unit_price\"))\r\n",
+							"\r\n",
+							"\r\n",
+							"# Sprawdzenie, czy tabela Silver już istnieje\r\n",
+							"try:\r\n",
+							"    silver_df = spark.read.parquet(silver_path)\r\n",
+							"    silver_exists = True\r\n",
+							"except:\r\n",
+							"    silver_exists = False\r\n",
+							"\r\n",
+							"\r\n",
+							"\r\n",
+							"\r\n",
+							"# Jeśli tabela Silver istnieje, wykonaj operację \"MERGE\" na podstawie DataFrame\r\n",
+							"if silver_exists:\r\n",
+							"    # Załaduj dane z tabeli Silver\r\n",
+							"    silver_df = spark.read.parquet(silver_path)\r\n",
+							"    \r\n",
+							"    # Połącz dane Silver z nowymi danymi (na podstawie order_id, customer_id, product_id)\r\n",
+							"    merged_df = silver_df.alias(\"silver\").join(\r\n",
+							"        aggregated_df.alias(\"new_orders\"),\r\n",
+							"        (F.col(\"silver.shipped_date\") == F.col(\"new_orders.shipped_date\")) & \r\n",
+							"        (F.col(\"silver.country_id\") == F.col(\"new_orders.country_id\")) & \r\n",
+							"        (F.col(\"silver.product_id\") == F.col(\"new_orders.product_id\")),\r\n",
+							"        how=\"outer\"\r\n",
+							"    )\r\n",
+							"\r\n",
+							"    # Wybór kolumn, które mają zostać zaktualizowane lub dodane\r\n",
+							"    final_df = merged_df.select(\r\n",
+							"        F.coalesce(\"new_orders.country_id\", \"silver.country_id\").alias(\"country_id\"),\r\n",
+							"        F.coalesce(\"new_orders.product_id\", \"silver.product_id\").alias(\"product_id\"),\r\n",
+							"        F.coalesce(\"new_orders.shipped_date\", \"silver.shipped_date\").alias(\"shipped_date\"), \r\n",
+							"        F.coalesce(\"new_orders.quantity\", \"silver.quantity\").alias(\"quantity\"),\r\n",
+							"        F.coalesce(\"new_orders.discount\", \"silver.discount\").alias(\"discount\"),\r\n",
+							"        F.coalesce(\"new_orders.amount\", \"silver.amount\").alias(\"amount\"),\r\n",
+							"       F.coalesce(\"new_orders.unit_price\", \"silver.unit_price\").alias(\"unit_price\")\r\n",
+							"    )\r\n",
+							"\r\n",
+							"    # Display or save the resulting DataFrame\r\n",
+							"    # Zapisanie zaktualizowanego DataFrame do warstwy Silver\r\n",
+							"\r\n",
+							"    final_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
+							"\r\n",
+							"else:\r\n",
+							"\r\n",
+							"\r\n",
+							"    # Display or save the resulting DataFrame\r\n",
+							"    # Zapisanie zaktualizowanego DataFrame do warstwy Silver\r\n",
+							"\r\n",
+							"    aggregated_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
+							"\r\n",
+							"# Zakończenie\r\n",
+							"print(\"Inkrementalne ładowanie zakończone!\")"
+						],
+						"outputs": [],
+						"execution_count": 2
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/F_WH_DATA_LOAD')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "sparkpool32",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"runAsWorkspaceSystemIdentity": false,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "6644fc0f-db4c-4e12-bbd4-0cfb619f0692"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"synapse_widget": {
+						"version": "0.1"
+					},
+					"enableDebugMode": false,
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+						"name": "sparkpool32",
+						"type": "Spark",
+						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net",
+							"authHeader": null
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28,
+						"extraHeader": null
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"from pyspark.sql import SparkSession\r\n",
+							"from pyspark.sql.functions import col, max, coalesce, trunc\r\n",
+							"from pyspark.sql.window import Window\r\n",
+							"from pyspark.sql import functions as F\r\n",
+							"\r\n",
+							"\r\n",
+							"# Tworzenie sesji Spark\r\n",
+							"spark = SparkSession.builder.appName(\"AzureSynapseMigration\").getOrCreate()\r\n",
+							"\r\n",
+							"# Parametry dla warstwy Bronze (ADLS Gen2)\r\n",
+							"bronze_bucket_name = \"abfss://bronze@bigpharma.dfs.core.windows.net/\"\r\n",
+							"bronze_prefix = \"Erp/\"\r\n",
+							"file_name = \"inventory_wholesaler_history_details\"\r\n",
+							"\r\n",
+							"# Parametry dla warstwy Silver (ADLS Gen2)\r\n",
+							"silver_bucket_name = \"abfss://silver@bigpharma.dfs.core.windows.net/\"\r\n",
+							"silver_prefix = \"f_wh_data/\"\r\n",
+							"\r\n",
+							"silver_path = f\"{silver_bucket_name}/{silver_prefix}\"\r\n",
+							"\r\n",
+							"# Ścieżki do plików Parquet w ADLS Gen2\r\n",
+							"path = f\"{bronze_bucket_name}{bronze_prefix}{file_name}\"\r\n",
+							"path_customers =  f\"{silver_bucket_name}d_customers\"\r\n",
+							"\r\n",
+							"# Załaduj dane z ADLS (tabela inventory_wholesaler_history_details)\r\n",
+							"bronze_df = spark.read.parquet(path)\r\n",
+							"customers_df = spark.read.parquet(path_customers)\r\n",
+							"\r\n",
+							"# Wykonaj JOIN na obu DataFrame'ach na podstawie customer_id\r\n",
+							"\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"bronze_df=bronze_df.join(customers_df,\"customer_id\")\r\n",
+							"\r\n",
+							"latest_bronze_df = bronze_df.withColumn(\"max_order_date\", F.max(\"update_date\").over(Window.partitionBy(\"product_id\", \"customer_id\",\"update_date\"))).filter(F.col(\"update_date\") == F.col(\"max_order_date\"))\r\n",
+							"\r\n",
+							"new_bronze_df = latest_bronze_df.select(\r\n",
+							"    \"product_id\",\r\n",
+							"    \"country_id\", \r\n",
+							"    \"transaction_date\", \r\n",
+							"    \"unit_price\", \r\n",
+							"    \"whrs_sell_in_quantity\",\r\n",
+							"    \"whrs_open_quantity\",  # Poprawiona nazwa\r\n",
+							"    \"whrs_end_quantity\"\r\n",
+							")\r\n",
+							"\r\n",
+							"new_bronze_df = new_bronze_df.withColumn(\r\n",
+							"    \"transaction_date\", trunc(\"transaction_date\",\"month\"))\r\n",
+							"\r\n",
+							"aggregated_bronze_df = new_bronze_df.groupBy(\"product_id\", \"country_id\", \"transaction_date\").agg(\r\n",
+							"                                    # Summing quantity, discount, and amount\r\n",
+							"                                     F.sum(\"whrs_sell_in_quantity\").alias(\"whrs_sell_in_quantity\"),\r\n",
+							"                                     F.sum(\"whrs_open_quantity\").alias(\"whrs_open_quantity\"),\r\n",
+							"                                     F.sum(\"whrs_end_quantity\").alias(\"whrs_end_quantity\"),\r\n",
+							"                                     F.round(F.sum(F.col(\"whrs_sell_in_quantity\") * F.col(\"unit_price\")),2).alias(\"whrs_sell_in_amount\"),\r\n",
+							"                                     F.round(F.sum(F.col(\"whrs_open_quantity\") * F.col(\"unit_price\")),2).alias(\"whrs_open_amount\"),\r\n",
+							"                                     F.round(F.sum(F.col(\"whrs_end_quantity\") * F.col(\"unit_price\")),2).alias(\"whrs_end_amount\"),\r\n",
+							"                                     F.round((F.sum(F.col(\"whrs_sell_in_quantity\") * F.col(\"unit_price\")) / F.sum(\"whrs_sell_in_quantity\")),2).alias(\"unit_price\"))\r\n",
+							"\r\n",
+							"\r\n",
+							"\r\n",
+							"# Sprawdzenie, czy tabela Silver już istnieje\r\n",
+							"try:\r\n",
+							"    silver_df = spark.read.parquet(silver_path)\r\n",
+							"    silver_exists = True\r\n",
+							"except:\r\n",
+							"    silver_exists = False\r\n",
+							"\r\n",
+							"\r\n",
+							"# Jeśli tabela Silver istnieje, wykonaj operację \"MERGE\" na podstawie DataFrame\r\n",
+							"if silver_exists:\r\n",
+							"    # Załaduj dane z tabeli Silver\r\n",
+							"    silver_df = spark.read.parquet(silver_path)\r\n",
+							"    \r\n",
+							"    # Połącz dane Silver z nowymi danymi (na podstawie order_id, customer_id, product_id)\r\n",
+							"    merged_df = silver_df.alias(\"silver\").join(\r\n",
+							"        aggregated_bronze_df.alias(\"new_pod\"),\r\n",
+							"        (F.col(\"silver.product_id\") == F.col(\"new_pod.product_id\")) & \r\n",
+							"        (F.col(\"silver.country_id\") == F.col(\"new_pod.country_id\")) & \r\n",
+							"        (F.col(\"silver.transaction_date\") == F.col(\"new_pod.transaction_date\")),\r\n",
+							"        how=\"outer\"\r\n",
+							"    )\r\n",
+							"\r\n",
+							"    # Wybór kolumn, które mają zostać zaktualizowane lub dodane\r\n",
+							"    final_df = merged_df.select(\r\n",
+							"        F.coalesce(\"new_pod.product_id\", \"silver.product_id\").alias(\"product_id\"),\r\n",
+							"        F.coalesce(\"new_pod.country_id\", \"silver.country_id\").alias(\"country_id\"),\r\n",
+							"        F.coalesce(\"new_pod.transaction_date\", \"silver.transaction_date\").alias(\"transaction_date\"),\r\n",
+							"        \r\n",
+							"        F.coalesce(\"new_pod.whrs_sell_in_quantity\", \"silver.whrs_sell_in_quantity\").alias(\"whrs_sell_in_quantity\"),\r\n",
+							"        F.coalesce(\"new_pod.whrs_open_quantity\", \"silver.whrs_open_quantity\").alias(\"whrs_open_quantity\"),\r\n",
+							"        F.coalesce(\"new_pod.whrs_end_quantity\", \"silver.whrs_end_quantity\").alias(\"whrs_end_quantity\"),\r\n",
+							"        \r\n",
+							"        F.coalesce(\"new_pod.whrs_sell_in_amount\", \"silver.whrs_sell_in_amount\").alias(\"whrs_sell_in_amount\"),\r\n",
+							"        F.coalesce(\"new_pod.whrs_open_amount\", \"silver.whrs_open_amount\").alias(\"whrs_open_amount\"),\r\n",
+							"        F.coalesce(\"new_pod.whrs_end_amount\", \"silver.whrs_end_amount\").alias(\"whrs_end_amount\"),\r\n",
+							"        F.coalesce(\"new_pod.unit_price\", \"silver.unit_price\").alias(\"unit_price\")\r\n",
+							"        )\r\n",
+							"    # Display or save the resulting DataFrame\r\n",
+							"    # Zapisanie zaktualizowanego DataFrame do warstwy Silver\r\n",
+							"    final_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
+							"\r\n",
+							"else:\r\n",
+							"    aggregated_bronze_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
+							"\r\n",
+							"# Zakończenie\r\n",
+							"print(\"Inkrementalne ładowanie zakończone!\")\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 7
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Notebook 2')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "sparkpool32",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"runAsWorkspaceSystemIdentity": false,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "b3b03d10-1c21-4913-8a55-325faa350670"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"synapse_widget": {
+						"version": "0.1"
+					},
+					"enableDebugMode": false,
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+						"name": "sparkpool32",
+						"type": "Spark",
+						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net",
+							"authHeader": null
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28,
+						"extraHeader": null
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"microsoft": {
+								"language": "python"
+							},
+							"collapsed": false
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"from pyspark.sql.functions import split\r\n",
+							"df = spark.read.format(\"csv\").option(\"delimiter\", \";\").option(\"inferSchema\",\"true\").load(\"abfss://bronze@bigpharma.dfs.core.windows.net/ExternalStatistics/inflation.csv\")\r\n",
+							"df1 =df.withColumn('Type', split(df['_c0'], ',').getItem(0))\\\r\n",
+							"       .withColumn('Type1', split(df['_c0'], ',').getItem(1))\\\r\n",
+							"       .withColumn('Type2', split(df['_c0'], ',').getItem(2))\\\r\n",
+							"       .withColumn('Type3', split(df['_c0'], ',').getItem(3))\\\r\n",
+							"       .withColumn('Type4', split(df['_c0'], ',').getItem(4))\r\n",
+							"\r\n",
+							"df2=df1.drop('_c0')\r\n",
+							"df2.show()\r\n",
+							"\r\n",
+							"import pandas as pd\r\n",
+							"\r\n",
+							"result_pdf = df2.select(\"*\").toPandas()\r\n",
+							"\r\n",
+							"\r\n",
+							"df4 = result_pdf.rename(columns=result_pdf.iloc[0]).loc[1:]\r\n",
+							"\r\n",
+							"\r\n",
+							"print(df4)"
+						],
+						"outputs": [],
+						"execution_count": 44
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sparkpool32')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"autoPause": {
+					"enabled": true,
+					"delayInMinutes": 5
+				},
+				"autoScale": {
+					"enabled": false,
+					"maxNodeCount": 3,
+					"minNodeCount": 3
+				},
+				"nodeCount": 3,
+				"nodeSize": "Small",
+				"nodeSizeFamily": "MemoryOptimized",
+				"sparkVersion": "3.4",
+				"isComputeIsolationEnabled": false,
+				"sessionLevelPackagesEnabled": false,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "polandcentral"
+		}
+	]
+}

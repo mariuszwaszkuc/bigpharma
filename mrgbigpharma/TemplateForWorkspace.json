@@ -1984,7 +1984,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "304d8c78-9ab9-4a7d-b854-30bc8a14caf1"
+						"spark.autotune.trackingId": "1c5a6cf5-bdbe-40a8-8014-b5c8d491ac7d"
 					}
 				},
 				"metadata": {
@@ -2329,12 +2329,16 @@
 							"df_pivoted[\"status\"] =  df_pivoted[\"forecast_snapshot\"].apply(lambda x: \"current\" if x == max_forecast_snapshot  else \"last\")\r\n",
 							"\r\n",
 							"\r\n",
-							"# Wyświetl wynik\r\n",
-							"print(df_pivoted)\r\n",
-							""
+							"\r\n",
+							"# Ścieżka do warstwy Gold (f_planning_book)\r\n",
+							"f_sales_path_gold = f\"{bucket_name_gold}/f_planning_book_unpivot\"\r\n",
+							"\r\n",
+							"df_spark = spark.createDataFrame(df_pivoted)\r\n",
+							"\r\n",
+							"df_spark.write.mode(\"overwrite\").parquet(f_sales_path_gold)"
 						],
 						"outputs": [],
-						"execution_count": 25
+						"execution_count": 30
 					}
 				]
 			},

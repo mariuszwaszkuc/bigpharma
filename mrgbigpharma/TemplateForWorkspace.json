@@ -2271,7 +2271,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "57e80806-a7c2-4dde-97d6-7f75ee704f02"
+						"spark.autotune.trackingId": "9ed5eb3d-8d17-423f-93d3-d31badd8df09"
 					}
 				},
 				"metadata": {
@@ -2335,24 +2335,7 @@
 							"orders_df.show(5)\r\n",
 							"order_details_df.show(5)\r\n",
 							"customers_df.show(5)\r\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": 1
-					},
-					{
-						"cell_type": "code",
-						"metadata": {},
-						"source": [
-							"join_bronze_df.show()"
-						],
-						"outputs": [],
-						"execution_count": 25
-					},
-					{
-						"cell_type": "code",
-						"metadata": {},
-						"source": [
+							"\r\n",
 							"\r\n",
 							"\r\n",
 							"orders_df = orders_df.withColumn(\r\n",
@@ -2397,8 +2380,6 @@
 							"    silver_exists = False\r\n",
 							"\r\n",
 							"\r\n",
-							"\r\n",
-							"\r\n",
 							"# Jeśli tabela Silver istnieje, wykonaj operację \"MERGE\" na podstawie DataFrame\r\n",
 							"if silver_exists:\r\n",
 							"    # Załaduj dane z tabeli Silver\r\n",
@@ -2424,24 +2405,22 @@
 							"       F.coalesce(\"new_orders.unit_price\", \"silver.unit_price\").alias(\"unit_price\")\r\n",
 							"    )\r\n",
 							"\r\n",
-							"    # Display or save the resulting DataFrame\r\n",
 							"    # Zapisanie zaktualizowanego DataFrame do warstwy Silver\r\n",
 							"\r\n",
 							"    final_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
 							"\r\n",
 							"else:\r\n",
 							"\r\n",
-							"\r\n",
-							"    # Display or save the resulting DataFrame\r\n",
 							"    # Zapisanie zaktualizowanego DataFrame do warstwy Silver\r\n",
 							"\r\n",
 							"    aggregated_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
 							"\r\n",
 							"# Zakończenie\r\n",
-							"print(\"Inkrementalne ładowanie zakończone!\")"
+							"print(\"Inkrementalne ładowanie zakończone!\")\r\n",
+							""
 						],
 						"outputs": [],
-						"execution_count": 2
+						"execution_count": 1
 					}
 				]
 			},

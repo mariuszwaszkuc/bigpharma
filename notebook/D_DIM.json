@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2d69fd19-5561-4004-8b26-2b037b6656ae"
+				"spark.autotune.trackingId": "3ed87d56-7be2-431d-88f9-f06ca9704090"
 			}
 		},
 		"metadata": {
@@ -92,8 +92,9 @@
 					"\r\n",
 					"selected_columns = d_regions[[\"country_id\", \"cluster\", \"region_description\", \"country\"]]\r\n",
 					"\r\n",
-					"selected_columns = selected_columns .withColumnRenamed('\"country_id\"', 'IDCountry').withColumnRenamed('Region', 'region_description').withColumnRenamed('cluster', 'Claster').withColumnRenamed('country', 'Country')\r\n",
+					"selected_columns = selected_columns.withColumnRenamed('country_id', 'IDCountry').withColumnRenamed('Region', 'region_description').withColumnRenamed('cluster', 'Claster').withColumnRenamed('country', 'Country')\r\n",
 					"\r\n",
+					"d_products = d_products.withColumnRenamed(\r\n",
 					"\r\n",
 					"# Usunięcie duplikatów\r\n",
 					"unique_d_regions = selected_columns.drop_duplicates()\r\n",

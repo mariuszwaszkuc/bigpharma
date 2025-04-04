@@ -1140,6 +1140,46 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 2')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/gold/f_planning_book/part-00000-da50a464-a5fd-4f80-8e0f-73fea7ea9990-c000.snappy.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 3')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/gold/f_planning_book_unpivot/**',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/D_CUSTOMERS_LOAD')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -1984,7 +2024,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "1c5a6cf5-bdbe-40a8-8014-b5c8d491ac7d"
+						"spark.autotune.trackingId": "dbbdc55a-7ac4-4ef6-bae6-b52a82eaf63e"
 					}
 				},
 				"metadata": {
@@ -2284,7 +2324,7 @@
 							"\r\n",
 							"\r\n",
 							"# Tworzenie nowej kolumny 'measure' na podstawie obecności 'quantity' lub 'amount' w nazwie kolumny\r\n",
-							"df_melted[\"measure\"] = df_melted[\"original_column\"].apply(lambda x: \"qty\" if \"quantity\" in x.lower() else \"gts\" if \"amount\" in x.lower() else \"unknown\")\r\n",
+							"df_melted[\"measure\"] = df_melted[\"original_column\"].apply(lambda x: \"EA\" if \"quantity\" in x.lower() else \"GTS\" if \"amount\" in x.lower() else \"unknown\")\r\n",
 							"\r\n",
 							"# Mapowanie nazw kolumn na nowe formaty\r\n",
 							"measure_mapping = {\r\n",
@@ -2326,19 +2366,21 @@
 							"max_forecast_snapshot = df_pivoted[\"forecast_snapshot\"].max()\r\n",
 							"\r\n",
 							"# Dodanie kolumny status\r\n",
-							"df_pivoted[\"status\"] =  df_pivoted[\"forecast_snapshot\"].apply(lambda x: \"current\" if x == max_forecast_snapshot  else \"last\")\r\n",
+							"df_pivoted[\"Version\"] =  df_pivoted[\"forecast_snapshot\"].apply(lambda x: \"Current\" if x == max_forecast_snapshot  else \"Last\")\r\n",
 							"\r\n",
-							"\r\n",
+							"bucket_name_gold = \"abfss://gold@bigpharma.dfs.core.windows.net/\"\r\n",
 							"\r\n",
 							"# Ścieżka do warstwy Gold (f_planning_book)\r\n",
 							"f_sales_path_gold = f\"{bucket_name_gold}/f_planning_book_unpivot\"\r\n",
 							"\r\n",
 							"df_spark = spark.createDataFrame(df_pivoted)\r\n",
+							"df_spark=df_spark.withColumnRenamed('product_id', 'IdProduct').withColumnRenamed('country_id', 'IDCountry')\r\n",
 							"\r\n",
-							"df_spark.write.mode(\"overwrite\").parquet(f_sales_path_gold)"
+							"df_spark.write.mode(\"overwrite\").parquet(f_sales_path_gold)\r\n",
+							"df_spark.show()"
 						],
 						"outputs": [],
-						"execution_count": 30
+						"execution_count": 36
 					}
 				]
 			},

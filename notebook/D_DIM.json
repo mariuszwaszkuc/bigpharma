@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "06c1067e-3e8d-407d-bef9-f1069cc61d3c"
+				"spark.autotune.trackingId": "2a237b0e-8c65-4320-9ca9-14734f6748a4"
 			}
 		},
 		"metadata": {
@@ -29,7 +29,7 @@
 			"enableDebugMode": false,
 			"kernelspec": {
 				"name": "synapse_pyspark",
-				"display_name": "python"
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "python"
@@ -91,7 +91,7 @@
 					"d_products = d_products.withColumnRenamed('product_id','IdProduct')\\\r\n",
 					"                       .withColumnRenamed('product_name','Name')\\\r\n",
 					"                       .withColumnRenamed('brand_name','Brand')\\\r\n",
-					"                       .withColumnRenamed('sub_brand_name','Brand')\\\r\n",
+					"                       .withColumnRenamed('sub_brand_name','SubBrand')\\\r\n",
 					"                       .withColumnRenamed('category_name','Category')\r\n",
 					"\r\n",
 					"\r\n",
@@ -100,12 +100,11 @@
 					"\r\n",
 					"selected_columns = d_regions[[\"country_id\", \"cluster\", \"region_description\", \"country\"]]\r\n",
 					"\r\n",
-					"selected_columns = selected_columns.withColumnRenamed('country_id', 'IDCountry').withColumnRenamed('Region', 'region_description').withColumnRenamed('cluster', 'Claster').withColumnRenamed('country', 'Country')\r\n",
+					"selected_columns = selected_columns.withColumnRenamed('country_id', 'IDCountry').withColumnRenamed(''region_description', 'Region').withColumnRenamed('cluster', 'Claster').withColumnRenamed('country', 'Country')\r\n",
 					"\r\n",
 					"\r\n",
 					"\r\n",
 					"\r\n",
-					"Usunięcie duplikatów\r\n",
 					"unique_d_regions = selected_columns.drop_duplicates()\r\n",
 					"unique_d_regions.write.mode(\"overwrite\").parquet(d_regions_gold_path)\r\n",
 					"\r\n",
@@ -113,7 +112,7 @@
 					"\r\n",
 					""
 				],
-				"execution_count": 3
+				"execution_count": 4
 			}
 		]
 	}

@@ -1322,7 +1322,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "30df6ef7-a31c-4888-9c9c-2b863217005a"
+						"spark.autotune.trackingId": "ac3e767e-30fe-4354-b800-73e588c76895"
 					}
 				},
 				"metadata": {
@@ -1348,7 +1348,6 @@
 						"nodeCount": 3,
 						"cores": 4,
 						"memory": 28,
-						"extraHeader": {},
 						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
@@ -1403,7 +1402,7 @@
 							"\r\n",
 							"selected_columns = d_regions[[\"country_id\", \"cluster\", \"region_description\", \"country\"]]\r\n",
 							"\r\n",
-							"selected_columns = selected_columns.withColumnRenamed('country_id', 'IDCountry').withColumnRenamed(''region_description', 'Region').withColumnRenamed('cluster', 'Claster').withColumnRenamed('country', 'Country')\r\n",
+							"selected_columns = selected_columns.withColumnRenamed('country_id', 'IDCountry').withColumnRenamed('region_description', 'Region').withColumnRenamed('cluster', 'Claster').withColumnRenamed('country', 'Country')\r\n",
 							"\r\n",
 							"\r\n",
 							"\r\n",
@@ -1416,7 +1415,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 5
+						"execution_count": 7
 					}
 				]
 			},

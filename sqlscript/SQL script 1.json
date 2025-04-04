@@ -2,7 +2,7 @@
 	"name": "SQL script 1",
 	"properties": {
 		"content": {
-			"query": "CREATE VIEW [dbo].[f_planning_book]\n\n\n\n\tAS \n\t\n\tSELECT [forecast_snapshot] as [Version\tDate],\t\n\t       Null                as [Date],\n\t\t   Null\t\t\t\t\t  [IdProduct],\t\n\t       Null                   [Ex-Factory],\t\n\t\t   Null                   [Sales to pharmacies],\t\n\t\t   Null                       [Open Stock],\t\n\t\t   Null                       [Close Stock],\t\n\t\t   Null                       [Open Stock Pharmacies],\t\n\t\t   Null                       [Close Stock Pharmacies],\n\t\t   Null                       [Free Goods Promo Adjustment],\n\t\t   Null                       [Consumer Off Take],\t\n\t\t   Null                       [IDCountry],\t\n\n\n\n\t\n\tFROM f_planning_book\n",
+			"query": "CREATE VIEW [dbo].[f_planning_book]\n\n\n\n\tAS \n\t\n\tSELECT [forecast_snapshot] as [Version\tDate],\t\n\t       Null                as [Date],\n\t\t                       as  [Measure],\n\t\t   Null\t\t\t\t   as  [IdProduct],\t\n\t       Null                    [Ex-Factory],\t\n\t\t   Null                    [Sales to pharmacies],\t\n\t\t   Null                    [Open Stock],\t\n\t\t   Null                    [Close Stock],\t\n\t\t   Null                    [Open Stock Pharmacies],\t\n\t\t   Null                    [Close Stock Pharmacies],\n\t\t   Null                    [Free Goods Promo Adjustment],\n\t\t   Null                    [Consumer Off Take],\t\n\t\t   Null                    [IDCountry],\t\n\n\n\n\t\n\tFROM f_planning_book\n",
 			"metadata": {
 				"language": "sql"
 			},

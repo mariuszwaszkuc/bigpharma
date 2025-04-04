@@ -55,7 +55,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "F_PRODUCT_LOAD",
+						"referenceName": "D_PRODUCT_LOAD",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,

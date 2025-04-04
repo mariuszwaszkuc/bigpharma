@@ -100,7 +100,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebook": {
-								"referenceName": "F_PRODUCT_LOAD",
+								"referenceName": "D_PRODUCT_LOAD",
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
@@ -134,7 +134,7 @@
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/notebooks/D_CUSTOMERS_LOAD')]",
 				"[concat(variables('workspaceId'), '/bigDataPools/sparkpool32')]",
-				"[concat(variables('workspaceId'), '/notebooks/F_PRODUCT_LOAD')]"
+				"[concat(variables('workspaceId'), '/notebooks/D_PRODUCT_LOAD')]"
 			]
 		},
 		{
@@ -1303,7 +1303,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"folder": {
-					"name": "Load_Silver"
+					"name": "Load Gold"
 				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
@@ -1322,15 +1322,16 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "3cfad5b5-5280-41b7-a089-4fef55ec9f94"
+						"spark.autotune.trackingId": "863315ac-bc60-40f1-a84f-c9d38b5e6a70"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
-					"synapse_widget": {
-						"version": "0.1"
-					},
 					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
 					"language_info": {
 						"name": "python"
 					},
@@ -1341,14 +1342,12 @@
 						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
 						"auth": {
 							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net",
-							"authHeader": null
+							"authResource": "https://dev.azuresynapse.net"
 						},
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"extraHeader": null
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1590,6 +1589,153 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/D_PRODUCT_LOAD')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "sparkpool32",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"runAsWorkspaceSystemIdentity": false,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "562b2eba-a58e-4573-acb1-908422966e69"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+						"name": "sparkpool32",
+						"type": "Spark",
+						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"from pyspark.sql import SparkSession\r\n",
+							"from pyspark.sql.functions import col, max, coalesce, trunc\r\n",
+							"from pyspark.sql.window import Window\r\n",
+							"from pyspark.sql import functions as F\r\n",
+							"\r\n",
+							"# Parametry dla warstwy Bronze (ADLS Gen2)\r\n",
+							"bronze_bucket_name = \"abfss://bronze@bigpharma.dfs.core.windows.net/\"\r\n",
+							"bronze_prefix = \"Erp/\"\r\n",
+							"file_name = \"products\"  # Zmieniamy na odpowiednią nazwę pliku\r\n",
+							"\r\n",
+							"# Parametry dla warstwy Silver (ADLS Gen2)\r\n",
+							"silver_bucket_name = \"abfss://silver@bigpharma.dfs.core.windows.net/\"\r\n",
+							"silver_prefix = \"d_products/\"\r\n",
+							"\r\n",
+							"# Ścieżki do plików Parquet w ADLS Gen2\r\n",
+							"path = f\"{bronze_bucket_name}{bronze_prefix}{file_name}\"\r\n",
+							"\r\n",
+							"# Ścieżka do warstwy Silver\r\n",
+							"silver_path = f\"{silver_bucket_name}{silver_prefix}\"\r\n",
+							"\r\n",
+							"# Załaduj dane z ADLS (tabela products)\r\n",
+							"products_df = spark.read.parquet(path)\r\n",
+							"\r\n",
+							"# Wyświetlenie pierwszych wierszy dla weryfikacji\r\n",
+							"products_df.show(5)\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"\r\n",
+							"#products_df.show()\r\n",
+							"\r\n",
+							"latest_products_df = products_df.withColumn(\"max_order_date\", F.max(\"update_date\").over(Window.partitionBy(\"product_id\"))).filter(F.col(\"update_date\") == F.col(\"max_order_date\"))\r\n",
+							"\r\n",
+							"\r\n",
+							"# Wybór odpowiednich kolumn do zapisania w warstwie Silver\r\n",
+							"new_products_df = latest_products_df.select(\r\n",
+							"    \"product_id\", \r\n",
+							"    \"product_name\", \r\n",
+							"    \"brand_name\", \r\n",
+							"    \"sub_brand_name\", \r\n",
+							"    \"category_name\")\r\n",
+							"\r\n",
+							"\r\n",
+							"# Sprawdzenie, czy tabela Silver już istnieje\r\n",
+							"try:\r\n",
+							"    silver_df = spark.read.parquet(silver_path)\r\n",
+							"    silver_exists = True\r\n",
+							"except:\r\n",
+							"    silver_exists = False\r\n",
+							"if silver_exists:\r\n",
+							"    silver_df = spark.read.parquet(silver_path)\r\n",
+							"    \r\n",
+							"    merged_df = silver_df.alias(\"silver\").join(\r\n",
+							"        new_products_df.alias(\"new_products\"),\r\n",
+							"        (F.col(\"silver.product_id\") == F.col(\"new_products.product_id\")),\r\n",
+							"        how=\"outer\"\r\n",
+							"        )\r\n",
+							"\r\n",
+							"        # Wybór kolumn, które mają zostać zaktualizowane lub dodane\r\n",
+							"    final_df = merged_df.select(\r\n",
+							"        F.coalesce(\"new_products.product_id\", \"silver.product_id\").alias(\"product_id\"),\r\n",
+							"        F.coalesce(\"new_products.product_name\", \"silver.product_name\").alias(\"product_name\"),\r\n",
+							"        F.coalesce(\"new_products.brand_name\", \"silver.brand_name\").alias(\"brand_name\"),\r\n",
+							"        F.coalesce(\"new_products.sub_brand_name\", \"silver.sub_brand_name\").alias(\"sub_brand_name\"),\r\n",
+							"        F.coalesce(\"new_products.category_name\", \"silver.category_name\").alias(\"category_name\")\r\n",
+							"    )\r\n",
+							"else:\r\n",
+							"\r\n",
+							"    new_products_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
+							"\r\n",
+							"# Zakończenie\r\n",
+							"print(\"Inkrementalne ładowanie zakończone!\")    \r\n",
+							"\r\n",
+							"\r\n",
+							"spark.stop()"
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/F_FORCAST_LOAD')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -1799,7 +1945,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"folder": {
-					"name": "Load_Silver"
+					"name": "Load Gold"
 				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
@@ -2101,152 +2247,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/F_PRODUCT_LOAD')]",
-			"type": "Microsoft.Synapse/workspaces/notebooks",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"folder": {
-					"name": "Load_Silver"
-				},
-				"nbformat": 4,
-				"nbformat_minor": 2,
-				"bigDataPool": {
-					"referenceName": "sparkpool32",
-					"type": "BigDataPoolReference"
-				},
-				"sessionProperties": {
-					"driverMemory": "28g",
-					"driverCores": 4,
-					"executorMemory": "28g",
-					"executorCores": 4,
-					"numExecutors": 2,
-					"runAsWorkspaceSystemIdentity": false,
-					"conf": {
-						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "2",
-						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "5561afa6-8127-45dc-9c3b-2bf912807ca4"
-					}
-				},
-				"metadata": {
-					"saveOutput": true,
-					"synapse_widget": {
-						"version": "0.1"
-					},
-					"enableDebugMode": false,
-					"language_info": {
-						"name": "python"
-					},
-					"a365ComputeOptions": {
-						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
-						"name": "sparkpool32",
-						"type": "Spark",
-						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
-						"auth": {
-							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net",
-							"authHeader": null
-						},
-						"sparkVersion": "3.4",
-						"nodeCount": 3,
-						"cores": 4,
-						"memory": 28,
-						"extraHeader": null
-					},
-					"sessionKeepAliveTimeout": 30
-				},
-				"cells": [
-					{
-						"cell_type": "code",
-						"source": [
-							"from pyspark.sql import SparkSession\r\n",
-							"from pyspark.sql.functions import col, max, coalesce, trunc\r\n",
-							"from pyspark.sql.window import Window\r\n",
-							"from pyspark.sql import functions as F\r\n",
-							"\r\n",
-							"# Parametry dla warstwy Bronze (ADLS Gen2)\r\n",
-							"bronze_bucket_name = \"abfss://bronze@bigpharma.dfs.core.windows.net/\"\r\n",
-							"bronze_prefix = \"Erp/\"\r\n",
-							"file_name = \"products\"  # Zmieniamy na odpowiednią nazwę pliku\r\n",
-							"\r\n",
-							"# Parametry dla warstwy Silver (ADLS Gen2)\r\n",
-							"silver_bucket_name = \"abfss://silver@bigpharma.dfs.core.windows.net/\"\r\n",
-							"silver_prefix = \"d_products/\"\r\n",
-							"\r\n",
-							"# Ścieżki do plików Parquet w ADLS Gen2\r\n",
-							"path = f\"{bronze_bucket_name}{bronze_prefix}{file_name}\"\r\n",
-							"\r\n",
-							"# Ścieżka do warstwy Silver\r\n",
-							"silver_path = f\"{silver_bucket_name}{silver_prefix}\"\r\n",
-							"\r\n",
-							"# Załaduj dane z ADLS (tabela products)\r\n",
-							"products_df = spark.read.parquet(path)\r\n",
-							"\r\n",
-							"# Wyświetlenie pierwszych wierszy dla weryfikacji\r\n",
-							"products_df.show(5)\r\n",
-							"\r\n",
-							""
-						],
-						"outputs": []
-					},
-					{
-						"cell_type": "code",
-						"source": [
-							"\r\n",
-							"#products_df.show()\r\n",
-							"\r\n",
-							"latest_products_df = products_df.withColumn(\"max_order_date\", F.max(\"update_date\").over(Window.partitionBy(\"product_id\"))).filter(F.col(\"update_date\") == F.col(\"max_order_date\"))\r\n",
-							"\r\n",
-							"\r\n",
-							"# Wybór odpowiednich kolumn do zapisania w warstwie Silver\r\n",
-							"new_products_df = latest_products_df.select(\r\n",
-							"    \"product_id\", \r\n",
-							"    \"product_name\", \r\n",
-							"    \"brand_name\", \r\n",
-							"    \"sub_brand_name\", \r\n",
-							"    \"category_name\")\r\n",
-							"\r\n",
-							"\r\n",
-							"# Sprawdzenie, czy tabela Silver już istnieje\r\n",
-							"try:\r\n",
-							"    silver_df = spark.read.parquet(silver_path)\r\n",
-							"    silver_exists = True\r\n",
-							"except:\r\n",
-							"    silver_exists = False\r\n",
-							"if silver_exists:\r\n",
-							"    silver_df = spark.read.parquet(silver_path)\r\n",
-							"    \r\n",
-							"    merged_df = silver_df.alias(\"silver\").join(\r\n",
-							"        new_products_df.alias(\"new_products\"),\r\n",
-							"        (F.col(\"silver.product_id\") == F.col(\"new_products.product_id\")),\r\n",
-							"        how=\"outer\"\r\n",
-							"        )\r\n",
-							"\r\n",
-							"        # Wybór kolumn, które mają zostać zaktualizowane lub dodane\r\n",
-							"    final_df = merged_df.select(\r\n",
-							"        F.coalesce(\"new_products.product_id\", \"silver.product_id\").alias(\"product_id\"),\r\n",
-							"        F.coalesce(\"new_products.product_name\", \"silver.product_name\").alias(\"product_name\"),\r\n",
-							"        F.coalesce(\"new_products.brand_name\", \"silver.brand_name\").alias(\"brand_name\"),\r\n",
-							"        F.coalesce(\"new_products.sub_brand_name\", \"silver.sub_brand_name\").alias(\"sub_brand_name\"),\r\n",
-							"        F.coalesce(\"new_products.category_name\", \"silver.category_name\").alias(\"category_name\")\r\n",
-							"    )\r\n",
-							"else:\r\n",
-							"\r\n",
-							"    new_products_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
-							"\r\n",
-							"# Zakończenie\r\n",
-							"print(\"Inkrementalne ładowanie zakończone!\")    \r\n",
-							"\r\n",
-							"\r\n",
-							"spark.stop()"
-						],
-						"outputs": []
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/F_SALES_LOAD')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -2271,15 +2271,16 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "728e7c2b-ced0-4e9d-aeef-0ffdc892a033"
+						"spark.autotune.trackingId": "57e80806-a7c2-4dde-97d6-7f75ee704f02"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
-					"synapse_widget": {
-						"version": "0.1"
-					},
 					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
 					"language_info": {
 						"name": "python"
 					},
@@ -2290,19 +2291,20 @@
 						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
 						"auth": {
 							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net",
-							"authHeader": null
+							"authResource": "https://dev.azuresynapse.net"
 						},
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"from pyspark.sql import SparkSession\r\n",
 							"from pyspark.sql.functions import col, max, coalesce, trunc\r\n",
@@ -2340,6 +2342,7 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"join_bronze_df.show()"
 						],
@@ -2348,6 +2351,7 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"\r\n",
 							"\r\n",
@@ -2468,15 +2472,16 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "6644fc0f-db4c-4e12-bbd4-0cfb619f0692"
+						"spark.autotune.trackingId": "1827bf51-9e48-4f98-a7f4-3370cb87a6b4"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
-					"synapse_widget": {
-						"version": "0.1"
-					},
 					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
 					"language_info": {
 						"name": "python"
 					},
@@ -2487,14 +2492,12 @@
 						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
 						"auth": {
 							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net",
-							"authHeader": null
+							"authResource": "https://dev.azuresynapse.net"
 						},
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"extraHeader": null
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -2620,100 +2623,6 @@
 						],
 						"outputs": [],
 						"execution_count": 7
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/Notebook 2')]",
-			"type": "Microsoft.Synapse/workspaces/notebooks",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"folder": {
-					"name": "Load_Silver"
-				},
-				"nbformat": 4,
-				"nbformat_minor": 2,
-				"bigDataPool": {
-					"referenceName": "sparkpool32",
-					"type": "BigDataPoolReference"
-				},
-				"sessionProperties": {
-					"driverMemory": "28g",
-					"driverCores": 4,
-					"executorMemory": "28g",
-					"executorCores": 4,
-					"numExecutors": 2,
-					"runAsWorkspaceSystemIdentity": false,
-					"conf": {
-						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "2",
-						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "b3b03d10-1c21-4913-8a55-325faa350670"
-					}
-				},
-				"metadata": {
-					"saveOutput": true,
-					"synapse_widget": {
-						"version": "0.1"
-					},
-					"enableDebugMode": false,
-					"language_info": {
-						"name": "python"
-					},
-					"a365ComputeOptions": {
-						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
-						"name": "sparkpool32",
-						"type": "Spark",
-						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
-						"auth": {
-							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net",
-							"authHeader": null
-						},
-						"sparkVersion": "3.4",
-						"nodeCount": 3,
-						"cores": 4,
-						"memory": 28,
-						"extraHeader": null
-					},
-					"sessionKeepAliveTimeout": 30
-				},
-				"cells": [
-					{
-						"cell_type": "code",
-						"metadata": {
-							"microsoft": {
-								"language": "python"
-							},
-							"collapsed": false
-						},
-						"source": [
-							"%%pyspark\r\n",
-							"from pyspark.sql.functions import split\r\n",
-							"df = spark.read.format(\"csv\").option(\"delimiter\", \";\").option(\"inferSchema\",\"true\").load(\"abfss://bronze@bigpharma.dfs.core.windows.net/ExternalStatistics/inflation.csv\")\r\n",
-							"df1 =df.withColumn('Type', split(df['_c0'], ',').getItem(0))\\\r\n",
-							"       .withColumn('Type1', split(df['_c0'], ',').getItem(1))\\\r\n",
-							"       .withColumn('Type2', split(df['_c0'], ',').getItem(2))\\\r\n",
-							"       .withColumn('Type3', split(df['_c0'], ',').getItem(3))\\\r\n",
-							"       .withColumn('Type4', split(df['_c0'], ',').getItem(4))\r\n",
-							"\r\n",
-							"df2=df1.drop('_c0')\r\n",
-							"df2.show()\r\n",
-							"\r\n",
-							"import pandas as pd\r\n",
-							"\r\n",
-							"result_pdf = df2.select(\"*\").toPandas()\r\n",
-							"\r\n",
-							"\r\n",
-							"df4 = result_pdf.rename(columns=result_pdf.iloc[0]).loc[1:]\r\n",
-							"\r\n",
-							"\r\n",
-							"print(df4)"
-						],
-						"outputs": [],
-						"execution_count": 44
 					}
 				]
 			},

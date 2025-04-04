@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3ed87d56-7be2-431d-88f9-f06ca9704090"
+				"spark.autotune.trackingId": "e43e8a80-5d6a-4d78-8587-4f81e8896b6f"
 			}
 		},
 		"metadata": {
@@ -94,9 +94,12 @@
 					"\r\n",
 					"selected_columns = selected_columns.withColumnRenamed('country_id', 'IDCountry').withColumnRenamed('Region', 'region_description').withColumnRenamed('cluster', 'Claster').withColumnRenamed('country', 'Country')\r\n",
 					"\r\n",
-					"d_products = d_products.withColumnRenamed(\r\n",
 					"\r\n",
-					"# Usunięcie duplikatów\r\n",
+					"d_products = d_products.withColumnRenamed('product_id','IdProduct').withColumnRenamed( 'product_name','Name').withColumnRenamed('brand_name','Brand').withColumnRenamed('sub_brand_name','Brand').withColumnRenamed('category_name','Category')\r\n",
+					"\r\n",
+					"\r\n",
+					"\r\n",
+					" Usunięcie duplikatów\r\n",
 					"unique_d_regions = selected_columns.drop_duplicates()\r\n",
 					"unique_d_regions.write.mode(\"overwrite\").parquet(d_regions_gold_path)\r\n",
 					"\r\n",

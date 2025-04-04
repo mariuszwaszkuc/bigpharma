@@ -1382,7 +1382,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "863315ac-bc60-40f1-a84f-c9d38b5e6a70"
+						"spark.autotune.trackingId": "f3f3ac67-c8a2-4aab-838c-498b6ee006fc"
 					}
 				},
 				"metadata": {
@@ -1407,13 +1407,15 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"from pyspark.sql import SparkSession\r\n",
 							"from pyspark.sql import SparkSession\r\n",
@@ -1451,6 +1453,9 @@
 							"d_products.write.mode(\"overwrite\").parquet(d_products_gold_path)\r\n",
 							"\r\n",
 							"selected_columns = d_regions[[\"country_id\", \"cluster\", \"region_description\", \"country\"]]\r\n",
+							"\r\n",
+							"selected_columns = selected_columns .withColumnRenamed('\"country_id\"', 'IDCountry').withColumnRenamed('Region', 'region_description').withColumnRenamed('cluster', 'Claster').withColumnRenamed('country', 'Country')\r\n",
+							"\r\n",
 							"\r\n",
 							"# Usunięcie duplikatów\r\n",
 							"unique_d_regions = selected_columns.drop_duplicates()\r\n",
@@ -2024,7 +2029,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "c1d5425f-e866-496e-87c5-4a9fbf28c38d"
+						"spark.autotune.trackingId": "008dbc35-fe22-4865-9ecf-574664b8e34b"
 					}
 				},
 				"metadata": {
@@ -2049,15 +2054,13 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"from pyspark.sql import SparkSession\r\n",
 							"from pyspark.sql import SparkSession\r\n",
@@ -2095,7 +2098,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"\r\n",
 							"# Pobranie maksymalnej wartości forecast_snapshot z f_forecast\r\n",
@@ -2306,7 +2308,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"import pandas as pd\r\n",
 							"\r\n",

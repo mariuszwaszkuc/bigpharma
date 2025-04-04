@@ -1100,6 +1100,26 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/Create External Table F_Planning_Book')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseParquetFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'gold_bigpharma_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [gold_bigpharma_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://gold@bigpharma.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE dbo.f_planning_book (\n\t[product_id] int,\n\t[country_id] int,\n\t[financial_date] date,\n\t[forecast_snapshot] date,\n\t[quantity] bigint,\n\t[amount] float,\n\t[unit_price] float,\n\t[whrs_sell_in_quantity] bigint,\n\t[whrs_open_quantity] bigint,\n\t[whrs_end_quantity] bigint,\n\t[whrs_sell_in_amount] float,\n\t[whrs_open_amount] float,\n\t[whrs_end_amount] float,\n\t[pos_sell_out_quantity] bigint,\n\t[pos_open_quantity] bigint,\n\t[pos_end_quantity] bigint,\n\t[pos_sell_out_amount] float,\n\t[pos_open_amount] float,\n\t[pos_end_amount] float,\n\t[discount] float\n\t)\n\tWITH (\n\tLOCATION = 'f_planning_book/**',\n\tDATA_SOURCE = [gold_bigpharma_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseParquetFormat]\n\t)\nGO\n\n\nSELECT TOP 100 * FROM dbo.f_planning_book\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "Sql_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/f_planning_book')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",

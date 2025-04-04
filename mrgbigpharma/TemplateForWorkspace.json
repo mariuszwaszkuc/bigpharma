@@ -1125,7 +1125,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "CREATE VIEW [dbo].[f_planning_book]\n\n\n\n\tAS \n\t\n\tSELECT [forecast_snapshot] as [Version\tDate],\t\n\t       Null                as [Date],\n\t\t   Null\t\t\t\t\t  [IdProduct],\t\n\t       Null                   [Ex-Factory],\t\n\t\t   Null                   [Sales to pharmacies],\t\n\t\t   Null                   [Open Stock],\t\n\t\t   Null                       [Close Stock],\t\n\t\t   Null                       [Open Stock Pharmacies],\t\n\t\t   Null                       [Close Stock Pharmacies],\n\t\t   Null                       [Free Goods Promo Adjustment],\n\t\t   Null                       [Consumer Off Take],\t\n\t\t   Null                       [IDCountry],\t\n\n\n\n\t\n\tFROM f_planning_book\n",
+					"query": "CREATE VIEW [dbo].[f_planning_book]\n\n\n\n\tAS \n\t\n\tSELECT [forecast_snapshot] as [Version\tDate],\t\n\t       Null                as [Date],\n\t\t                       as  [Measure],\n\t\t   Null\t\t\t\t   as  [IdProduct],\t\n\t       Null                    [Ex-Factory],\t\n\t\t   Null                    [Sales to pharmacies],\t\n\t\t   Null                    [Open Stock],\t\n\t\t   Null                    [Close Stock],\t\n\t\t   Null                    [Open Stock Pharmacies],\t\n\t\t   Null                    [Close Stock Pharmacies],\n\t\t   Null                    [Free Goods Promo Adjustment],\n\t\t   Null                    [Consumer Off Take],\t\n\t\t   Null                    [IDCountry],\t\n\n\n\n\t\n\tFROM f_planning_book\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -1984,15 +1984,16 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f9f1c294-1e49-4461-b5f2-63921e11738c"
+						"spark.autotune.trackingId": "304d8c78-9ab9-4a7d-b854-30bc8a14caf1"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
-					"synapse_widget": {
-						"version": "0.1"
-					},
 					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
 					"language_info": {
 						"name": "python"
 					},
@@ -2003,20 +2004,20 @@
 						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
 						"auth": {
 							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net",
-							"authHeader": null
+							"authResource": "https://dev.azuresynapse.net"
 						},
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
 						"memory": 28,
-						"extraHeader": null
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"from pyspark.sql import SparkSession\r\n",
 							"from pyspark.sql import SparkSession\r\n",
@@ -2050,10 +2051,11 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 1
+						"execution_count": 14
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"\r\n",
 							"# Pobranie maksymalnej wartości forecast_snapshot z f_forecast\r\n",
@@ -2260,7 +2262,79 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 3
+						"execution_count": 15
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"import pandas as pd\r\n",
+							"\r\n",
+							"# Załaduj dane\r\n",
+							"df_pandas = aggregated_df.toPandas()\r\n",
+							"\r\n",
+							"df_pandas = df_pandas.drop(columns=['discount', 'unit_price'])\r\n",
+							"\r\n",
+							"# Unpivotowanie (melt)\r\n",
+							"df_melted = df_pandas.melt(\r\n",
+							"   id_vars=['product_id', 'country_id', 'financial_date', 'forecast_snapshot'],\r\n",
+							"    var_name=\"original_column\",\r\n",
+							"    value_name=\"value\"\r\n",
+							")\r\n",
+							"\r\n",
+							"\r\n",
+							"# Tworzenie nowej kolumny 'measure' na podstawie obecności 'quantity' lub 'amount' w nazwie kolumny\r\n",
+							"df_melted[\"measure\"] = df_melted[\"original_column\"].apply(lambda x: \"qty\" if \"quantity\" in x.lower() else \"gts\" if \"amount\" in x.lower() else \"unknown\")\r\n",
+							"\r\n",
+							"# Mapowanie nazw kolumn na nowe formaty\r\n",
+							"measure_mapping = {\r\n",
+							"    'quantity': 'Ex-Factory',\r\n",
+							"    'amount': 'Ex-Factory',\r\n",
+							"    'whrs_sell_in_quantity': 'Sales to pharmacies',\r\n",
+							"    'whrs_open_quantity': 'Open Stock',\r\n",
+							"    'whrs_end_quantity': 'Close Stock',\r\n",
+							"    'whrs_sell_in_amount': 'Sales to pharmacies',\r\n",
+							"    'whrs_open_amount': 'Open Stock',\r\n",
+							"    'whrs_end_amount': 'Close Stock',\r\n",
+							"    'pos_sell_out_quantity': 'Sales to pharmacies',\r\n",
+							"    'pos_open_quantity': 'Open Stock Pharmacies',\r\n",
+							"    'pos_end_quantity': 'Close Stock Pharmacies',\r\n",
+							"    'pos_sell_out_amount': 'Sales to pharmacies',\r\n",
+							"    'pos_open_amount': 'Open Stock Pharmacies',\r\n",
+							"    'pos_end_amount': 'Close Stock Pharmacies'\r\n",
+							"}\r\n",
+							"\r\n",
+							"# Zastosowanie mapowania\r\n",
+							"df_melted[\"original_column\"] = df_melted[\"original_column\"].replace(measure_mapping)\r\n",
+							"\r\n",
+							"# Usuwamy wiersze z brakującymi wartościami\r\n",
+							"df_melted = df_melted.dropna(subset=[\"original_column\", \"value\"])\r\n",
+							"\r\n",
+							"# Pivotowanie danych\r\n",
+							"df_pivoted = df_melted.pivot_table(\r\n",
+							"    index=['product_id', 'country_id', 'financial_date', 'forecast_snapshot', 'measure'],  \r\n",
+							"    columns='original_column',\r\n",
+							"    values='value',\r\n",
+							"    aggfunc='first'  # lub 'sum', jeśli chcesz sumować wartości\r\n",
+							").reset_index()\r\n",
+							"\r\n",
+							"# Usunięcie nazwy kolumny po pivotowaniu\r\n",
+							"df_pivoted.columns.name = None\r\n",
+							"\r\n",
+							"\r\n",
+							"# Znalezienie maksymalnej daty\r\n",
+							"max_forecast_snapshot = df_pivoted[\"forecast_snapshot\"].max()\r\n",
+							"\r\n",
+							"# Dodanie kolumny status\r\n",
+							"df_pivoted[\"status\"] =  df_pivoted[\"forecast_snapshot\"].apply(lambda x: \"current\" if x == max_forecast_snapshot  else \"last\")\r\n",
+							"\r\n",
+							"\r\n",
+							"# Wyświetl wynik\r\n",
+							"print(df_pivoted)\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 25
 					}
 				]
 			},

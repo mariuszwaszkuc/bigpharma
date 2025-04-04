@@ -1180,6 +1180,26 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 4')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/gold/d_products/**',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/D_CUSTOMERS_LOAD')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -1382,7 +1402,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "c91e9ae8-e59f-40a8-8e53-4779eabad379"
+						"spark.autotune.trackingId": "5d56b513-c025-433d-aa08-6e109ffd63ce"
 					}
 				},
 				"metadata": {
@@ -1456,9 +1476,12 @@
 							"\r\n",
 							"selected_columns = selected_columns.withColumnRenamed('country_id', 'IDCountry').withColumnRenamed('Region', 'region_description').withColumnRenamed('cluster', 'Claster').withColumnRenamed('country', 'Country')\r\n",
 							"\r\n",
-							"d_products = d_products.withColumnRenamed(\r\n",
 							"\r\n",
-							"# Usunięcie duplikatów\r\n",
+							"d_products = d_products.withColumnRenamed('product_id','IdProduct').withColumnRenamed( 'product_name','Name').withColumnRenamed('brand_name','Brand').withColumnRenamed('sub_brand_name','Brand').withColumnRenamed('category_name','Category')\r\n",
+							"\r\n",
+							"\r\n",
+							"\r\n",
+							" Usunięcie duplikatów\r\n",
 							"unique_d_regions = selected_columns.drop_duplicates()\r\n",
 							"unique_d_regions.write.mode(\"overwrite\").parquet(d_regions_gold_path)\r\n",
 							"\r\n",

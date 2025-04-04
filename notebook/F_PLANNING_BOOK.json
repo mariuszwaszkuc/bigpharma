@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5b6f2cd4-b378-4cb4-ac6a-8c5f40f677b3"
+				"spark.autotune.trackingId": "56d6cb18-7983-47db-92ce-c03541a52e95"
 			}
 		},
 		"metadata": {
@@ -316,7 +316,7 @@
 					"\r\n",
 					"\r\n",
 					"# Tworzenie nowej kolumny 'measure' na podstawie obecności 'quantity' lub 'amount' w nazwie kolumny\r\n",
-					"df_melted[\"measure\"] = df_melted[\"original_column\"].apply(lambda x: \"EA\" if \"quantity\" in x.lower() else \"GTS\" if \"amount\" in x.lower() else \"unknown\")\r\n",
+					"df_melted[\"Measure\"] = df_melted[\"original_column\"].apply(lambda x: \"EA\" if \"quantity\" in x.lower() else \"GTS\" if \"amount\" in x.lower() else \"unknown\")\r\n",
 					"\r\n",
 					"# Mapowanie nazw kolumn na nowe formaty\r\n",
 					"measure_mapping = {\r\n",
@@ -344,7 +344,7 @@
 					"\r\n",
 					"# Pivotowanie danych\r\n",
 					"df_pivoted = df_melted.pivot_table(\r\n",
-					"    index=['product_id', 'country_id', 'financial_date', 'forecast_snapshot', 'measure'],  \r\n",
+					"    index=['product_id', 'country_id', 'financial_date', 'forecast_snapshot', 'Measure'],  \r\n",
 					"    columns='original_column',\r\n",
 					"    values='value',\r\n",
 					"    aggfunc='first'  # lub 'sum', jeśli chcesz sumować wartości\r\n",
@@ -366,12 +366,12 @@
 					"f_sales_path_gold = f\"{bucket_name_gold}/f_planning_book_unpivot\"\r\n",
 					"\r\n",
 					"df_spark = spark.createDataFrame(df_pivoted)\r\n",
-					"df_spark=df_spark.withColumnRenamed('product_id', 'IdProduct').withColumnRenamed('country_id', 'IDCountry')\r\n",
+					"df_spark=df_spark.withColumnRenamed('product_id', 'IdProduct').withColumnRenamed('country_id', 'IDCountry').withColumnRenamed('financial_date', 'Date')\r\n",
 					"\r\n",
 					"df_spark.write.mode(\"overwrite\").parquet(f_sales_path_gold)\r\n",
 					"df_spark.show()"
 				],
-				"execution_count": 36
+				"execution_count": 39
 			}
 		]
 	}

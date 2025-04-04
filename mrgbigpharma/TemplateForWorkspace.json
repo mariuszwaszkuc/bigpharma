@@ -1402,7 +1402,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "5d56b513-c025-433d-aa08-6e109ffd63ce"
+						"spark.autotune.trackingId": "41a57eb5-7a2e-4d37-971e-b5210590a7e1"
 					}
 				},
 				"metadata": {
@@ -1477,7 +1477,11 @@
 							"selected_columns = selected_columns.withColumnRenamed('country_id', 'IDCountry').withColumnRenamed('Region', 'region_description').withColumnRenamed('cluster', 'Claster').withColumnRenamed('country', 'Country')\r\n",
 							"\r\n",
 							"\r\n",
-							"d_products = d_products.withColumnRenamed('product_id','IdProduct').withColumnRenamed( 'product_name','Name').withColumnRenamed('brand_name','Brand').withColumnRenamed('sub_brand_name','Brand').withColumnRenamed('category_name','Category')\r\n",
+							"d_products = d_products.withColumnRenamed('product_id','IdProduct')\\\r\n",
+							"                       .withColumnRenamed( 'product_name','Name')\\\r\n",
+							"                       .withColumnRenamed('brand_name','Brand')\\\r\n",
+							"                       .withColumnRenamed('sub_brand_name','Brand')\\\r\n",
+							"                       .withColumnRenamed('category_name','Category')\r\n",
 							"\r\n",
 							"\r\n",
 							"\r\n",

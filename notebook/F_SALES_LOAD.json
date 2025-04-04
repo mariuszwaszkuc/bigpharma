@@ -21,15 +21,16 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "728e7c2b-ced0-4e9d-aeef-0ffdc892a033"
+				"spark.autotune.trackingId": "7540f32e-5548-4954-a8e3-bea120cd2000"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
-			"synapse_widget": {
-				"version": "0.1"
-			},
 			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
 			"language_info": {
 				"name": "python"
 			},
@@ -40,13 +41,13 @@
 				"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
 				"auth": {
 					"type": "AAD",
-					"authResource": "https://dev.azuresynapse.net",
-					"authHeader": null
+					"authResource": "https://dev.azuresynapse.net"
 				},
 				"sparkVersion": "3.4",
 				"nodeCount": 3,
 				"cores": 4,
-				"memory": 28
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -83,20 +84,7 @@
 					"orders_df.show(5)\r\n",
 					"order_details_df.show(5)\r\n",
 					"customers_df.show(5)\r\n",
-					""
-				],
-				"execution_count": 1
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"join_bronze_df.show()"
-				],
-				"execution_count": 25
-			},
-			{
-				"cell_type": "code",
-				"source": [
+					"\r\n",
 					"\r\n",
 					"\r\n",
 					"orders_df = orders_df.withColumn(\r\n",
@@ -141,8 +129,6 @@
 					"    silver_exists = False\r\n",
 					"\r\n",
 					"\r\n",
-					"\r\n",
-					"\r\n",
 					"# Jeśli tabela Silver istnieje, wykonaj operację \"MERGE\" na podstawie DataFrame\r\n",
 					"if silver_exists:\r\n",
 					"    # Załaduj dane z tabeli Silver\r\n",
@@ -168,23 +154,21 @@
 					"       F.coalesce(\"new_orders.unit_price\", \"silver.unit_price\").alias(\"unit_price\")\r\n",
 					"    )\r\n",
 					"\r\n",
-					"    # Display or save the resulting DataFrame\r\n",
 					"    # Zapisanie zaktualizowanego DataFrame do warstwy Silver\r\n",
 					"\r\n",
 					"    final_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
 					"\r\n",
 					"else:\r\n",
 					"\r\n",
-					"\r\n",
-					"    # Display or save the resulting DataFrame\r\n",
 					"    # Zapisanie zaktualizowanego DataFrame do warstwy Silver\r\n",
 					"\r\n",
 					"    aggregated_df.write.mode(\"overwrite\").parquet(silver_path)\r\n",
 					"\r\n",
 					"# Zakończenie\r\n",
-					"print(\"Inkrementalne ładowanie zakończone!\")"
+					"print(\"Inkrementalne ładowanie zakończone!\")\r\n",
+					""
 				],
-				"execution_count": 2
+				"execution_count": 1
 			}
 		]
 	}

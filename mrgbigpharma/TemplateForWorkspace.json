@@ -1120,6 +1120,26 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "CREATE VIEW [dbo].[f_planning_book]\n\n\n\n\tAS \n\t\n\tSELECT [forecast_snapshot] as [Version\tDate],\t\n\t       Null                as [Date],\n\t\t   Null\t\t\t\t\t  [IdProduct],\t\n\t       Null                   [Ex-Factory],\t\n\t\t   Null                   [Sales to pharmacies],\t\n\t\t   Null                   [Open Stock],\t\n\t\t   Null                       [Close Stock],\t\n\t\t   Null                       [Open Stock Pharmacies],\t\n\t\t   Null                       [Close Stock Pharmacies],\n\t\t   Null                       [Free Goods Promo Adjustment],\n\t\t   Null                       [Consumer Off Take],\t\n\t\t   Null                       [IDCountry],\t\n\n\n\n\t\n\tFROM f_planning_book\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "Sql_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/D_CUSTOMERS_LOAD')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -2271,7 +2291,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "9ed5eb3d-8d17-423f-93d3-d31badd8df09"
+						"spark.autotune.trackingId": "7540f32e-5548-4954-a8e3-bea120cd2000"
 					}
 				},
 				"metadata": {
@@ -2296,15 +2316,13 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"from pyspark.sql import SparkSession\r\n",
 							"from pyspark.sql.functions import col, max, coalesce, trunc\r\n",

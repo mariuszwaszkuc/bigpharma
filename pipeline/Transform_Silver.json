@@ -1,5 +1,5 @@
 {
-	"name": "Load_Silver",
+	"name": "Transform_Silver",
 	"properties": {
 		"activities": [
 			{
@@ -78,7 +78,7 @@
 			}
 		],
 		"folder": {
-			"name": "Brozne"
+			"name": "Silver"
 		},
 		"annotations": [],
 		"lastPublishTime": "2025-04-02T06:40:26Z"

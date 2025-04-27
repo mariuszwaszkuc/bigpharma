@@ -1,5 +1,5 @@
 {
-	"name": "mysql_erp_load",
+	"name": "extract_load_erp",
 	"properties": {
 		"activities": [
 			{

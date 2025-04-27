@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d1f9a595-68c0-4a9b-9526-65a54287ab7d"
+				"spark.autotune.trackingId": "7b04f5c0-922b-4ef6-a571-5b53520245ff"
 			}
 		},
 		"metadata": {
@@ -58,44 +58,33 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": 1
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"spark._jsc.hadoopConfiguration().set(\"fs.s3a.endpoint\", \"http://20.215.33.25:9000\")\n",
-					"spark._jsc.hadoopConfiguration().set(\"fs.s3a.access.key\", \"minioadmin\")\n",
-					"spark._jsc.hadoopConfiguration().set(\"fs.s3a.secret.key\", \"minioadmin\")\n",
-					"spark._jsc.hadoopConfiguration().set(\"fs.s3a.path.style.access\", \"true\")\n",
-					"spark._jsc.hadoopConfiguration().set(\"fs.s3a.connection.ssl.enabled\", \"false\")  # lub \"true\" jeśli masz HTTPS"
+					"!pip show azure-core\n",
+					"!pip show azure-identity\n",
+					"!pip show azure-keyvault-secrets"
 				],
-				"execution_count": 2
+				"execution_count": 42
 			},
 			{
 				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"outputs_hidden": true
-					}
-				},
 				"source": [
-					"df = spark.read \\\n",
-					"    .option(\"header\", \"true\") \\\n",
-					"    .option(\"inferSchema\", \"true\") \\\n",
-					"    .option(\"recursiveFileLookup\", \"true\") \\\n",
-					"    .csv(\"s3a://distributors/\")\n",
-					"\n",
-					"df.count(*)"
+					"!pip install --upgrade azure-core azure-identity azure-keyvault-secrets"
 				],
-				"execution_count": 11
+				"execution_count": 43
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"import os\n",
+					"\n",
 					"from pyspark.sql import SparkSession\n",
 					"from pyspark.sql.utils import AnalysisException\n",
 					"from pyspark.sql.functions import input_file_name\n",
+					"# Pakiety z Key Vault\n",
 					"from azure.identity import DefaultAzureCredential\n",
 					"from azure.keyvault.secrets import SecretClient\n",
 					"\n",
@@ -118,14 +107,14 @@
 					"    .config(\"spark.hadoop.fs.s3a.path.style.access\", \"true\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 46
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"\n",
 					"# Krok 1: Sprawdzamy, czy plik Delta z przetworzonymi plikami istnieje\n",
-					"processed_files_path = \"abfss://bronze@bigpharma.dfs.core.windows.net/processed_files_delta\"\n",
+					"processed_files_path = \"abfss://bronze@bigpharma.dfs.core.windows.net/MinIoDistributors/processed_files_delta\"\n",
 					"\n",
 					"# Próbujemy odczytać plik Delta\n",
 					"processed_df = None\n",

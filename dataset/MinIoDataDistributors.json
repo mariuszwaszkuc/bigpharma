@@ -11,7 +11,8 @@
 			"location": {
 				"type": "AmazonS3CompatibleLocation",
 				"bucketName": "distributors",
-				"folderPath": "data"
+				"folderPath": "data",
+				"fileName": "*"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",

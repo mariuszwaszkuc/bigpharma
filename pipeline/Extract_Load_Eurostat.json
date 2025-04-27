@@ -1,5 +1,5 @@
 {
-	"name": "eurostat_load",
+	"name": "Extract_Load_Eurostat",
 	"properties": {
 		"activities": [
 			{

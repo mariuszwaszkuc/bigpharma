@@ -139,7 +139,8 @@
 									"type": "DatasetReference"
 								},
 								"fieldList": [
-									"lastModified"
+									"lastModified",
+									"itemName"
 								],
 								"storeSettings": {
 									"type": "AzureBlobFSReadSettings",
@@ -177,7 +178,14 @@
 											"secureOutput": false,
 											"secureInput": false
 										},
-										"userProperties": []
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "MaxTime",
+											"value": {
+												"value": "@activity('GetFileMetadata').output.lastModified",
+												"type": "Expression"
+											}
+										}
 									},
 									{
 										"name": "SetFileName",
@@ -194,7 +202,14 @@
 											"secureOutput": false,
 											"secureInput": false
 										},
-										"userProperties": []
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "FileName",
+											"value": {
+												"value": "@activity('GetFileMetadata').output.itemName",
+												"type": "Expression"
+											}
+										}
 									}
 								]
 							}

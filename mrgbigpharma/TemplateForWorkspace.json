@@ -3130,7 +3130,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "066b5b3b-ed21-4974-886e-c610e08ed575"
+						"spark.autotune.trackingId": "494e5f07-e6a8-45fa-aa7d-b31ad81fc975"
 					}
 				},
 				"metadata": {
@@ -3280,23 +3280,6 @@
 						"execution_count": 8
 					}
 				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/sparkConfiguration1')]",
-			"type": "Microsoft.Synapse/workspaces/sparkConfigurations",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"configs": {
-					"spark.jars.packages": "org.apache.hadoop:hadoop-aws:3.3.1"
-				},
-				"created": "2025-04-27T23:56:57.1890000+02:00",
-				"createdBy": "01135158@pw.edu.pl",
-				"annotations": [],
-				"configMergeRule": {
-					"artifact.currentOperation.spark.jars.packages": "replace"
-				}
 			},
 			"dependsOn": []
 		},

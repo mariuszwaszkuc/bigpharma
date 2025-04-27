@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7b04f5c0-922b-4ef6-a571-5b53520245ff"
+				"spark.autotune.trackingId": "c44443f5-eaed-4746-bdd6-f4c2021aa164"
 			}
 		},
 		"metadata": {
@@ -58,23 +58,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": 21
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"!pip show azure-core\n",
-					"!pip show azure-identity\n",
-					"!pip show azure-keyvault-secrets"
-				],
-				"execution_count": 42
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"!pip install --upgrade azure-core azure-identity azure-keyvault-secrets"
-				],
-				"execution_count": 43
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -84,20 +68,14 @@
 					"from pyspark.sql import SparkSession\n",
 					"from pyspark.sql.utils import AnalysisException\n",
 					"from pyspark.sql.functions import input_file_name\n",
-					"# Pakiety z Key Vault\n",
-					"from azure.identity import DefaultAzureCredential\n",
-					"from azure.keyvault.secrets import SecretClient\n",
 					"\n",
-					"# Konfiguracja połączenia z Key Vault\n",
-					"key_vault_url = \"https://keylakehouse.vault.azure.net/\"\n",
-					"credential = DefaultAzureCredential()\n",
-					"client = SecretClient(vault_url=key_vault_url, credential=credential)\n",
 					"\n",
-					"# Odczytanie sekretu z Key Vault\n",
-					"access_key = client.get_secret(\"s3-access-key\").value\n",
-					"secret_key = client.get_secret(\"s3-secret-key\").value\n",
 					"\n",
-					"# Użycie tych sekretów do konfiguracji Spark\n",
+					"# Odczytanie sekretów z Key Vault\n",
+					"access_key = 'minioadmin'\n",
+					"secret_key = 'minioadmin'\n",
+					"\n",
+					"# Inicjalizacja sesji Spark z odczytanymi danymi uwierzytelniającymi\n",
 					"spark = SparkSession.builder \\\n",
 					"    .appName(\"Incremental Load MinIO to ADLS Gen2\") \\\n",
 					"    .config(\"spark.hadoop.fs.s3a.endpoint\", \"http://20.215.33.25:9000\") \\\n",
@@ -105,9 +83,10 @@
 					"    .config(\"spark.hadoop.fs.s3a.secret.key\", secret_key) \\\n",
 					"    .config(\"spark.hadoop.fs.s3a.connection.maximum\", \"100\") \\\n",
 					"    .config(\"spark.hadoop.fs.s3a.path.style.access\", \"true\") \\\n",
-					"    .getOrCreate()"
+					"    .getOrCreate()\n",
+					""
 				],
-				"execution_count": 46
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -169,7 +148,7 @@
 					"print(f\"Załadowano {len(new_files)} nowych plików.\")\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 8
 			}
 		]
 	}

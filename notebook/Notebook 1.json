@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7cca0037-a0ca-4a9c-83dd-27692e2d0ceb"
+				"spark.autotune.trackingId": "a29e9b7e-b5e5-4bd6-8f38-2d994c14194d"
 			}
 		},
 		"metadata": {
@@ -63,6 +63,13 @@
 			{
 				"cell_type": "code",
 				"source": [
+					""
+				],
+				"execution_count": 15
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"import os\n",
 					"from pyspark.sql import SparkSession\n",
 					"from pyspark.sql.utils import AnalysisException\n",
@@ -72,11 +79,12 @@
 					"# Inicjalizacja sesji Spark z odczytanymi danymi uwierzytelniającymi\n",
 					"spark = SparkSession.builder \\\n",
 					"    .appName(\"Incremental Load MinIO to ADLS Gen2\") \\\n",
-					"    .config(\"spark.hadoop.fs.s3a.endpoint\", \"http://20.215.33.25:9000\") \\\n",
 					"    .config(\"spark.hadoop.fs.s3a.access.key\", \"minioadmin\") \\\n",
 					"    .config(\"spark.hadoop.fs.s3a.secret.key\", \"minioadmin\") \\\n",
+					"    .config(\"spark.hadoop.fs.s3a.endpoint\", \"http://20.215.33.25:9000\") \\\n",
 					"    .config(\"spark.hadoop.fs.s3a.connection.maximum\", \"100\") \\\n",
 					"    .config(\"spark.hadoop.fs.s3a.path.style.access\", \"true\") \\\n",
+					"    .config(\"spark.hadoop.fs.s3a.credentials.provider\", \"org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider\") \\\n",
 					"    .getOrCreate()\n",
 					"\n",
 					"bucket_name = 'distributors'\n",
@@ -89,7 +97,7 @@
 					"files_metadata.show(truncate=False)\n",
 					""
 				],
-				"execution_count": 7
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",

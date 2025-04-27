@@ -21,7 +21,7 @@
 					},
 					"snapshot": true,
 					"sparkPool": {
-						"referenceName": "sparkpool32",
+						"referenceName": "sprak32small",
 						"type": "BigDataPoolReference"
 					},
 					"executorSize": "Small",
@@ -60,7 +60,7 @@
 					},
 					"snapshot": true,
 					"sparkPool": {
-						"referenceName": "sparkpool32",
+						"referenceName": "sprak32small",
 						"type": "BigDataPoolReference"
 					},
 					"executorSize": "Small",

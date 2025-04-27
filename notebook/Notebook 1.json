@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a29e9b7e-b5e5-4bd6-8f38-2d994c14194d"
+				"spark.autotune.trackingId": "d2d540c4-75d2-4a8c-8a36-3fc8cc293a31"
 			}
 		},
 		"metadata": {
@@ -58,7 +58,7 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -70,34 +70,14 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"import os\n",
-					"from pyspark.sql import SparkSession\n",
-					"from pyspark.sql.utils import AnalysisException\n",
-					"from pyspark.sql.functions import input_file_name\n",
-					"\n",
-					"\n",
-					"# Inicjalizacja sesji Spark z odczytanymi danymi uwierzytelniającymi\n",
-					"spark = SparkSession.builder \\\n",
-					"    .appName(\"Incremental Load MinIO to ADLS Gen2\") \\\n",
-					"    .config(\"spark.hadoop.fs.s3a.access.key\", \"minioadmin\") \\\n",
-					"    .config(\"spark.hadoop.fs.s3a.secret.key\", \"minioadmin\") \\\n",
-					"    .config(\"spark.hadoop.fs.s3a.endpoint\", \"http://20.215.33.25:9000\") \\\n",
-					"    .config(\"spark.hadoop.fs.s3a.connection.maximum\", \"100\") \\\n",
-					"    .config(\"spark.hadoop.fs.s3a.path.style.access\", \"true\") \\\n",
-					"    .config(\"spark.hadoop.fs.s3a.credentials.provider\", \"org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider\") \\\n",
-					"    .getOrCreate()\n",
-					"\n",
-					"bucket_name = 'distributors'\n",
-					"folder_path = 'data/'\n",
-					"\n",
-					"# Wczytanie plików z MinIO\n",
-					"files_metadata = spark.read.option(\"header\", \"true\").csv(f\"s3a://{bucket_name}/{folder_path}*\")\n",
-					"\n",
-					"# Wypisz metadane dla plików (debugowanie)\n",
-					"files_metadata.show(truncate=False)\n",
+					"spark.conf.set(\"spark.hadoop.fs.s3a.access.key\", \"minioadmin\")\n",
+					"spark.conf.set(\"spark.hadoop.fs.s3a.secret.key\", \"minioadmin\")\n",
+					"spark.conf.set(\"spark.hadoop.fs.s3a.endpoint\", \"http://20.215.33.25:9000\")\n",
+					"spark.conf.set(\"spark.hadoop.fs.s3a.connection.ssl.enabled\", \"false\")  # jeśli MinIO nie używa SSL\n",
+					"spark.conf.set(\"spark.hadoop.fs.s3a.impl\", \"org.apache.hadoop.fs.s3a.S3AFileSystem\")\n",
 					""
 				],
-				"execution_count": 16
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -112,7 +92,7 @@
 					"# Wypisz metadane dla plików (debugowanie)\n",
 					"files_metadata.show(truncate=False)"
 				],
-				"execution_count": 5
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",

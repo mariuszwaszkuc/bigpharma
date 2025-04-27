@@ -2,17 +2,16 @@
 	"name": "MinIoDataDistributors",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "MinIoS3",
+			"referenceName": "S3MinIO",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "AmazonS3CompatibleLocation",
+				"type": "AmazonS3Location",
 				"bucketName": "distributors",
-				"folderPath": "data",
-				"fileName": "*"
+				"fileName": "part-00000-b20e9098-7b48-48f2-888f-57de2602203c.c000.csv"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",

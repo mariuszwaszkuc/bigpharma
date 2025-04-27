@@ -3117,7 +3117,7 @@
 				"nbformat": 4,
 				"nbformat_minor": 2,
 				"bigDataPool": {
-					"referenceName": "sprak32small",
+					"referenceName": "sparkpool32",
 					"type": "BigDataPoolReference"
 				},
 				"sessionProperties": {
@@ -3130,7 +3130,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "a135160d-267b-4293-837f-afdf389c68c0"
+						"spark.autotune.trackingId": "066b5b3b-ed21-4974-886e-c610e08ed575"
 					}
 				},
 				"metadata": {
@@ -3144,24 +3144,26 @@
 						"name": "python"
 					},
 					"a365ComputeOptions": {
-						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sprak32small",
-						"name": "sprak32small",
+						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+						"name": "sparkpool32",
 						"type": "Spark",
-						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sprak32small",
+						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
 						"auth": {
 							"type": "AAD",
 							"authResource": "https://dev.azuresynapse.net"
 						},
 						"sparkVersion": "3.4",
-						"nodeCount": 10,
+						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"%%configure -f\n",
 							"{\n",
@@ -3175,6 +3177,7 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							""
 						],
@@ -3183,6 +3186,7 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"spark.conf.set(\"spark.hadoop.fs.s3a.access.key\", \"minioadmin\")\n",
 							"spark.conf.set(\"spark.hadoop.fs.s3a.secret.key\", \"minioadmin\")\n",
@@ -3196,6 +3200,7 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"# Jeśli chcesz teraz załadować pliki CSV z MinIO\n",
 							"bucket_name = 'distributors'\n",
@@ -3212,6 +3217,7 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"\n",
 							"# Krok 1: Sprawdzamy, czy plik Delta z przetworzonymi plikami istnieje\n",
@@ -3274,6 +3280,23 @@
 						"execution_count": 8
 					}
 				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sparkConfiguration1')]",
+			"type": "Microsoft.Synapse/workspaces/sparkConfigurations",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"configs": {
+					"spark.jars.packages": "org.apache.hadoop:hadoop-aws:3.3.1"
+				},
+				"created": "2025-04-27T23:56:57.1890000+02:00",
+				"createdBy": "01135158@pw.edu.pl",
+				"annotations": [],
+				"configMergeRule": {
+					"artifact.currentOperation.spark.jars.packages": "replace"
+				}
 			},
 			"dependsOn": []
 		},

@@ -29,6 +29,10 @@
 						"storeSettings": {
 							"type": "AmazonS3CompatibleReadSettings",
 							"recursive": true,
+							"modifiedDatetimeStart": {
+								"value": "@variables('MaxTime')",
+								"type": "Expression"
+							},
 							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
@@ -91,6 +95,7 @@
 					],
 					"storeSettings": {
 						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
 						"enablePartitionDiscovery": false
 					},
 					"formatSettings": {
@@ -138,6 +143,7 @@
 								],
 								"storeSettings": {
 									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
 									"enablePartitionDiscovery": false
 								},
 								"formatSettings": {
@@ -156,12 +162,58 @@
 									]
 								}
 							],
-							"userProperties": []
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@greater(activity('GetFileMetadata').output.lastModified,variables('MaxTime'))",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "SetMaxTime",
+										"type": "SetVariable",
+										"dependsOn": [],
+										"policy": {
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": []
+									},
+									{
+										"name": "SetFileName",
+										"type": "SetVariable",
+										"dependsOn": [
+											{
+												"activity": "SetMaxTime",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": []
+									}
+								]
+							}
 						}
 					]
 				}
 			}
 		],
+		"variables": {
+			"MaxTime": {
+				"type": "String"
+			},
+			"FileName": {
+				"type": "String"
+			},
+			"FinalTime": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "Brozne"
 		},

@@ -1,17 +1,18 @@
 {
-	"name": "DelimitedText1",
+	"name": "MinIoDataDistributors",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "MinIoS3",
+			"referenceName": "mrgbigpharma-WorkspaceDefaultStorage",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "AmazonS3CompatibleLocation",
-				"bucketName": "distributors",
-				"folderPath": "data"
+				"type": "AzureBlobFSLocation",
+				"fileName": "*",
+				"folderPath": "MinIoDistributors",
+				"fileSystem": "bronze"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",

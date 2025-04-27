@@ -11,6 +11,9 @@
 		"MinIoS3_secretAccessKey": {
 			"value": ""
 		},
+		"S3MinIO_secretAccessKey": {
+			"value": ""
+		},
 		"mrgbigpharma-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:mrgbigpharma.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
@@ -31,6 +34,9 @@
 		},
 		"MySqlPassword_properties_typeProperties_baseUrl": {
 			"value": "https://keylakehouse.vault.azure.net/"
+		},
+		"S3MinIO_properties_typeProperties_accessKeyId": {
+			"value": "minioadmin"
 		},
 		"eceuropaeu_inflation_properties_typeProperties_url": {
 			"value": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ei_cphi_m$defaultview/?format=TSV&compressed=false"

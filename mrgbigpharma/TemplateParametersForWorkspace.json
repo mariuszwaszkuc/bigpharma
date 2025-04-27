@@ -5,8 +5,14 @@
 		"workspaceName": {
 			"value": "mrgbigpharma"
 		},
+		"AmazonS3Compatible2_secretAccessKey": {
+			"value": ""
+		},
 		"mrgbigpharma-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:mrgbigpharma.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"AmazonS3Compatible2_properties_typeProperties_accessKeyId": {
+			"value": "minioadmin"
 		},
 		"MySqlErp_properties_typeProperties_server": {
 			"value": "@{linkedService().Server}"

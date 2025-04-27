@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c44443f5-eaed-4746-bdd6-f4c2021aa164"
+				"spark.autotune.trackingId": "7cca0037-a0ca-4a9c-83dd-27692e2d0ceb"
 			}
 		},
 		"metadata": {
@@ -58,35 +58,53 @@
 					"    }\n",
 					"}"
 				],
-				"execution_count": 1
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"import os\n",
-					"\n",
 					"from pyspark.sql import SparkSession\n",
 					"from pyspark.sql.utils import AnalysisException\n",
 					"from pyspark.sql.functions import input_file_name\n",
 					"\n",
 					"\n",
-					"\n",
-					"# Odczytanie sekretów z Key Vault\n",
-					"access_key = 'minioadmin'\n",
-					"secret_key = 'minioadmin'\n",
-					"\n",
 					"# Inicjalizacja sesji Spark z odczytanymi danymi uwierzytelniającymi\n",
 					"spark = SparkSession.builder \\\n",
 					"    .appName(\"Incremental Load MinIO to ADLS Gen2\") \\\n",
 					"    .config(\"spark.hadoop.fs.s3a.endpoint\", \"http://20.215.33.25:9000\") \\\n",
-					"    .config(\"spark.hadoop.fs.s3a.access.key\", access_key) \\\n",
-					"    .config(\"spark.hadoop.fs.s3a.secret.key\", secret_key) \\\n",
+					"    .config(\"spark.hadoop.fs.s3a.access.key\", \"minioadmin\") \\\n",
+					"    .config(\"spark.hadoop.fs.s3a.secret.key\", \"minioadmin\") \\\n",
 					"    .config(\"spark.hadoop.fs.s3a.connection.maximum\", \"100\") \\\n",
 					"    .config(\"spark.hadoop.fs.s3a.path.style.access\", \"true\") \\\n",
 					"    .getOrCreate()\n",
+					"\n",
+					"bucket_name = 'distributors'\n",
+					"folder_path = 'data/'\n",
+					"\n",
+					"# Wczytanie plików z MinIO\n",
+					"files_metadata = spark.read.option(\"header\", \"true\").csv(f\"s3a://{bucket_name}/{folder_path}*\")\n",
+					"\n",
+					"# Wypisz metadane dla plików (debugowanie)\n",
+					"files_metadata.show(truncate=False)\n",
 					""
 				],
 				"execution_count": 7
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Jeśli chcesz teraz załadować pliki CSV z MinIO\n",
+					"bucket_name = 'distributors'\n",
+					"folder_path = 'data/'\n",
+					"\n",
+					"# Wczytanie plików z MinIO\n",
+					"files_metadata = spark.read.option(\"header\", \"true\").csv(f\"s3a://{bucket_name}/{folder_path}*\")\n",
+					"\n",
+					"# Wypisz metadane dla plików (debugowanie)\n",
+					"files_metadata.show(truncate=False)"
+				],
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",

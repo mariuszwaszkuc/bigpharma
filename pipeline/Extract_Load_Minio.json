@@ -5,6 +5,8 @@
 			{
 				"name": "Copy data1",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "ForEach1",
@@ -25,7 +27,7 @@
 					"source": {
 						"type": "DelimitedTextSource",
 						"storeSettings": {
-							"type": "AmazonS3CompatibleReadSettings",
+							"type": "AmazonS3ReadSettings",
 							"recursive": true,
 							"modifiedDatetimeStart": {
 								"value": "@variables('MaxTime')",
@@ -77,6 +79,8 @@
 			{
 				"name": "Get Last Modify Date FilesDistributors",
 				"type": "GetMetadata",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -107,6 +111,8 @@
 			{
 				"name": "ForEach1",
 				"type": "ForEach",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Get Last Modify Date FilesDistributors",

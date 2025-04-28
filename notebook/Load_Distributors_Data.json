@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e69a43f9-6ac4-4a8f-aba9-1d10d53e267f"
+				"spark.autotune.trackingId": "6d404614-4ab0-4982-9803-4affff20e757"
 			}
 		},
 		"metadata": {
@@ -82,7 +82,7 @@
 					"from pyspark.sql.functions import input_file_name\n",
 					"\n",
 					"# Ścieżka do DeltaTable z listą przetworzonych plików\n",
-					"processed_files_path = \"abfss://bronze@bigpharma.dfs.core.windows.net/MinIoDistributors/processed_files_delta\"\n",
+					"processed_files_path = \"abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Distributors/Processed_Files_Logs\"\n",
 					"\n",
 					"try:\n",
 					"    processed_df = spark.read.format(\"delta\").load(processed_files_path)\n",
@@ -128,7 +128,7 @@
 					"    print(f\"Wczytywanie pliku: {file_name}\")\n",
 					"    print(f\"Wczytywanie sciezki: {country_name}\")\n",
 					"\n",
-					"    target_path = f\"abfss://bronze@bigpharma.dfs.core.windows.net/MinIoDistributors/{country_name}/{file_name}\"\n",
+					"    target_path = f\"abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Distributors/{country_name}/{file_name}\"\n",
 					"\n",
 					"\n",
 					"    print(f\" Wczytywanie pliku: {file_path}\")\n",

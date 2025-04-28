@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6d404614-4ab0-4982-9803-4affff20e757"
+				"spark.autotune.trackingId": "acbd9008-a401-454a-b644-a14771acf57f"
 			}
 		},
 		"metadata": {
@@ -66,8 +66,14 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"spark._jsc.hadoopConfiguration().set(\"fs.s3a.access.key\", \"minioadmin\")\n",
-					"spark._jsc.hadoopConfiguration().set(\"fs.s3a.secret.key\", \"minioadmin\")\n",
+					"from notebookutils import mssparkutils\n",
+					"\n",
+					"access_key=mssparkutils.credentials.getSecret('keylakehouse','s3-access-key')\n",
+					"\n",
+					"secret_key =mssparkutils.credentials.getSecret('keylakehouse','s3-secret-key')\n",
+					"\n",
+					"spark._jsc.hadoopConfiguration().set(\"fs.s3a.access.key\", access_key)\n",
+					"spark._jsc.hadoopConfiguration().set(\"fs.s3a.secret.key\", secret_key)\n",
 					"spark._jsc.hadoopConfiguration().set(\"fs.s3a.endpoint\", \"http://20.215.33.25:9000\")\n",
 					"spark._jsc.hadoopConfiguration().set(\"fs.s3a.path.style.access\", \"true\")\n",
 					"spark._jsc.hadoopConfiguration().set(\"fs.s3a.impl\", \"org.apache.hadoop.fs.s3a.S3AFileSystem\")\n",

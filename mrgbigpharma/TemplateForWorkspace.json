@@ -3122,7 +3122,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "abcf33b0-74d1-4166-9b9f-9e86ddfd1146"
+						"spark.autotune.trackingId": "e69a43f9-6ac4-4a8f-aba9-1d10d53e267f"
 					}
 				},
 				"metadata": {
@@ -3147,15 +3147,13 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"%%configure -f\n",
 							"{\n",
@@ -3169,7 +3167,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"spark._jsc.hadoopConfiguration().set(\"fs.s3a.access.key\", \"minioadmin\")\n",
 							"spark._jsc.hadoopConfiguration().set(\"fs.s3a.secret.key\", \"minioadmin\")\n",
@@ -3183,7 +3180,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"from pyspark.sql.utils import AnalysisException\n",
 							"from pyspark.sql.functions import input_file_name\n",
@@ -3305,7 +3301,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "39d4b425-9351-41ef-8f3a-4ad967f59a8d"
+						"spark.autotune.trackingId": "f0930ef7-8bea-4d47-b18a-5bf77b3522b9"
 					}
 				},
 				"metadata": {
@@ -3330,13 +3326,15 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"%%configure -f\n",
 							"{\n",
@@ -3350,6 +3348,7 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"spark._jsc.hadoopConfiguration().set(\"fs.s3a.access.key\", \"minioadmin\")\n",
 							"spark._jsc.hadoopConfiguration().set(\"fs.s3a.secret.key\", \"minioadmin\")\n",
@@ -3363,12 +3362,13 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"from pyspark.sql.utils import AnalysisException\n",
 							"from pyspark.sql.functions import input_file_name\n",
 							"\n",
 							"# Ścieżka do DeltaTable z listą przetworzonych plików\n",
-							"processed_files_path = \"abfss://bronze@bigpharma.dfs.core.windows.net/MinIoDistributors/processed_files_delta\"\n",
+							"processed_files_path = \"abfss://bronze@bigpharma.dfs.core.windows.net/MinIoPharmacies/processed_files_delta\"\n",
 							"\n",
 							"try:\n",
 							"    processed_df = spark.read.format(\"delta\").load(processed_files_path)\n",
@@ -3414,7 +3414,7 @@
 							"    print(f\"Wczytywanie pliku: {file_name}\")\n",
 							"    print(f\"Wczytywanie sciezki: {country_name}\")\n",
 							"\n",
-							"    target_path = f\"abfss://bronze@bigpharma.dfs.core.windows.net/MinIoDistributors/{country_name}/{file_name}\"\n",
+							"    target_path = f\"abfss://bronze@bigpharma.dfs.core.windows.net/MinIoPharmacies/{country_name}/{file_name}\"\n",
 							"\n",
 							"\n",
 							"    print(f\" Wczytywanie pliku: {file_path}\")\n",

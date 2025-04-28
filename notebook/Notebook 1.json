@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "635eb739-eb7b-4089-8343-38f50e88044f"
+				"spark.autotune.trackingId": "899557d0-a598-4794-95f6-c30f0f56d7e9"
 			}
 		},
 		"metadata": {
@@ -107,7 +107,7 @@
 					"all_paths = list(set([file.split(\",\")[-1] for file in all_files]))\n",
 					"\n",
 					"# Lista już przetworzonych plików\n",
-					"processed_filenames = [row.filename for row in processed_df.collect()]\n",
+					"processed_filenames = [row.filepaths for row in processed_df.collect()]\n",
 					"\n",
 					"# Wyszukanie nowych plików do przetworzenia\n",
 					"new_paths = [paths for paths in all_paths if  paths not in processed_filenames]\n",
@@ -119,13 +119,14 @@
 					"    file_path = path\n",
 					"    file_path= file_path.split(\"?\")[0]\n",
 					"    print(file_path)\n",
-					"    file_name = file_path.split(\"/\")[-1]\n",
+					"    file_name = [part for part in file_path.split(\"/\") if \"closed_month=\" in part][0].split(\"=\")[1] #file_path.split(\"/\")[-1]\n",
 					"    country_name = [segment for segment in file_path.split(\"/\") if segment.startswith(\"country=\")][0].split(\"=\")[1]\n",
 					"    print(f\"Wczytywanie sciezki: {file_path}\")\n",
-					"    print(f\"Wczytywanie pliku: {file_name }\")\n",
+					"    print(f\"Wczytywanie pliku: {file_name}\")\n",
 					"    print(f\"Wczytywanie sciezki: {country_name}\")\n",
 					"\n",
 					"    target_path = f\"abfss://bronze@bigpharma.dfs.core.windows.net/MinIoDistributors/{country_name}/{file_name}\"\n",
+					"\n",
 					"\n",
 					"    print(f\" Wczytywanie pliku: {file_path}\")\n",
 					"\n",
@@ -152,7 +153,17 @@
 					"\n",
 					""
 				],
-				"execution_count": 6
+				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"processed_files_updated.show()"
+				],
+				"execution_count": 8
 			}
 		]
 	}

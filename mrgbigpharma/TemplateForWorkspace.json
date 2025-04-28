@@ -3119,7 +3119,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "5d2ffba7-860e-41be-91d1-5278d6641e2b"
+						"spark.autotune.trackingId": "413f9409-e4e2-455a-be12-b831f9ce69f1"
 					}
 				},
 				"metadata": {
@@ -3191,23 +3191,8 @@
 						"cell_type": "code",
 						"metadata": {},
 						"source": [
-							"# Jeśli chcesz teraz załadować pliki CSV z MinIO\n",
-							"bucket_name = 'distributors'\n",
-							"folder_path = 'data/'\n",
-							"\n",
-							"# Wczytanie plików z MinIO\n",
-							"files_metadata = spark.read.option(\"header\", \"true\").csv(f\"s3a://{bucket_name}/{folder_path}*\")\n",
-							"\n",
-							"# Wypisz metadane dla plików (debugowanie)\n",
-							"files_metadata.show(truncate=False)"
-						],
-						"outputs": [],
-						"execution_count": 5
-					},
-					{
-						"cell_type": "code",
-						"metadata": {},
-						"source": [
+							"from pyspark.sql.utils import AnalysisException\n",
+							"from pyspark.sql.functions import input_file_name\n",
 							"\n",
 							"# Krok 1: Sprawdzamy, czy plik Delta z przetworzonymi plikami istnieje\n",
 							"processed_files_path = \"abfss://bronze@bigpharma.dfs.core.windows.net/MinIoDistributors/processed_files_delta\"\n",
@@ -3266,7 +3251,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 8
+						"execution_count": 6
 					}
 				]
 			},

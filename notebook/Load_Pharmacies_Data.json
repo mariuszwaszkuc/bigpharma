@@ -1,6 +1,9 @@
 {
-	"name": "Notebook 1",
+	"name": "Load_Pharmacies_Data",
 	"properties": {
+		"folder": {
+			"name": "Load_Bronze"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
@@ -17,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "899557d0-a598-4794-95f6-c30f0f56d7e9"
+				"spark.autotune.trackingId": "39d4b425-9351-41ef-8f3a-4ad967f59a8d"
 			}
 		},
 		"metadata": {

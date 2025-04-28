@@ -3122,7 +3122,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f0b82e86-c630-4301-bedc-aa7f7d488a70"
+						"spark.autotune.trackingId": "6d404614-4ab0-4982-9803-4affff20e757"
 					}
 				},
 				"metadata": {
@@ -3147,15 +3147,13 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"%%configure -f\n",
 							"{\n",
@@ -3169,7 +3167,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"spark._jsc.hadoopConfiguration().set(\"fs.s3a.access.key\", \"minioadmin\")\n",
 							"spark._jsc.hadoopConfiguration().set(\"fs.s3a.secret.key\", \"minioadmin\")\n",
@@ -3183,7 +3180,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"from pyspark.sql.utils import AnalysisException\n",
 							"from pyspark.sql.functions import input_file_name\n",
@@ -3305,7 +3301,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "1eeeabc4-6704-4e0c-a5eb-e15b63cf7b5f"
+						"spark.autotune.trackingId": "72d5535a-3e2e-4584-97d8-0718ffc0f67a"
 					}
 				},
 				"metadata": {
@@ -3372,7 +3368,7 @@
 							"from pyspark.sql.functions import input_file_name\n",
 							"\n",
 							"# Ścieżka do DeltaTable z listą przetworzonych plików\n",
-							"processed_files_path = \"abfss://bronze@bigpharma.dfs.core.windows.net/MinIoPharmacies/processed_files_delta\"\n",
+							"processed_files_path = \"abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Pharmacies/Processed_Files_Logs\"\n",
 							"\n",
 							"try:\n",
 							"    processed_df = spark.read.format(\"delta\").load(processed_files_path)\n",
@@ -3418,7 +3414,7 @@
 							"    print(f\"Wczytywanie pliku: {file_name}\")\n",
 							"    print(f\"Wczytywanie sciezki: {country_name}\")\n",
 							"\n",
-							"    target_path = f\"abfss://bronze@bigpharma.dfs.core.windows.net/MinIoPharmacies/{country_name}/{file_name}\"\n",
+							"    target_path = f\"abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Pharmacies/{country_name}/{file_name}\"\n",
 							"\n",
 							"\n",
 							"    print(f\" Wczytywanie pliku: {file_path}\")\n",

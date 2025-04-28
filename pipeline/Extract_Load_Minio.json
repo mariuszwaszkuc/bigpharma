@@ -5,8 +5,6 @@
 			{
 				"name": "Copy data1",
 				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "ForEach1",
@@ -27,7 +25,7 @@
 					"source": {
 						"type": "DelimitedTextSource",
 						"storeSettings": {
-							"type": "AmazonS3ReadSettings",
+							"type": "AmazonS3CompatibleReadSettings",
 							"recursive": true,
 							"modifiedDatetimeStart": {
 								"value": "@variables('MaxTime')",

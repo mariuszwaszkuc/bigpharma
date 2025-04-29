@@ -3749,7 +3749,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "19f478e9-12c8-43f8-ae69-3c02f19e325d"
+						"spark.autotune.trackingId": "9af0c077-1472-417c-a461-0d8d2932c1b2"
 					}
 				},
 				"metadata": {
@@ -3774,7 +3774,8 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -3798,14 +3799,14 @@
 							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/order_details'\n",
 							");\n",
 							"\n",
-							"CREATE OR REPLACE TEMP VIEW silver_customers\n",
+							"CREATE OR REPLACE TEMP VIEW d_customers\n",
 							"USING parquet\n",
 							"OPTIONS (\n",
 							"  path 'abfss://silver@bigpharma.dfs.core.windows.net/d_customers'\n",
 							");\n",
 							"\n",
 							"-- 2. Utworzenie tabeli docelowej (jeśli nie istnieje)\n",
-							"CREATE TABLE IF NOT EXISTS silver_sales (\n",
+							"CREATE TABLE IF NOT EXISTS f_sales (\n",
 							"    country_id STRING,\n",
 							"    product_id STRING,\n",
 							"    shipped_date DATE,\n",
@@ -3818,7 +3819,7 @@
 							"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/f_sales/';\n",
 							"\n",
 							"-- 3. Przekształcenie i zapis danych do tabeli Silver z użyciem MERGE\n",
-							"MERGE INTO silver_sales AS silver\n",
+							"MERGE INTO f_sales AS silver\n",
 							"USING (\n",
 							"    WITH orders_trunc AS (\n",
 							"        SELECT\n",
@@ -3841,7 +3842,7 @@
 							"            o.order_date\n",
 							"        FROM orders_trunc o\n",
 							"        JOIN bronze_order_details od ON o.order_id = od.order_id\n",
-							"        JOIN silver_customers c ON o.customer_id = c.customer_id\n",
+							"        JOIN d_customers c ON o.customer_id = c.customer_id\n",
 							"    ),\n",
 							"    latest_orders AS (\n",
 							"        SELECT *\n",
@@ -4112,6 +4113,10 @@
 			"properties": {
 				"nbformat": 4,
 				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "sparkpool32",
+					"type": "BigDataPoolReference"
+				},
 				"sessionProperties": {
 					"driverMemory": "28g",
 					"driverCores": 4,
@@ -4122,18 +4127,32 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "65b07f24-afeb-4953-b6ab-3f8bc0d52ca9"
+						"spark.autotune.trackingId": "56a51a71-f9de-4d92-b49c-3146795589e3"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
 					"kernelspec": {
-						"name": "synapse_sparksql",
-						"display_name": "sql"
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
 					},
 					"language_info": {
 						"name": "sql"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+						"name": "sparkpool32",
+						"type": "Spark",
+						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -4239,7 +4258,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 1
 					}
 				]
 			},

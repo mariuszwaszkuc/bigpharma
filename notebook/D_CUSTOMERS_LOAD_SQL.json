@@ -1,5 +1,5 @@
 {
-	"name": "Notebook 2",
+	"name": "D_CUSTOMERS_LOAD_SQL",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -17,15 +17,15 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "bdf1a6ef-8aa6-48f8-b6fe-97a2abb19350"
+				"spark.autotune.trackingId": "fb5a863e-600e-4ffc-afe4-94dea368ed11"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
 			"kernelspec": {
-				"name": "synapse_pyspark",
-				"display_name": "Synapse PySpark"
+				"name": "synapse_sparksql",
+				"display_name": "sql"
 			},
 			"language_info": {
 				"name": "sql"

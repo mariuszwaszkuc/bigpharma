@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5bf36bc1-e7d0-430d-9616-69e579398f7c"
+				"spark.autotune.trackingId": "20729c46-96c7-4275-99ea-8c05628f15be"
 			}
 		},
 		"metadata": {
@@ -25,7 +25,7 @@
 			"enableDebugMode": false,
 			"kernelspec": {
 				"name": "synapse_pyspark",
-				"display_name": "python"
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "sql"
@@ -50,6 +50,9 @@
 		"cells": [
 			{
 				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
 				"source": [
 					"-- 1. Tymczasowe widoki na pliki z ADLS Gen2\n",
 					"CREATE OR REPLACE TEMP VIEW bronze_orders\n",
@@ -152,7 +155,7 @@
 					"    );\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 1
 			}
 		]
 	}

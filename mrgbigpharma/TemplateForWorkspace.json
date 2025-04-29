@@ -1491,7 +1491,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "fb5a863e-600e-4ffc-afe4-94dea368ed11"
+						"spark.autotune.trackingId": "ca2ef56a-334c-4ad3-86e8-a51c385a32ca"
 					}
 				},
 				"metadata": {
@@ -1516,7 +1516,8 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1524,6 +1525,9 @@
 					{
 						"cell_type": "code",
 						"metadata": {
+							"jupyter": {
+								"outputs_hidden": false
+							},
 							"collapsed": false
 						},
 						"source": [
@@ -1608,7 +1612,18 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 2
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"collapsed": false
+						},
+						"source": [
+							"DROP TABLE IF EXISTS default.silver_customers;"
+						],
+						"outputs": [],
+						"execution_count": 5
 					}
 				]
 			},
@@ -1756,7 +1771,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "7aa06980-be07-4584-8269-26a248a086d4"
+						"spark.autotune.trackingId": "0dfe6008-cf0a-4ad3-b7d0-d4577d698853"
 					}
 				},
 				"metadata": {
@@ -1774,7 +1789,6 @@
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"-- Załadowanie danych z warstwy Silver do tabeli Delta\n",
 							"-- Tworzenie tabel Delta w warstwie Silver\n",

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d9c50c4e-9c2b-4124-8cf9-dadda7e4b334"
+				"spark.autotune.trackingId": "ff4713f3-2456-478b-921b-718f2597983c"
 			}
 		},
 		"metadata": {
@@ -51,6 +51,9 @@
 			{
 				"cell_type": "code",
 				"metadata": {
+					"jupyter": {
+						"outputs_hidden": true
+					},
 					"collapsed": false
 				},
 				"source": [
@@ -73,7 +76,6 @@
 					"  path 'abfss://silver@bigpharma.dfs.core.windows.net/d_customers'\n",
 					");\n",
 					"\n",
-					"-- 2. Utworzenie tabeli docelowej (jeśli nie istnieje)\n",
 					"CREATE TABLE IF NOT EXISTS f_sales (\n",
 					"    country_id STRING,\n",
 					"    product_id STRING,\n",
@@ -112,16 +114,7 @@
 					"        JOIN bronze_order_details od ON o.order_id = od.order_id\n",
 					"        JOIN d_customers c ON o.customer_id = c.customer_id\n",
 					"    ),\n",
-					"    latest_orders AS (\n",
-					"        SELECT *\n",
-					"        FROM (\n",
-					"            SELECT *,\n",
-					"                   ROW_NUMBER() OVER (PARTITION BY order_id ORDER BY order_date DESC) AS rn\n",
-					"            FROM joined_orders\n",
-					"        ) t\n",
-					"        WHERE rn = 1\n",
-					"    ),\n",
-					"    aggregated AS (\n",
+					"    final_orders AS (\n",
 					"        SELECT\n",
 					"            country_id,\n",
 					"            product_id,\n",
@@ -130,10 +123,10 @@
 					"            SUM(discount) AS discount,\n",
 					"            ROUND(SUM(quantity * unit_price), 2) AS amount,\n",
 					"            ROUND(SUM(quantity * unit_price) / NULLIF(SUM(quantity), 0), 2) AS unit_price\n",
-					"        FROM latest_orders\n",
+					"        FROM joined_orders\n",
 					"        GROUP BY country_id, product_id, shipped_date\n",
 					"    )\n",
-					"    SELECT * FROM aggregated\n",
+					"    SELECT * FROM  final_orders\n",
 					") AS new_data\n",
 					"ON silver.country_id = new_data.country_id\n",
 					"   AND silver.product_id = new_data.product_id\n",
@@ -155,7 +148,32 @@
 					"    );\n",
 					""
 				],
-				"execution_count": 1
+				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"outputs_hidden": false
+					},
+					"collapsed": false
+				},
+				"source": [
+					"\n",
+					"\n",
+					""
+				],
+				"execution_count": 22
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"select *From d_customers "
+				],
+				"execution_count": 18
 			}
 		]
 	}

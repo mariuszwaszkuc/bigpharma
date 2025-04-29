@@ -17,15 +17,15 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "157adffa-4f8e-4c4e-b51b-42693e8c63df"
+				"spark.autotune.trackingId": "8f90a39f-63d8-4f41-b7d5-82e6e0926ac4"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
 			"kernelspec": {
-				"name": "synapse_pyspark",
-				"display_name": "Synapse PySpark"
+				"name": "synapse_sparksql",
+				"display_name": "sql"
 			},
 			"language_info": {
 				"name": "sql"
@@ -82,14 +82,9 @@
 					"    co.region_description,\n",
 					"    co.country,\n",
 					"    co.cluster\n",
-					"FROM (\n",
-					"    SELECT *,\n",
-					"           ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY update_date DESC) as row_num\n",
-					"    FROM bronze_customers\n",
-					") c\n",
+					"FROM bronze_customers c\n",
 					"JOIN bronze_countries co\n",
-					"  ON c.country_id = co.country_id\n",
-					"WHERE c.row_num = 1;\n",
+					"  ON c.country_id = co.country_id;\n",
 					"\n",
 					"-- 4. Stworzenie tabeli docelowej jako Delta Lake (jeśli nie istnieje)\n",
 					"CREATE TABLE IF NOT EXISTS silver_customers\n",

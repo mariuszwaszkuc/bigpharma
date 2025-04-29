@@ -17,15 +17,15 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "fb5a863e-600e-4ffc-afe4-94dea368ed11"
+				"spark.autotune.trackingId": "157adffa-4f8e-4c4e-b51b-42693e8c63df"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
 			"kernelspec": {
-				"name": "synapse_sparksql",
-				"display_name": "sql"
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "sql"
@@ -51,6 +51,9 @@
 			{
 				"cell_type": "code",
 				"metadata": {
+					"jupyter": {
+						"outputs_hidden": false
+					},
 					"collapsed": false
 				},
 				"source": [
@@ -134,7 +137,17 @@
 					"  );\n",
 					""
 				],
-				"execution_count": 2
+				"execution_count": 6
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"DROP TABLE IF EXISTS default.silver_customers;"
+				],
+				"execution_count": 5
 			}
 		]
 	}

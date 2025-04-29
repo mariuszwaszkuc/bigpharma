@@ -3729,7 +3729,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "768f8add-767e-4773-bce6-90c5f01299c3"
+						"spark.autotune.trackingId": "f5b209e6-91b1-420d-8891-ed06f81df5c4"
 					}
 				},
 				"metadata": {
@@ -3899,7 +3899,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f66f13b6-3d8e-44bb-af50-edbb0b28758d"
+						"spark.autotune.trackingId": "5aebe184-917e-45cb-80d2-d4e917975e8a"
 					}
 				},
 				"metadata": {
@@ -3924,13 +3924,15 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"from pyspark.sql import SparkSession\r\n",
 							"from pyspark.sql.functions import col, max, coalesce, trunc\r\n",
@@ -3970,6 +3972,7 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"bronze_df=bronze_df.join(customers_df,\"customer_id\")\r\n",
 							"\r\n",
@@ -4072,7 +4075,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "0cc580b4-b04f-47eb-a3fc-d970ac0940b8"
+						"spark.autotune.trackingId": "a324fa11-9ed2-4a23-9c8e-4bd0258fb2b3"
 					}
 				},
 				"metadata": {
@@ -4090,7 +4093,6 @@
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"-- Tworzenie sesji Spark z obsługą Delta Lake\n",
 							"CREATE DATABASE IF NOT EXISTS bigpharma;\n",

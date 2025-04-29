@@ -3729,15 +3729,15 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "92d7d9b0-7c65-41e1-a251-6dcfb7197bf9"
+						"spark.autotune.trackingId": "768f8add-767e-4773-bce6-90c5f01299c3"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
 					"kernelspec": {
-						"name": "synapse_sparksql",
-						"display_name": "sql"
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
 					},
 					"language_info": {
 						"name": "sql"
@@ -3762,7 +3762,9 @@
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
+						"metadata": {
+							"collapsed": false
+						},
 						"source": [
 							"-- 1. Tymczasowe widoki na pliki z ADLS Gen2\n",
 							"CREATE OR REPLACE TEMP VIEW bronze_orders\n",
@@ -3866,7 +3868,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 1
 					}
 				]
 			},
@@ -4070,7 +4072,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f4a27a92-379a-4964-af65-cd86837735c3"
+						"spark.autotune.trackingId": "0cc580b4-b04f-47eb-a3fc-d970ac0940b8"
 					}
 				},
 				"metadata": {
@@ -4088,6 +4090,7 @@
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"-- Tworzenie sesji Spark z obsługą Delta Lake\n",
 							"CREATE DATABASE IF NOT EXISTS bigpharma;\n",

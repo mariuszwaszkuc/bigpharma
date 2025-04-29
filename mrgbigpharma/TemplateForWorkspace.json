@@ -2868,7 +2868,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "3ee83e6f-c5c5-43b9-ab7d-0914ed14e5cb"
+						"spark.autotune.trackingId": "acbd9008-a401-454a-b644-a14771acf57f"
 					}
 				},
 				"metadata": {
@@ -2893,15 +2893,13 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"%%configure -f\n",
 							"{\n",
@@ -2915,7 +2913,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"from notebookutils import mssparkutils\n",
 							"\n",
@@ -2935,7 +2932,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"from pyspark.sql.utils import AnalysisException\n",
 							"from pyspark.sql.functions import input_file_name\n",
@@ -3213,6 +3209,119 @@
 						],
 						"outputs": [],
 						"execution_count": 8
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Notebook 1')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Load_Bronze"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "d6623a7a-a09e-484e-bb6e-3b3a745594ae"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"from pyspark.sql.functions import col, max\n",
+							"from pyspark.sql.window import Window\n",
+							"from pyspark.sql import functions as F\n",
+							"from delta.tables import DeltaTable\n",
+							"\n",
+							"# Ścieżki\n",
+							"bronze_bucket_name = \"abfss://bronze@bigpharma.dfs.core.windows.net/\"\n",
+							"bronze_prefix = \"Erp/\"\n",
+							"file_name = \"customers\"\n",
+							"bronze_path = f\"{bronze_bucket_name}{bronze_prefix}{file_name}/*.parquet\"\n",
+							"join_path = f\"{bronze_bucket_name}{bronze_prefix}countries/*.parquet\"\n",
+							"\n",
+							"silver_bucket_name = \"abfss://silver@bigpharma.dfs.core.windows.net/\"\n",
+							"silver_prefix = \"d_customers\"\n",
+							"silver_path = f\"{silver_bucket_name}{silver_prefix}\"\n",
+							"\n",
+							"# Wczytanie danych\n",
+							"bronze_df = spark.read.format(\"parquet\").load(bronze_path)\n",
+							"join_bronze_df = spark.read.format(\"parquet\").load(join_path)\n",
+							"\n",
+							"# Zmiana nazw kolumn z kolizją\n",
+							"join_bronze_df = join_bronze_df.select(\n",
+							"    [col(c).alias(f\"{c}_right\") if c != \"country_id\" else col(c) for c in join_bronze_df.columns]\n",
+							")\n",
+							"\n",
+							"# Join\n",
+							"joined_df = bronze_df.join(join_bronze_df, on=\"country_id\", how=\"inner\")\n",
+							"\n",
+							"# Najnowsze dane wg customer_id\n",
+							"latest_bronze_df = joined_df.withColumn(\n",
+							"    \"max_order_date\", max(\"update_date\").over(Window.partitionBy(\"customer_id\"))\n",
+							").filter(col(\"update_date\") == col(\"max_order_date\"))\n",
+							"\n",
+							"# Usuwanie sufiksów _right\n",
+							"new_column_names = [col_name.replace(\"_right\", \"\") for col_name in latest_bronze_df.columns]\n",
+							"new_bronze_df = latest_bronze_df.toDF(*new_column_names)\n",
+							"\n",
+							"# Kolumny końcowe\n",
+							"new_bronze_df = new_bronze_df.select(\n",
+							"    \"customer_id\",\n",
+							"    \"country_id\", \n",
+							"    \"company_name\", \n",
+							"    \"address\", \n",
+							"    \"city\",\n",
+							"    \"region_description\", \n",
+							"    \"country\", \n",
+							"    \"cluster\"\n",
+							")\n",
+							"\n",
+							"# Zapis z Delta Lake\n",
+							"try:\n",
+							"    delta_table = DeltaTable.forPath(spark, silver_path)\n",
+							"    delta_table.alias(\"target\").merge(\n",
+							"        new_bronze_df.alias(\"source\"),\n",
+							"        \"target.customer_id = source.customer_id\"\n",
+							"    ).whenMatchedUpdateAll() \\\n",
+							"     .whenNotMatchedInsertAll() \\\n",
+							"     .execute()\n",
+							"\n",
+							"    print(\"Zaktualizowano istniejącą tabelę Delta (UPSERT).\")\n",
+							"\n",
+							"except Exception as e:\n",
+							"    print(f\"Nie znaleziono tabeli Delta — zostanie utworzona. Szczegóły: {str(e)}\")\n",
+							"    new_bronze_df.write.format(\"delta\").mode(\"overwrite\").save(silver_path)\n",
+							"    print(\"Zapisano nową tabelę Delta.\")"
+						],
+						"outputs": [],
+						"execution_count": null
 					}
 				]
 			},

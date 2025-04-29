@@ -4126,15 +4126,15 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "492dff7f-11e9-4eca-aa31-9b6e73234463"
+						"spark.autotune.trackingId": "9296194b-545e-4e53-b0fc-093f1e52b0bf"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
 					"kernelspec": {
-						"name": "synapse_pyspark",
-						"display_name": "Synapse PySpark"
+						"name": "synapse_sparksql",
+						"display_name": "sql"
 					},
 					"language_info": {
 						"name": "sql"
@@ -4159,7 +4159,9 @@
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
+						"metadata": {
+							"collapsed": false
+						},
 						"source": [
 							"-- 1. Załaduj dane z Bronze i Customers jako tymczasowe widoki\n",
 							"CREATE OR REPLACE TEMP VIEW bronze_inventory\n",
@@ -4259,7 +4261,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 1
+						"execution_count": 2
 					}
 				]
 			},

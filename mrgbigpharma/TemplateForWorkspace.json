@@ -1295,6 +1295,26 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 2')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/silver/d_customers/',\n        FORMAT = 'DELTA'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/D_CUSTOMERS_LOAD')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -3729,7 +3749,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "4ad5849b-d2dc-414d-9095-20040b120217"
+						"spark.autotune.trackingId": "24e45896-6ae9-444d-8be9-e7861fbe59e1"
 					}
 				},
 				"metadata": {
@@ -3869,6 +3889,108 @@
 						],
 						"outputs": [],
 						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"collapsed": false
+						},
+						"source": [
+							"-- 2. Utwórz tabelę docelową Silver jako Delta (jeśli nie istnieje)\n",
+							"CREATE TABLE IF NOT EXISTS f_wh_data (\n",
+							"  product_id STRING,\n",
+							"  country_id STRING,\n",
+							"  transaction_date DATE,\n",
+							"  whrs_sell_in_quantity DOUBLE,\n",
+							"  whrs_open_quantity DOUBLE,\n",
+							"  whrs_end_quantity DOUBLE,\n",
+							"  whrs_sell_in_amount DOUBLE,\n",
+							"  whrs_open_amount DOUBLE,\n",
+							"  whrs_end_amount DOUBLE,\n",
+							"  unit_price DOUBLE\n",
+							")\n",
+							"USING DELTA\n",
+							"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/f_wh_data/';\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"collapsed": false
+						},
+						"source": [
+							"\n",
+							"-- 3. MERGE danych do tabeli Silver z agregacją i filtrowaniem\n",
+							"MERGE INTO f_wh_data AS silver\n",
+							"USING (\n",
+							"    WITH enriched AS (\n",
+							"        SELECT\n",
+							"            inv.*,\n",
+							"            c.country_id,\n",
+							"            ROW_NUMBER() OVER (PARTITION BY inv.product_id, inv.customer_id ORDER BY inv.update_date DESC) AS rn\n",
+							"        FROM bronze_inventory inv\n",
+							"        JOIN silver_customers c ON inv.customer_id = c.customer_id\n",
+							"    ),\n",
+							"    filtered AS (\n",
+							"        SELECT\n",
+							"            product_id,\n",
+							"            country_id,\n",
+							"            TRUNC(transaction_date, 'MM') AS transaction_date,\n",
+							"            unit_price,\n",
+							"            whrs_sell_in_quantity,\n",
+							"            whrs_open_quantity,\n",
+							"            whrs_end_quantity\n",
+							"        FROM enriched\n",
+							"        WHERE rn = 1\n",
+							"    ),\n",
+							"    aggregated AS (\n",
+							"        SELECT\n",
+							"            product_id,\n",
+							"            country_id,\n",
+							"            transaction_date,\n",
+							"            SUM(whrs_sell_in_quantity) AS whrs_sell_in_quantity,\n",
+							"            SUM(whrs_open_quantity) AS whrs_open_quantity,\n",
+							"            SUM(whrs_end_quantity) AS whrs_end_quantity,\n",
+							"            ROUND(SUM(whrs_sell_in_quantity * unit_price), 2) AS whrs_sell_in_amount,\n",
+							"            ROUND(SUM(whrs_open_quantity * unit_price), 2) AS whrs_open_amount,\n",
+							"            ROUND(SUM(whrs_end_quantity * unit_price), 2) AS whrs_end_amount,\n",
+							"            ROUND(SUM(whrs_sell_in_quantity * unit_price) / NULLIF(SUM(whrs_sell_in_quantity), 0), 2) AS unit_price\n",
+							"        FROM filtered\n",
+							"        GROUP BY product_id, country_id, transaction_date\n",
+							"    )\n",
+							"    SELECT * FROM aggregated\n",
+							") AS new_data\n",
+							"ON silver.product_id = new_data.product_id\n",
+							"   AND silver.country_id = new_data.country_id\n",
+							"   AND silver.transaction_date = new_data.transaction_date\n",
+							"WHEN MATCHED THEN\n",
+							"  UPDATE SET\n",
+							"    whrs_sell_in_quantity = new_data.whrs_sell_in_quantity,\n",
+							"    whrs_open_quantity = new_data.whrs_open_quantity,\n",
+							"    whrs_end_quantity = new_data.whrs_end_quantity,\n",
+							"    whrs_sell_in_amount = new_data.whrs_sell_in_amount,\n",
+							"    whrs_open_amount = new_data.whrs_open_amount,\n",
+							"    whrs_end_amount = new_data.whrs_end_amount,\n",
+							"    unit_price = new_data.unit_price\n",
+							"WHEN NOT MATCHED THEN\n",
+							"  INSERT (\n",
+							"    product_id, country_id, transaction_date,\n",
+							"    whrs_sell_in_quantity, whrs_open_quantity, whrs_end_quantity,\n",
+							"    whrs_sell_in_amount, whrs_open_amount, whrs_end_amount,\n",
+							"    unit_price\n",
+							"  )\n",
+							"  VALUES (\n",
+							"    new_data.product_id, new_data.country_id, new_data.transaction_date,\n",
+							"    new_data.whrs_sell_in_quantity, new_data.whrs_open_quantity, new_data.whrs_end_quantity,\n",
+							"    new_data.whrs_sell_in_amount, new_data.whrs_open_amount, new_data.whrs_end_amount,\n",
+							"    new_data.unit_price\n",
+							"  );"
+						],
+						"outputs": [],
+						"execution_count": 7
 					}
 				]
 			},
@@ -4103,7 +4225,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "b92a7652-27d6-4c4e-b7a8-bed509e9dee5"
+						"spark.autotune.trackingId": "4bb024fe-b921-4fce-8f62-ef4579c8f9d3"
 					}
 				},
 				"metadata": {
@@ -4131,13 +4253,13 @@
 							");\n",
 							"\n",
 							"CREATE OR REPLACE TEMP VIEW silver_customers\n",
-							"USING parquet\n",
+							"USING delta\n",
 							"OPTIONS (\n",
 							"  path 'abfss://silver@bigpharma.dfs.core.windows.net/d_customers'\n",
 							");\n",
 							"\n",
 							"-- 2. Utwórz tabelę docelową Silver jako Delta (jeśli nie istnieje)\n",
-							"CREATE TABLE IF NOT EXISTS default.f_wh_data (\n",
+							"CREATE TABLE IF NOT EXISTS f_wh_data (\n",
 							"  product_id STRING,\n",
 							"  country_id STRING,\n",
 							"  transaction_date DATE,\n",
@@ -4153,13 +4275,13 @@
 							"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/f_wh_data/';\n",
 							"\n",
 							"-- 3. MERGE danych do tabeli Silver z agregacją i filtrowaniem\n",
-							"MERGE INTO default.f_wh_data AS silver\n",
+							"MERGE INTO f_wh_data AS silver\n",
 							"USING (\n",
 							"    WITH enriched AS (\n",
 							"        SELECT\n",
 							"            inv.*,\n",
 							"            c.country_id,\n",
-							"            ROW_NUMBER() OVER (PARTITION BY product_id, customer_id ORDER BY update_date DESC) AS rn\n",
+							"            ROW_NUMBER() OVER (PARTITION BY inv.product_id, inv.customer_id ORDER BY inv.update_date DESC) AS rn\n",
 							"        FROM bronze_inventory inv\n",
 							"        JOIN silver_customers c ON inv.customer_id = c.customer_id\n",
 							"    ),\n",
@@ -4217,6 +4339,7 @@
 							"    new_data.whrs_sell_in_amount, new_data.whrs_open_amount, new_data.whrs_end_amount,\n",
 							"    new_data.unit_price\n",
 							"  );\n",
+							"\n",
 							""
 						],
 						"outputs": [],

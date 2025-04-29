@@ -1,0 +1,101 @@
+{
+	"name": "F_WH_DATA_LOAD_SQL",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "f4a27a92-379a-4964-af65-cd86837735c3"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"-- Tworzenie sesji Spark z obsługą Delta Lake\n",
+					"CREATE DATABASE IF NOT EXISTS bigpharma;\n",
+					"\n",
+					"-- Załaduj dane z warstwy Bronze do tymczasowej tabeli (w formacie Delta)\n",
+					"CREATE OR REPLACE TEMP VIEW bronze_data AS\n",
+					"SELECT *\n",
+					"FROM delta.`abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_wholesaler_history_details`;\n",
+					"\n",
+					"-- Załaduj dane z tabeli customers (Silver)\n",
+					"CREATE OR REPLACE TEMP VIEW customers_data AS\n",
+					"SELECT *\n",
+					"FROM delta.`abfss://silver@bigpharma.dfs.core.windows.net/d_customers`;\n",
+					"\n",
+					"-- Stworzenie widoku z najnowszymi danymi z tabeli bronze\n",
+					"CREATE OR REPLACE TEMP VIEW latest_bronze_data AS\n",
+					"SELECT\n",
+					"    b.product_id,\n",
+					"    b.country_id,\n",
+					"    TRUNCATE(b.transaction_date, 'MM') AS transaction_date,  -- Truncating the transaction date to month level\n",
+					"    b.unit_price,\n",
+					"    b.whrs_sell_in_quantity,\n",
+					"    b.whrs_open_quantity,\n",
+					"    b.whrs_end_quantity,\n",
+					"    b.update_date,\n",
+					"    ROW_NUMBER() OVER (PARTITION BY b.product_id, b.customer_id ORDER BY b.update_date DESC) AS row_num\n",
+					"FROM bronze_data b\n",
+					"JOIN customers_data c\n",
+					"    ON b.customer_id = c.customer_id;\n",
+					"\n",
+					"-- Wybór tylko najnowszych rekordów\n",
+					"CREATE OR REPLACE TEMP VIEW filtered_bronze_data AS\n",
+					"SELECT \n",
+					"    product_id, \n",
+					"    country_id, \n",
+					"    transaction_date, \n",
+					"    unit_price, \n",
+					"    whrs_sell_in_quantity, \n",
+					"    whrs_open_quantity, \n",
+					"    whrs_end_quantity\n",
+					"FROM latest_bronze_data\n",
+					"WHERE row_num = 1;\n",
+					"\n",
+					"-- Agregacja danych\n",
+					"CREATE OR REPLACE TEMP VIEW aggregated_bronze_data AS\n",
+					"SELECT\n",
+					"    product_id,\n",
+					"    country_id,\n",
+					"    transaction_date,\n",
+					"    SUM(whrs_sell_in_quantity) AS whrs_sell_in_quantity,\n",
+					"    SUM(whrs_open_quantity) AS whrs_open_quantity,\n",
+					"    SUM(whrs_end_quantity) AS whrs_end_quantity,\n",
+					"    ROUND(SUM(whrs_sell_in_quantity * unit_price), 2) AS whrs_sell_in_amount,\n",
+					"    ROUND(SUM(whrs_open_quantity * unit_price), 2) AS whrs_open_amount,\n",
+					"    ROUND(SUM(whrs_end_quantity * unit_price), 2) AS whrs_end_amount,\n",
+					"    ROUND(SUM(whrs_sell_in_quantity * unit_price) / NULLIF(SUM(whrs_sell_in_quantity), 0), 2) AS unit_price\n",
+					"FROM filtered_bronze_data\n",
+					"GROUP BY product_id, country_id, transaction_date;\n",
+					"\n",
+					"-- Sprawdzenie, czy tabela Silver istnieje\n",
+					"CREATE TABLE IF NOT\n",
+					""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}

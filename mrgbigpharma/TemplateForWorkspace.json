@@ -3749,7 +3749,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "9af0c077-1472-417c-a461-0d8d2932c1b2"
+						"spark.autotune.trackingId": "d9c50c4e-9c2b-4124-8cf9-dadda7e4b334"
 					}
 				},
 				"metadata": {
@@ -3774,8 +3774,7 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -4127,7 +4126,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "56a51a71-f9de-4d92-b49c-3146795589e3"
+						"spark.autotune.trackingId": "fd6926d1-513c-4934-96eb-dcd82b93e360"
 					}
 				},
 				"metadata": {
@@ -4152,13 +4151,15 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"-- 1. Załaduj dane z Bronze i Customers jako tymczasowe widoki\n",
 							"CREATE OR REPLACE TEMP VIEW bronze_inventory\n",

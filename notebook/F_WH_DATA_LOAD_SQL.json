@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "06720e4a-96f4-4351-8084-f55a8bea6cfb"
+				"spark.autotune.trackingId": "94888d89-b2fa-4cdd-8f62-d0bf7289830f"
 			}
 		},
 		"metadata": {
@@ -50,6 +50,9 @@
 		"cells": [
 			{
 				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
 				"source": [
 					"-- 1. Załaduj dane z Bronze i Customers jako tymczasowe widoki\n",
 					"CREATE OR REPLACE TEMP VIEW bronze_inventory\n",
@@ -148,7 +151,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 1
+				"execution_count": 2
 			}
 		]
 	}

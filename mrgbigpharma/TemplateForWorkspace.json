@@ -1571,7 +1571,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "5fd8e37f-7bf4-42c3-8c2b-97cd5a95cd23"
+						"spark.autotune.trackingId": "722d79cc-a620-400a-9467-f3d9b0c33b7b"
 					}
 				},
 				"metadata": {
@@ -1596,8 +1596,7 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -2392,7 +2391,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "04fcbd34-0f90-425e-8071-4ad9719a1da5"
+						"spark.autotune.trackingId": "b4e8235d-d268-4b14-b9fc-10cca8f744c5"
 					}
 				},
 				"metadata": {
@@ -2410,7 +2409,6 @@
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"set path_bronze_products = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/products';\n",
 							"set path_silver_products = 'abfss://silver@bigpharma.dfs.core.windows.net/d_products';\n",
@@ -2707,7 +2705,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "91bd239c-dfb1-472a-ae1a-3669b66ba26d"
+						"spark.autotune.trackingId": "e970d14e-ccb3-4fce-a667-d5973a51dd68"
 					}
 				},
 				"metadata": {
@@ -2725,10 +2723,12 @@
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"set path_bronze_forecast = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/forecast_details';\n",
 							"set path_silver_f_forecast = 'abfss://silver@bigpharma.dfs.core.windows.net/f_forecast';\n",
 							"\n",
+							"CREATE DATABASE IF NOT EXISTS silver;\n",
 							"\n",
 							"-- ============================================\n",
 							"-- 1. Załaduj dane z warstwy Bronze jako tymczasowy widok\n",
@@ -2774,7 +2774,7 @@
 							"-- ============================================\n",
 							"-- 3. Stwórz tabelę Silver, jeśli nie istnieje\n",
 							"-- ============================================\n",
-							"CREATE TABLE IF NOT EXISTS silver_f_forecast\n",
+							"CREATE TABLE IF NOT EXISTS silver.f_forecast\n",
 							"USING delta\n",
 							"LOCATION ${path_silver_f_forecast}\n",
 							"AS\n",
@@ -2784,7 +2784,7 @@
 							"-- ============================================\n",
 							"-- 4. Wykonaj MERGE INTO, aby zaktualizować lub dodać nowe dane\n",
 							"-- ============================================\n",
-							"MERGE INTO silver_forecast AS target\n",
+							"MERGE INTO silver.forecast AS target\n",
 							"USING aggregated_forecast AS source\n",
 							"ON target.product_id = source.product_id\n",
 							"   AND target.country_id = source.country_id\n",
@@ -3499,7 +3499,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "7e3a8dc3-e547-401a-9243-65f7b11ea876"
+						"spark.autotune.trackingId": "b8cf5f0c-120e-4479-af89-db394dfd2f65"
 					}
 				},
 				"metadata": {
@@ -3517,6 +3517,7 @@
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"set path_bronze_pos = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_pos_history_details';\n",
 							"set path_silver_f_pos_data = 'abfss://silver@bigpharma.dfs.core.windows.net/f_pos_data';\n",

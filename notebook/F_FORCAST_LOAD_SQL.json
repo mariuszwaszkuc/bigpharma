@@ -13,7 +13,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5b209c43-9157-420c-9cdc-bee2fc621f2e"
+				"spark.autotune.trackingId": "8c0aab6d-a693-47eb-9052-97d0e1f55ba6"
 			}
 		},
 		"metadata": {
@@ -91,7 +91,7 @@
 					"-- ============================================\n",
 					"-- 4. Wykonaj MERGE INTO, aby zaktualizować lub dodać nowe dane\n",
 					"-- ============================================\n",
-					"MERGE INTO silver.forecast AS target\n",
+					"MERGE INTO silver.f_forecast AS target\n",
 					"USING aggregated_forecast AS source\n",
 					"ON target.product_id = source.product_id\n",
 					"   AND target.country_id = source.country_id\n",

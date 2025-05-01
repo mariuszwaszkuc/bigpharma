@@ -3498,7 +3498,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "8e2591ce-15ba-4659-a862-b57308e53cf0"
+						"spark.autotune.trackingId": "a3a09c18-6348-408a-93e8-e3e459feed88"
 					}
 				},
 				"metadata": {
@@ -3516,7 +3516,6 @@
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"set path_bronze_pos = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_pos_history_details';\n",
 							"set path_silver_f_pos_data = 'abfss://silver@bigpharma.dfs.core.windows.net/f_pos_data';\n",
@@ -3810,7 +3809,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "2c570229-89f1-4fba-b865-640ced639abd"
+						"spark.autotune.trackingId": "a6201a11-a685-449d-b6ab-bdd43ffec50c"
 					}
 				},
 				"metadata": {
@@ -3856,6 +3855,7 @@
 							"set path_silver_f_sales = 'abfss://silver@bigpharma.dfs.core.windows.net/f_sales/';\n",
 							"\n",
 							"\n",
+							"CREATE DATABASE IF NOT EXISTS silver;\n",
 							"-- 1. Tymczasowe widoki na pliki z ADLS Gen2\n",
 							"\n",
 							"CREATE OR REPLACE TEMP VIEW bronze_orders\n",
@@ -3876,7 +3876,7 @@
 							"  path ${path_silver_d_customers}\n",
 							");\n",
 							"\n",
-							"CREATE TABLE IF NOT EXISTS f_sales (\n",
+							"CREATE TABLE IF NOT EXISTS silver.f_sales (\n",
 							"    country_id STRING,\n",
 							"    product_id STRING,\n",
 							"    shipped_date DATE,\n",
@@ -3889,7 +3889,7 @@
 							"LOCATION ${path_silver_f_sales};\n",
 							"\n",
 							"-- 3. Przekształcenie i zapis danych do tabeli Silver z użyciem MERGE\n",
-							"MERGE INTO f_sales AS target\n",
+							"MERGE INTO silver.f_sales AS target\n",
 							"USING (\n",
 							"    WITH orders_trunc AS (\n",
 							"        SELECT\n",
@@ -3950,33 +3950,6 @@
 						],
 						"outputs": [],
 						"execution_count": 11
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"outputs_hidden": false
-							},
-							"collapsed": false
-						},
-						"source": [
-							"\n",
-							"\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": 22
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"collapsed": false
-						},
-						"source": [
-							"select *From d_customers "
-						],
-						"outputs": [],
-						"execution_count": 18
 					}
 				]
 			},

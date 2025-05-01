@@ -13,7 +13,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b4e8235d-d268-4b14-b9fc-10cca8f744c5"
+				"spark.autotune.trackingId": "39fb2b16-adf6-48a8-8619-2f2e063389c4"
 			}
 		},
 		"metadata": {
@@ -51,7 +51,7 @@
 					"-- 2. Wybór najnowszych danych wg update_date\n",
 					"-- ============================================\n",
 					"\n",
-					"CREATE OR REPLACE TEMP VIEW d_products AS\n",
+					"CREATE OR REPLACE TEMP VIEW new_d_products AS\n",
 					"SELECT \n",
 					"    product_id,\n",
 					"    product_name,\n",
@@ -98,7 +98,7 @@
 					"    source.brand_name,\n",
 					"    source.sub_brand_name,\n",
 					"    source.category_name\n",
-					"  );ch"
+					"  )"
 				],
 				"execution_count": null
 			}

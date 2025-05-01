@@ -13,7 +13,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "65e9102c-4a7f-48de-83f1-a14cf55ce2fa"
+				"spark.autotune.trackingId": "7e3a8dc3-e547-401a-9243-65f7b11ea876"
 			}
 		},
 		"metadata": {
@@ -34,6 +34,7 @@
 				"source": [
 					"set path_bronze_pos = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_pos_history_details';\n",
 					"set path_silver_f_pos_data = 'abfss://silver@bigpharma.dfs.core.windows.net/f_pos_data';\n",
+					"\n",
 					"-- ============================================\n",
 					"-- 1. Rejestracja danych z Bronze jako widok tymczasowy\n",
 					"-- ============================================\n",

@@ -13,7 +13,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "91bd239c-dfb1-472a-ae1a-3669b66ba26d"
+				"spark.autotune.trackingId": "5b209c43-9157-420c-9cdc-bee2fc621f2e"
 			}
 		},
 		"metadata": {
@@ -35,6 +35,7 @@
 					"set path_bronze_forecast = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/forecast_details';\n",
 					"set path_silver_f_forecast = 'abfss://silver@bigpharma.dfs.core.windows.net/f_forecast';\n",
 					"\n",
+					"CREATE DATABASE IF NOT EXISTS silver;\n",
 					"\n",
 					"-- ============================================\n",
 					"-- 1. Załaduj dane z warstwy Bronze jako tymczasowy widok\n",
@@ -80,7 +81,7 @@
 					"-- ============================================\n",
 					"-- 3. Stwórz tabelę Silver, jeśli nie istnieje\n",
 					"-- ============================================\n",
-					"CREATE TABLE IF NOT EXISTS silver_f_forecast\n",
+					"CREATE TABLE IF NOT EXISTS silver.f_forecast\n",
 					"USING delta\n",
 					"LOCATION ${path_silver_f_forecast}\n",
 					"AS\n",
@@ -90,7 +91,7 @@
 					"-- ============================================\n",
 					"-- 4. Wykonaj MERGE INTO, aby zaktualizować lub dodać nowe dane\n",
 					"-- ============================================\n",
-					"MERGE INTO silver_forecast AS target\n",
+					"MERGE INTO silver.forecast AS target\n",
 					"USING aggregated_forecast AS source\n",
 					"ON target.product_id = source.product_id\n",
 					"   AND target.country_id = source.country_id\n",

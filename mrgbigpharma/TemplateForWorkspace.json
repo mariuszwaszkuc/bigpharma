@@ -3497,7 +3497,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "2ab5bee6-81c9-4922-9a7e-87cd506619f7"
+						"spark.autotune.trackingId": "7e3a8dc3-e547-401a-9243-65f7b11ea876"
 					}
 				},
 				"metadata": {
@@ -3515,7 +3515,6 @@
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"set path_bronze_pos = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_pos_history_details';\n",
 							"set path_silver_f_pos_data = 'abfss://silver@bigpharma.dfs.core.windows.net/f_pos_data';\n",
@@ -3808,7 +3807,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "a66aa553-630d-4d98-ab7b-0727556aceac"
+						"spark.autotune.trackingId": "f0c55a28-dc26-402a-a15d-f546e09570fa"
 					}
 				},
 				"metadata": {
@@ -3848,23 +3847,30 @@
 							"collapsed": false
 						},
 						"source": [
+							"set path_bronze_orders = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/orders';\n",
+							"set path_bronze_order_details = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/order_details';\n",
+							"set path_silver_d_customers = 'abfss://silver@bigpharma.dfs.core.windows.net/d_customers';\n",
+							"set path_silver_f_sales = 'abfss://silver@bigpharma.dfs.core.windows.net/f_sales/';\n",
+							"\n",
+							"\n",
 							"-- 1. Tymczasowe widoki na pliki z ADLS Gen2\n",
+							"\n",
 							"CREATE OR REPLACE TEMP VIEW bronze_orders\n",
 							"USING parquet\n",
 							"OPTIONS (\n",
-							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/orders'\n",
+							"  path ${path_bronze_orders }\n",
 							");\n",
 							"\n",
 							"CREATE OR REPLACE TEMP VIEW bronze_order_details\n",
 							"USING parquet\n",
 							"OPTIONS (\n",
-							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/order_details'\n",
+							"  path ${path_bronze_order_details}\n",
 							");\n",
 							"\n",
 							"CREATE OR REPLACE TEMP VIEW d_customers\n",
 							"USING parquet\n",
 							"OPTIONS (\n",
-							"  path 'abfss://silver@bigpharma.dfs.core.windows.net/d_customers'\n",
+							"  path ${path_silver_d_customers}\n",
 							");\n",
 							"\n",
 							"CREATE TABLE IF NOT EXISTS f_sales (\n",
@@ -3877,7 +3883,7 @@
 							"    unit_price DOUBLE\n",
 							")\n",
 							"USING DELTA\n",
-							"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/f_sales/';\n",
+							"LOCATION ${path_silver_f_sales};\n",
 							"\n",
 							"-- 3. Przekształcenie i zapis danych do tabeli Silver z użyciem MERGE\n",
 							"MERGE INTO f_sales AS silver\n",
@@ -3918,24 +3924,24 @@
 							"        GROUP BY country_id, product_id, shipped_date\n",
 							"    )\n",
 							"    SELECT * FROM  final_orders\n",
-							") AS new_data\n",
-							"ON silver.country_id = new_data.country_id\n",
-							"   AND silver.product_id = new_data.product_id\n",
-							"   AND silver.shipped_date = new_data.shipped_date\n",
+							") AS new_f_sales\n",
+							"ON silver.country_id = new_f_sales.country_id\n",
+							"   AND silver.product_id = new_f_sales.product_id\n",
+							"   AND silver.shipped_date = new_f_sales.shipped_date\n",
 							"WHEN MATCHED THEN\n",
 							"    UPDATE SET\n",
-							"        quantity = new_data.quantity,\n",
-							"        discount = new_data.discount,\n",
-							"        amount = new_data.amount,\n",
-							"        unit_price = new_data.unit_price\n",
+							"        quantity = new_f_sales.quantity,\n",
+							"        discount = new_f_sales.discount,\n",
+							"        amount = new_f_sales.amount,\n",
+							"        unit_price = new_f_sales.unit_price\n",
 							"WHEN NOT MATCHED THEN\n",
 							"    INSERT (\n",
 							"        country_id, product_id, shipped_date,\n",
 							"        quantity, discount, amount, unit_price\n",
 							"    )\n",
 							"    VALUES (\n",
-							"        new_data.country_id, new_data.product_id, new_data.shipped_date,\n",
-							"        new_data.quantity, new_data.discount, new_data.amount, new_data.unit_price\n",
+							"        new_f_sales.country_id, new_f_sales.product_id, new_f_sales.shipped_date,\n",
+							"        new_f_sales.quantity, new_f_sales.discount, new_f_sales.amount, new_f_sales.unit_price\n",
 							"    );\n",
 							""
 						],

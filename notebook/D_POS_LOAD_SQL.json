@@ -13,7 +13,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ff210aa7-7153-4c0e-96e9-8f223270a838"
+				"spark.autotune.trackingId": "3c092c92-ae9d-4541-a26c-0dfc58003a45"
 			}
 		},
 		"metadata": {
@@ -24,7 +24,7 @@
 				"display_name": "python"
 			},
 			"language_info": {
-				"name": "python"
+				"name": "sql"
 			},
 			"sessionKeepAliveTimeout": 30
 		},

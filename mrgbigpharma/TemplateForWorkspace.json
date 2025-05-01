@@ -2701,32 +2701,37 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "c12eb7ee-61ab-40a6-b153-c4f89b8693ae"
+						"spark.autotune.trackingId": "d3c25ab8-b820-4964-998f-404f73588f41"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
 					"kernelspec": {
-						"name": "synapse_pyspark",
-						"display_name": "python"
+						"name": "synapse_sparksql",
+						"display_name": "sql"
 					},
 					"language_info": {
-						"name": "python"
+						"name": "sql"
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
+							"set path_bronze_forecast = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/forecast_details';\n",
+							"set path_silver_f_forecast = 'abfss://silver@bigpharma.dfs.core.windows.net/f_forecast';\n",
+							"\n",
+							"\n",
 							"-- ============================================\n",
 							"-- 1. Załaduj dane z warstwy Bronze jako tymczasowy widok\n",
 							"-- ============================================\n",
 							"CREATE OR REPLACE TEMP VIEW bronze_forecast\n",
 							"USING parquet\n",
 							"OPTIONS (\n",
-							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/forecast_details'\n",
+							"  path ${path_bronze_forecast}\n",
 							");\n",
 							"\n",
 							"-- ============================================\n",
@@ -2772,7 +2777,7 @@
 							"-- ============================================\n",
 							"-- 3. Stwórz tabelę Silver, jeśli nie istnieje\n",
 							"-- ============================================\n",
-							"CREATE TABLE IF NOT EXISTS silver_forecast\n",
+							"CREATE TABLE IF NOT EXISTS silver_f_forecast\n",
 							"USING delta\n",
 							"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/f_forecast'\n",
 							"AS\n",
@@ -3807,7 +3812,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f0c55a28-dc26-402a-a15d-f546e09570fa"
+						"spark.autotune.trackingId": "04ad2184-3d1e-4352-be86-4a23d29e1f56"
 					}
 				},
 				"metadata": {
@@ -3886,7 +3891,7 @@
 							"LOCATION ${path_silver_f_sales};\n",
 							"\n",
 							"-- 3. Przekształcenie i zapis danych do tabeli Silver z użyciem MERGE\n",
-							"MERGE INTO f_sales AS silver\n",
+							"MERGE INTO f_sales AS target\n",
 							"USING (\n",
 							"    WITH orders_trunc AS (\n",
 							"        SELECT\n",
@@ -3924,24 +3929,24 @@
 							"        GROUP BY country_id, product_id, shipped_date\n",
 							"    )\n",
 							"    SELECT * FROM  final_orders\n",
-							") AS new_f_sales\n",
-							"ON silver.country_id = new_f_sales.country_id\n",
-							"   AND silver.product_id = new_f_sales.product_id\n",
-							"   AND silver.shipped_date = new_f_sales.shipped_date\n",
+							") AS source\n",
+							"ON target.country_id = source.country_id\n",
+							"   AND target.product_id = source.product_id\n",
+							"   AND target.shipped_date = source.shipped_date\n",
 							"WHEN MATCHED THEN\n",
 							"    UPDATE SET\n",
-							"        quantity = new_f_sales.quantity,\n",
-							"        discount = new_f_sales.discount,\n",
-							"        amount = new_f_sales.amount,\n",
-							"        unit_price = new_f_sales.unit_price\n",
+							"        target.quantity = source.quantity,\n",
+							"        target.discount = source.discount,\n",
+							"        target.amount = source.amount,\n",
+							"        target.unit_price = source.unit_price\n",
 							"WHEN NOT MATCHED THEN\n",
 							"    INSERT (\n",
-							"        country_id, product_id, shipped_date,\n",
-							"        quantity, discount, amount, unit_price\n",
+							"        target.country_id, target.product_id, target.shipped_date,\n",
+							"        target.quantity, target.discount, target.amount, target.unit_price\n",
 							"    )\n",
 							"    VALUES (\n",
-							"        new_f_sales.country_id, new_f_sales.product_id, new_f_sales.shipped_date,\n",
-							"        new_f_sales.quantity, new_f_sales.discount, new_f_sales.amount, new_f_sales.unit_price\n",
+							"        source.country_id, source.product_id, source.shipped_date,\n",
+							"        source.quantity, source.discount, source.amount, source.unit_price\n",
 							"    );\n",
 							""
 						],

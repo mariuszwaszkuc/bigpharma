@@ -1571,7 +1571,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "8f90a39f-63d8-4f41-b7d5-82e6e0926ac4"
+						"spark.autotune.trackingId": "f8dc7c13-de3a-4dc1-bd30-f218e9361f2c"
 					}
 				},
 				"metadata": {
@@ -1596,7 +1596,8 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1610,18 +1611,23 @@
 							"collapsed": false
 						},
 						"source": [
+							"set path_bronze_customers = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/customers/';\n",
+							"set path_bronze_countries = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/countries/';\n",
+							"set path_silver_customers = 'abfss://silver@bigpharma.dfs.core.windows.net/d_customers';\n",
+							"\n",
+							"\n",
 							"-- 1. Rejestracja bronze_customers jako tymczasowy widok\n",
 							"CREATE OR REPLACE TEMP VIEW bronze_customers\n",
 							"USING parquet\n",
 							"OPTIONS (\n",
-							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/customers/'\n",
+							"  path ${path_bronze_customers}\n",
 							");\n",
 							"\n",
 							"-- 2. Rejestracja bronze_countries jako tymczasowy widok\n",
 							"CREATE OR REPLACE TEMP VIEW bronze_countries\n",
 							"USING parquet\n",
 							"OPTIONS (\n",
-							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/countries/'\n",
+							"  path ${path_bronze_countries}\n",
 							");\n",
 							"\n",
 							"-- 3. Przygotowanie danych – JOIN + wybór najnowszych po customer_id\n",
@@ -1642,7 +1648,7 @@
 							"-- 4. Stworzenie tabeli docelowej jako Delta Lake (jeśli nie istnieje)\n",
 							"CREATE TABLE IF NOT EXISTS silver_customers\n",
 							"USING delta\n",
-							"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/d_customers'\n",
+							"LOCATION ${path_silver_customers}\n",
 							"AS\n",
 							"SELECT * FROM new_bronze_customers\n",
 							"WHERE 1 = 0;\n",
@@ -2188,18 +2194,18 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "a9b8bb1b-bc19-4c3d-bfdd-7658876bf273"
+						"spark.autotune.trackingId": "90e43358-5daa-40d1-9fe0-d45516de642c"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
 					"kernelspec": {
-						"name": "synapse_pyspark",
-						"display_name": "python"
+						"name": "synapse_sparksql",
+						"display_name": "sql"
 					},
 					"language_info": {
-						"name": "python"
+						"name": "sql"
 					},
 					"sessionKeepAliveTimeout": 30
 				},

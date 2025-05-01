@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1d166f76-2f27-4d3b-b5e3-f4ddc01fbc5f"
+				"spark.autotune.trackingId": "b22b7a06-b54c-47bc-9272-1868fb6ce832"
 			}
 		},
 		"metadata": {
@@ -63,6 +63,7 @@
 					"set path_silver_f_sales = 'abfss://silver@bigpharma.dfs.core.windows.net/f_sales/';\n",
 					"\n",
 					"\n",
+					"CREATE DATABASE IF NOT EXISTS silver;\n",
 					"-- 1. Tymczasowe widoki na pliki z ADLS Gen2\n",
 					"\n",
 					"CREATE OR REPLACE TEMP VIEW bronze_orders\n",
@@ -83,7 +84,7 @@
 					"  path ${path_silver_d_customers}\n",
 					");\n",
 					"\n",
-					"CREATE TABLE IF NOT EXISTS f_sales (\n",
+					"CREATE TABLE IF NOT EXISTS silver.f_sales (\n",
 					"    country_id STRING,\n",
 					"    product_id STRING,\n",
 					"    shipped_date DATE,\n",
@@ -96,7 +97,7 @@
 					"LOCATION ${path_silver_f_sales};\n",
 					"\n",
 					"-- 3. Przekształcenie i zapis danych do tabeli Silver z użyciem MERGE\n",
-					"MERGE INTO f_sales AS target\n",
+					"MERGE INTO silver.f_sales AS target\n",
 					"USING (\n",
 					"    WITH orders_trunc AS (\n",
 					"        SELECT\n",
@@ -156,31 +157,6 @@
 					""
 				],
 				"execution_count": 11
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"outputs_hidden": false
-					},
-					"collapsed": false
-				},
-				"source": [
-					"\n",
-					"\n",
-					""
-				],
-				"execution_count": 22
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"collapsed": false
-				},
-				"source": [
-					"select *From d_customers "
-				],
-				"execution_count": 18
 			}
 		]
 	}

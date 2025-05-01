@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "73fb0dac-6d2a-4baa-b939-d22519eba31d"
+				"spark.autotune.trackingId": "05bb69f0-9035-4488-9d2d-c3941ff12599"
 			}
 		},
 		"metadata": {
@@ -59,6 +59,8 @@
 					"set path_silver_f_wh_data = 'abfss://silver@bigpharma.dfs.core.windows.net/f_wh_data/';\n",
 					"\n",
 					"\n",
+					"CREATE DATABASE IF NOT EXISTS silver;\n",
+					"\n",
 					"-- 1. Załaduj dane z Bronze i Customers jako tymczasowe widoki\n",
 					"CREATE OR REPLACE TEMP VIEW bronze_inventory\n",
 					"USING parquet\n",
@@ -73,7 +75,7 @@
 					");\n",
 					"\n",
 					"-- 2. Utwórz tabelę docelową Silver jako Delta (jeśli nie istnieje)\n",
-					"CREATE TABLE IF NOT EXISTS f_wh_data (\n",
+					"CREATE TABLE IF NOT EXISTS silver.f_wh_data (\n",
 					"  product_id STRING,\n",
 					"  country_id STRING,\n",
 					"  transaction_date DATE,\n",
@@ -89,7 +91,7 @@
 					"LOCATION {path_silver_f_wh_data};\n",
 					"\n",
 					"-- 3. MERGE danych do tabeli Silver z agregacją i filtrowaniem\n",
-					"MERGE INTO f_wh_data AS target\n",
+					"MERGE INTO silver.f_wh_data AS target\n",
 					"USING (\n",
 					"    WITH enriched AS (\n",
 					"        SELECT\n",

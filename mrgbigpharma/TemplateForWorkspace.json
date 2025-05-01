@@ -2391,7 +2391,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "be6e3cd9-4cfb-427f-adfb-13ae412eeb31"
+						"spark.autotune.trackingId": "39fb2b16-adf6-48a8-8619-2f2e063389c4"
 					}
 				},
 				"metadata": {
@@ -2409,7 +2409,6 @@
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"set path_bronze_products = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/products';\n",
 							"set path_silver_products = 'abfss://silver@bigpharma.dfs.core.windows.net/d_products';\n",
@@ -2706,7 +2705,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "193f7cb6-41e5-4bda-a050-a1cc31ac8887"
+						"spark.autotune.trackingId": "51f22f9b-d335-4e5e-bc7e-161145d83829"
 					}
 				},
 				"metadata": {
@@ -2785,7 +2784,7 @@
 							"-- ============================================\n",
 							"-- 4. Wykonaj MERGE INTO, aby zaktualizować lub dodać nowe dane\n",
 							"-- ============================================\n",
-							"MERGE INTO silver.forecast AS target\n",
+							"MERGE INTO silver.f_forecast AS target\n",
 							"USING aggregated_forecast AS source\n",
 							"ON target.product_id = source.product_id\n",
 							"   AND target.country_id = source.country_id\n",

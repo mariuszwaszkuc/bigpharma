@@ -2188,7 +2188,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "9d0ada82-1315-4ab9-903e-b67ee1f07483"
+						"spark.autotune.trackingId": "a9b8bb1b-bc19-4c3d-bfdd-7658876bf273"
 					}
 				},
 				"metadata": {
@@ -2206,16 +2206,18 @@
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
+							"set path_bronze_pos = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_pos_history_details';\n",
+							"set path_silver_f_pos_data = 'abfss://silver@bigpharma.dfs.core.windows.net/f_pos_data';\n",
 							"-- ============================================\n",
 							"-- 1. Rejestracja danych z Bronze jako widok tymczasowy\n",
 							"-- ============================================\n",
 							"CREATE OR REPLACE TEMP VIEW bronze_pos\n",
 							"USING parquet\n",
 							"OPTIONS (\n",
-							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_pos_history_details'\n",
+							"  path '${path_bronze_pos}'\n",
 							");\n",
-							"\n",
 							"-- ============================================\n",
 							"-- 2. Przygotowanie danych – najnowsze update + agregacja miesięczna\n",
 							"-- ============================================\n",
@@ -2231,23 +2233,16 @@
 							"    ROUND(SUM(pos_open_quantity * unit_price), 2) AS pos_open_amount,\n",
 							"    ROUND(SUM(pos_end_quantity * unit_price), 2) AS pos_end_amount,\n",
 							"    ROUND(SUM(pos_sell_out_quantity * unit_price) / NULLIF(SUM(pos_sell_out_quantity), 0), 2) AS unit_price\n",
-							"FROM (\n",
-							"    SELECT *, \n",
-							"           ROW_NUMBER() OVER (\n",
-							"             PARTITION BY product_id, country_id, update_date \n",
-							"             ORDER BY update_date DESC\n",
-							"           ) AS rn\n",
-							"    FROM bronze_pos\n",
-							") AS filtered\n",
-							"WHERE rn = 1\n",
+							"FROM  bronze_pos\n",
 							"GROUP BY product_id, country_id, TRUNC(transaction_date, \"MM\");\n",
+							"\n",
 							"\n",
 							"-- ============================================\n",
 							"-- 3. Stworzenie tabeli docelowej (Silver) jeśli nie istnieje\n",
 							"-- ============================================\n",
-							"CREATE TABLE IF NOT EXISTS silver_pos_data\n",
+							"CREATE TABLE IF NOT EXISTS f_pos_data\n",
 							"USING delta\n",
-							"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/f_pos_data'\n",
+							"LOCATION '${path_silver_f_pos_data}'\n",
 							"AS\n",
 							"SELECT * FROM aggregated_bronze_pos\n",
 							"WHERE 1 = 0;\n",
@@ -2255,7 +2250,7 @@
 							"-- ============================================\n",
 							"-- 4. MERGE INTO (UPSERT) danych do tabeli Delta\n",
 							"-- ============================================\n",
-							"MERGE INTO silver_pos_data AS target\n",
+							"MERGE INTO f_pos_data AS target\n",
 							"USING aggregated_bronze_pos AS source\n",
 							"ON target.product_id = source.product_id\n",
 							"   AND target.country_id = source.country_id\n",
@@ -2295,8 +2290,7 @@
 							"    source.pos_open_amount,\n",
 							"    source.pos_end_amount,\n",
 							"    source.unit_price\n",
-							"  );\n",
-							""
+							"  );"
 						],
 						"outputs": [],
 						"execution_count": null
@@ -4885,7 +4879,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f67b84e5-402c-4c38-a8ff-b9aa62914585"
+						"spark.autotune.trackingId": "be31118c-6311-4b7f-bf91-d4902caee5cf"
 					}
 				},
 				"metadata": {
@@ -4903,26 +4897,9 @@
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
-							"set path_bronze_pos = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_pos_history_details';"
-						],
-						"outputs": [],
-						"execution_count": 69
-					},
-					{
-						"cell_type": "code",
-						"metadata": {},
-						"source": [
-							"set path_silver_f_pos_data = 'abfss://silver@bigpharma.dfs.core.windows.net/f_pos_data';"
-						],
-						"outputs": [],
-						"execution_count": 70
-					},
-					{
-						"cell_type": "code",
-						"metadata": {},
-						"source": [
+							"set path_bronze_pos = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_pos_history_details';\n",
+							"set path_silver_f_pos_data = 'abfss://silver@bigpharma.dfs.core.windows.net/f_pos_data';\n",
 							"-- ============================================\n",
 							"-- 1. Rejestracja danych z Bronze jako widok tymczasowy\n",
 							"-- ============================================\n",
@@ -4930,15 +4907,7 @@
 							"USING parquet\n",
 							"OPTIONS (\n",
 							"  path '${path_bronze_pos}'\n",
-							");"
-						],
-						"outputs": [],
-						"execution_count": 71
-					},
-					{
-						"cell_type": "code",
-						"metadata": {},
-						"source": [
+							");\n",
 							"-- ============================================\n",
 							"-- 2. Przygotowanie danych – najnowsze update + agregacja miesięczna\n",
 							"-- ============================================\n",
@@ -4954,25 +4923,9 @@
 							"    ROUND(SUM(pos_open_quantity * unit_price), 2) AS pos_open_amount,\n",
 							"    ROUND(SUM(pos_end_quantity * unit_price), 2) AS pos_end_amount,\n",
 							"    ROUND(SUM(pos_sell_out_quantity * unit_price) / NULLIF(SUM(pos_sell_out_quantity), 0), 2) AS unit_price\n",
-							"FROM (\n",
-							"    SELECT *, \n",
-							"           ROW_NUMBER() OVER (\n",
-							"             PARTITION BY product_id, country_id, update_date \n",
-							"             ORDER BY update_date DESC\n",
-							"           ) AS rn\n",
-							"    FROM bronze_pos\n",
-							") AS filtered\n",
-							"WHERE rn = 1\n",
+							"FROM  bronze_pos\n",
 							"GROUP BY product_id, country_id, TRUNC(transaction_date, \"MM\");\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": 72
-					},
-					{
-						"cell_type": "code",
-						"metadata": {},
-						"source": [
+							"\n",
 							"\n",
 							"-- ============================================\n",
 							"-- 3. Stworzenie tabeli docelowej (Silver) jeśli nie istnieje\n",
@@ -4983,15 +4936,7 @@
 							"AS\n",
 							"SELECT * FROM aggregated_bronze_pos\n",
 							"WHERE 1 = 0;\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": 73
-					},
-					{
-						"cell_type": "code",
-						"metadata": {},
-						"source": [
+							"\n",
 							"-- ============================================\n",
 							"-- 4. MERGE INTO (UPSERT) danych do tabeli Delta\n",
 							"-- ============================================\n",
@@ -5039,11 +4984,10 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 74
+						"execution_count": 69
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							""
 						],
@@ -5052,7 +4996,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							""
 						],

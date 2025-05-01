@@ -2705,7 +2705,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "e970d14e-ccb3-4fce-a667-d5973a51dd68"
+						"spark.autotune.trackingId": "5b209c43-9157-420c-9cdc-bee2fc621f2e"
 					}
 				},
 				"metadata": {
@@ -2723,7 +2723,6 @@
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"set path_bronze_forecast = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/forecast_details';\n",
 							"set path_silver_f_forecast = 'abfss://silver@bigpharma.dfs.core.windows.net/f_forecast';\n",
@@ -3499,7 +3498,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "b8cf5f0c-120e-4479-af89-db394dfd2f65"
+						"spark.autotune.trackingId": "8e2591ce-15ba-4659-a862-b57308e53cf0"
 					}
 				},
 				"metadata": {
@@ -3521,6 +3520,7 @@
 						"source": [
 							"set path_bronze_pos = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_pos_history_details';\n",
 							"set path_silver_f_pos_data = 'abfss://silver@bigpharma.dfs.core.windows.net/f_pos_data';\n",
+							"CREATE DATABASE IF NOT EXISTS silver;\n",
 							"\n",
 							"-- ============================================\n",
 							"-- 1. Rejestracja danych z Bronze jako widok tymczasowy\n",
@@ -3552,7 +3552,7 @@
 							"-- ============================================\n",
 							"-- 3. Stworzenie tabeli docelowej (Silver) jeśli nie istnieje\n",
 							"-- ============================================\n",
-							"CREATE TABLE IF NOT EXISTS f_pos_data\n",
+							"CREATE TABLE IF NOT EXISTS silver.f_pos_data\n",
 							"USING delta\n",
 							"LOCATION '${path_silver_f_pos_data}'\n",
 							"AS\n",
@@ -3562,7 +3562,7 @@
 							"-- ============================================\n",
 							"-- 4. MERGE INTO (UPSERT) danych do tabeli Delta\n",
 							"-- ============================================\n",
-							"MERGE INTO f_pos_data AS target\n",
+							"MERGE INTO silver.f_pos_data AS target\n",
 							"USING aggregated_bronze_pos AS source\n",
 							"ON target.product_id = source.product_id\n",
 							"   AND target.country_id = source.country_id\n",
@@ -3810,7 +3810,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "1d166f76-2f27-4d3b-b5e3-f4ddc01fbc5f"
+						"spark.autotune.trackingId": "2c570229-89f1-4fba-b865-640ced639abd"
 					}
 				},
 				"metadata": {
@@ -3835,7 +3835,8 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},

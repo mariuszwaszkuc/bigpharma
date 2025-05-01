@@ -1571,7 +1571,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "23ee1459-9b95-4b75-b786-323eb9d648f1"
+						"spark.autotune.trackingId": "1b1e679b-6ac9-45b6-9948-20863ee3ff6f"
 					}
 				},
 				"metadata": {
@@ -1596,8 +1596,7 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -2392,7 +2391,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "b4e8235d-d268-4b14-b9fc-10cca8f744c5"
+						"spark.autotune.trackingId": "be6e3cd9-4cfb-427f-adfb-13ae412eeb31"
 					}
 				},
 				"metadata": {
@@ -2410,6 +2409,7 @@
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"set path_bronze_products = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/products';\n",
 							"set path_silver_products = 'abfss://silver@bigpharma.dfs.core.windows.net/d_products';\n",
@@ -2430,7 +2430,7 @@
 							"-- 2. Wybór najnowszych danych wg update_date\n",
 							"-- ============================================\n",
 							"\n",
-							"CREATE OR REPLACE TEMP VIEW d_products AS\n",
+							"CREATE OR REPLACE TEMP VIEW new_d_products AS\n",
 							"SELECT \n",
 							"    product_id,\n",
 							"    product_name,\n",
@@ -2477,7 +2477,7 @@
 							"    source.brand_name,\n",
 							"    source.sub_brand_name,\n",
 							"    source.category_name\n",
-							"  );ch"
+							"  )"
 						],
 						"outputs": [],
 						"execution_count": null
@@ -2706,7 +2706,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "5b209c43-9157-420c-9cdc-bee2fc621f2e"
+						"spark.autotune.trackingId": "193f7cb6-41e5-4bda-a050-a1cc31ac8887"
 					}
 				},
 				"metadata": {
@@ -2724,6 +2724,7 @@
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"set path_bronze_forecast = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/forecast_details';\n",
 							"set path_silver_f_forecast = 'abfss://silver@bigpharma.dfs.core.windows.net/f_forecast';\n",

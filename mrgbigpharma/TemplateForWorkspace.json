@@ -3497,7 +3497,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "d564e18d-9e49-4fdb-acd9-f0eea52612af"
+						"spark.autotune.trackingId": "2ab5bee6-81c9-4922-9a7e-87cd506619f7"
 					}
 				},
 				"metadata": {
@@ -3519,6 +3519,7 @@
 						"source": [
 							"set path_bronze_pos = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_pos_history_details';\n",
 							"set path_silver_f_pos_data = 'abfss://silver@bigpharma.dfs.core.windows.net/f_pos_data';\n",
+							"\n",
 							"-- ============================================\n",
 							"-- 1. Rejestracja danych z Bronze jako widok tymczasowy\n",
 							"-- ============================================\n",
@@ -3807,15 +3808,15 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "ff4713f3-2456-478b-921b-718f2597983c"
+						"spark.autotune.trackingId": "a66aa553-630d-4d98-ab7b-0727556aceac"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
 					"kernelspec": {
-						"name": "synapse_pyspark",
-						"display_name": "Synapse PySpark"
+						"name": "synapse_sparksql",
+						"display_name": "sql"
 					},
 					"language_info": {
 						"name": "sql"
@@ -3832,7 +3833,8 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},

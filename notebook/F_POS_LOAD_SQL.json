@@ -1,5 +1,5 @@
 {
-	"name": "D_POS_LOAD_SQL",
+	"name": "F_POS_LOAD_SQL",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -13,15 +13,15 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3c092c92-ae9d-4541-a26c-0dfc58003a45"
+				"spark.autotune.trackingId": "65e9102c-4a7f-48de-83f1-a14cf55ce2fa"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
 			"kernelspec": {
-				"name": "synapse_pyspark",
-				"display_name": "python"
+				"name": "synapse_sparksql",
+				"display_name": "sql"
 			},
 			"language_info": {
 				"name": "sql"

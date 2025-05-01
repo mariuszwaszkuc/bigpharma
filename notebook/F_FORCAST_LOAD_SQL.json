@@ -13,7 +13,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c12eb7ee-61ab-40a6-b153-c4f89b8693ae"
+				"spark.autotune.trackingId": "b1f9ec15-5750-4daf-8fd1-68fbb6e0b710"
 			}
 		},
 		"metadata": {
@@ -24,7 +24,7 @@
 				"display_name": "python"
 			},
 			"language_info": {
-				"name": "python"
+				"name": "sql"
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -32,13 +32,17 @@
 			{
 				"cell_type": "code",
 				"source": [
+					"set path_bronze_forecast = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/forecast_details';\n",
+					"set path_silver_f_forecast = 'abfss://silver@bigpharma.dfs.core.windows.net/f_forecast';\n",
+					"\n",
+					"\n",
 					"-- ============================================\n",
 					"-- 1. Załaduj dane z warstwy Bronze jako tymczasowy widok\n",
 					"-- ============================================\n",
 					"CREATE OR REPLACE TEMP VIEW bronze_forecast\n",
 					"USING parquet\n",
 					"OPTIONS (\n",
-					"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/forecast_details'\n",
+					"  path ${path_bronze_forecast}\n",
 					");\n",
 					"\n",
 					"-- ============================================\n",
@@ -84,7 +88,7 @@
 					"-- ============================================\n",
 					"-- 3. Stwórz tabelę Silver, jeśli nie istnieje\n",
 					"-- ============================================\n",
-					"CREATE TABLE IF NOT EXISTS silver_forecast\n",
+					"CREATE TABLE IF NOT EXISTS silver_f_forecast\n",
 					"USING delta\n",
 					"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/f_forecast'\n",
 					"AS\n",

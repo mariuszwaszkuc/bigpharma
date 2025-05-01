@@ -13,15 +13,15 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b1f9ec15-5750-4daf-8fd1-68fbb6e0b710"
+				"spark.autotune.trackingId": "91bd239c-dfb1-472a-ae1a-3669b66ba26d"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
 			"kernelspec": {
-				"name": "synapse_pyspark",
-				"display_name": "python"
+				"name": "synapse_sparksql",
+				"display_name": "sql"
 			},
 			"language_info": {
 				"name": "sql"
@@ -74,15 +74,7 @@
 					"    ROUND(SUM(pos_end_quantity * unit_price), 2) AS pos_end_amount,\n",
 					"    \n",
 					"    ROUND(SUM(quantity * unit_price) / NULLIF(SUM(quantity), 0), 2) AS unit_price\n",
-					"FROM (\n",
-					"    SELECT *,\n",
-					"           ROW_NUMBER() OVER (\n",
-					"               PARTITION BY product_id, country_id, TRUNC(forecast_date, \"MM\"), TRUNC(forecast_snapshot, \"MM\") \n",
-					"               ORDER BY update_date DESC\n",
-					"           ) AS rn\n",
-					"    FROM bronze_forecast\n",
-					") latest\n",
-					"WHERE rn = 1\n",
+					"FROM  bronze_forecast\n",
 					"GROUP BY product_id, country_id, TRUNC(forecast_date, \"MM\"), TRUNC(forecast_snapshot, \"MM\");\n",
 					"\n",
 					"-- ============================================\n",
@@ -90,7 +82,7 @@
 					"-- ============================================\n",
 					"CREATE TABLE IF NOT EXISTS silver_f_forecast\n",
 					"USING delta\n",
-					"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/f_forecast'\n",
+					"LOCATION ${path_silver_f_forecast}\n",
 					"AS\n",
 					"SELECT * FROM aggregated_forecast\n",
 					"WHERE 1 = 0;\n",

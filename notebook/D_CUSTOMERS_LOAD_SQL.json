@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "98d0f164-b45e-4e28-aaa7-dae4ebfc1781"
+				"spark.autotune.trackingId": "f4ec3a84-e3f2-4cf7-891a-b5f849d3e994"
 			}
 		},
 		"metadata": {
@@ -77,7 +77,7 @@
 					");\n",
 					"\n",
 					"-- 3. Przygotowanie danych – JOIN + wybór najnowszych po customer_id\n",
-					"CREATE OR REPLACE TEMP VIEW new_bronze_customers AS\n",
+					"CREATE OR REPLACE TEMP VIEW new_bronze_d_customers AS\n",
 					"SELECT \n",
 					"    c.customer_id,\n",
 					"    c.country_id,\n",
@@ -92,16 +92,16 @@
 					"  ON c.country_id = co.country_id;\n",
 					"\n",
 					"-- 4. Stworzenie tabeli docelowej jako Delta Lake (jeśli nie istnieje)\n",
-					"CREATE TABLE IF NOT EXISTS silver_customers\n",
+					"CREATE TABLE IF NOT EXISTS silver_d_customers\n",
 					"USING delta\n",
 					"LOCATION ${path_silver_customers}\n",
 					"AS\n",
-					"SELECT * FROM new_bronze_customers\n",
+					"SELECT * FROM new_bronze_d_customers\n",
 					"WHERE 1 = 0;\n",
 					"\n",
 					"-- 5. Merge (UPSERT) danych do tabeli docelowej\n",
-					"MERGE INTO silver_customers AS target\n",
-					"USING new_bronze_customers AS source\n",
+					"MERGE INTO silver_d_customers AS target\n",
+					"USING new_bronze_d_customers AS source\n",
 					"ON target.customer_id = source.customer_id\n",
 					"\n",
 					"WHEN MATCHED THEN\n",
@@ -145,7 +145,7 @@
 					"collapsed": false
 				},
 				"source": [
-					"DROP TABLE IF EXISTS default.silver_customers;"
+					""
 				],
 				"execution_count": 5
 			}

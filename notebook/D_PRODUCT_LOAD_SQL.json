@@ -13,7 +13,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "014d8497-8e42-4e54-9623-7dc43e82f610"
+				"spark.autotune.trackingId": "8f1d2e17-3540-4f39-adbe-8cc814497ad3"
 			}
 		},
 		"metadata": {
@@ -24,7 +24,7 @@
 				"display_name": "python"
 			},
 			"language_info": {
-				"name": "python"
+				"name": "sql"
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -32,6 +32,10 @@
 			{
 				"cell_type": "code",
 				"source": [
+					"set path_bronze_products = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/products';\n",
+					"set path_silver_products = 'abfss://silver@bigpharma.dfs.core.windows.net/d_products';\n",
+					"\n",
+					"\n",
 					"-- ============================================\n",
 					"-- 1. Rejestracja danych z Bronze jako tymczasowy widok\n",
 					"-- ============================================\n",

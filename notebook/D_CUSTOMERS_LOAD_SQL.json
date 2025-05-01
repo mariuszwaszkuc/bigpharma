@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f4ec3a84-e3f2-4cf7-891a-b5f849d3e994"
+				"spark.autotune.trackingId": "722d79cc-a620-400a-9467-f3d9b0c33b7b"
 			}
 		},
 		"metadata": {
@@ -61,6 +61,8 @@
 					"set path_bronze_countries = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/countries/';\n",
 					"set path_silver_customers = 'abfss://silver@bigpharma.dfs.core.windows.net/d_customers';\n",
 					"\n",
+					"CREATE DATABASE IF NOT EXISTS silver;\n",
+					"\n",
 					"\n",
 					"-- 1. Rejestracja bronze_customers jako tymczasowy widok\n",
 					"CREATE OR REPLACE TEMP VIEW bronze_customers\n",
@@ -92,7 +94,7 @@
 					"  ON c.country_id = co.country_id;\n",
 					"\n",
 					"-- 4. Stworzenie tabeli docelowej jako Delta Lake (jeśli nie istnieje)\n",
-					"CREATE TABLE IF NOT EXISTS silver_d_customers\n",
+					"CREATE TABLE IF NOT EXISTS silver.d_customers\n",
 					"USING delta\n",
 					"LOCATION ${path_silver_customers}\n",
 					"AS\n",
@@ -100,7 +102,7 @@
 					"WHERE 1 = 0;\n",
 					"\n",
 					"-- 5. Merge (UPSERT) danych do tabeli docelowej\n",
-					"MERGE INTO silver_d_customers AS target\n",
+					"MERGE INTO silver.customers AS target\n",
 					"USING new_bronze_d_customers AS source\n",
 					"ON target.customer_id = source.customer_id\n",
 					"\n",

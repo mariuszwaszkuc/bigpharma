@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8b9a417a-f5c6-4d9c-b6b3-56e9663fb595"
+				"spark.autotune.trackingId": "57225548-007c-4a7f-b8c9-05824890e5d5"
 			}
 		},
 		"metadata": {
@@ -88,8 +88,8 @@
 					"    co.region_description,\n",
 					"    co.country,\n",
 					"    co.cluster,\n",
-					"    c.customer_update_date,\n",
-					"    co.country_update_date\n",
+					"    c.update_date as customer_update_date,\n",
+					"    co.update_date as country_update_date\n",
 					"\n",
 					"FROM bronze_customers c\n",
 					"JOIN bronze_countries co\n",

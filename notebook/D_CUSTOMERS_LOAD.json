@@ -1,5 +1,5 @@
 {
-	"name": "D_CUSTOMERS_LOAD_SQL",
+	"name": "D_CUSTOMERS_LOAD",
 	"properties": {
 		"folder": {
 			"name": "Load_Silver"
@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "92ee6f72-6128-47b5-ba9c-2f5467fcf32a"
+				"spark.autotune.trackingId": "18869d0c-d69f-4f68-86de-75588e8ab2bb"
 			}
 		},
 		"metadata": {
@@ -60,7 +60,6 @@
 					"collapsed": false
 				},
 				"source": [
-					"\n",
 					"CREATE DATABASE IF NOT EXISTS silver;\n",
 					"\n",
 					"\n",
@@ -88,7 +87,10 @@
 					"    c.city,\n",
 					"    co.region_description,\n",
 					"    co.country,\n",
-					"    co.cluster\n",
+					"    co.cluster,\n",
+					"    c.customer_update_date,\n",
+					"    co.country_update_date\n",
+					"\n",
 					"FROM bronze_customers c\n",
 					"JOIN bronze_countries co\n",
 					"  ON c.country_id = co.country_id;\n",
@@ -114,7 +116,9 @@
 					"    target.city = source.city,\n",
 					"    target.region_description = source.region_description,\n",
 					"    target.country = source.country,\n",
-					"    target.cluster = source.cluster\n",
+					"    target.cluster = source.cluster,\n",
+					"    target.customer_update_date = source.customer_update_date,\n",
+					"    target.country_update_date = source.country_update_date\n",
 					"\n",
 					"WHEN NOT MATCHED THEN\n",
 					"  INSERT (\n",
@@ -125,7 +129,9 @@
 					"    city,\n",
 					"    region_description,\n",
 					"    country,\n",
-					"    cluster\n",
+					"    cluster,\n",
+					"    customer_update_date,\n",
+					"    country_update_date\n",
 					"  )\n",
 					"  VALUES (\n",
 					"    source.customer_id,\n",
@@ -135,7 +141,9 @@
 					"    source.city,\n",
 					"    source.region_description,\n",
 					"    source.country,\n",
-					"    source.cluster\n",
+					"    source.cluster,\n",
+					"    source.customer_update_date,\n",
+					"    source.country_update_date\n",
 					"  );\n",
 					""
 				],

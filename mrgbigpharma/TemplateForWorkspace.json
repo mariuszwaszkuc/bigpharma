@@ -4041,7 +4041,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "ed7e1bb5-bdb5-477e-ba93-1bc04fdba087"
+						"spark.autotune.trackingId": "286f1ebc-2c8a-437e-ba6a-5703a9c991e8"
 					}
 				},
 				"metadata": {
@@ -4111,7 +4111,6 @@
 							"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/f_wh_data/';\n",
 							"\n",
 							"CREATE OR REPLACE TEMP VIEW aggregated_bronze_wh AS\n",
-							"(\n",
 							"    WITH join_wh AS (\n",
 							"        SELECT\n",
 							"            inv.*,\n",
@@ -4383,7 +4382,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Load_Pharmacies_Data_Py')]",
+			"name": "[concat(parameters('workspaceName'), '/LOAD_PHARMACIES_DATA_PY')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -4573,7 +4572,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"folder": {
-					"name": "Load_Bronze"
+					"name": "Arch"
 				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
@@ -4587,7 +4586,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "656cc32b-4b19-49cb-9c47-044763fc3dc4"
+						"spark.autotune.trackingId": "7a807791-4380-436f-940e-949726b48877"
 					}
 				},
 				"metadata": {

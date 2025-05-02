@@ -4041,7 +4041,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "ae3ca67f-6f4b-4692-987c-8873638c8d9f"
+						"spark.autotune.trackingId": "ed7e1bb5-bdb5-477e-ba93-1bc04fdba087"
 					}
 				},
 				"metadata": {
@@ -4105,7 +4105,7 @@
 							"  whrs_open_amount DOUBLE,\n",
 							"  whrs_end_amount DOUBLE,\n",
 							"  unit_price DOUBLE,\n",
-							"  wh_update_date DATE\n",
+							"  whrs_update_date DATE\n",
 							")\n",
 							"USING DELTA\n",
 							"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/f_wh_data/';\n",
@@ -4198,7 +4198,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Load_Distributors_Data_Py')]",
+			"name": "[concat(parameters('workspaceName'), '/LOAD_DISTRIBUTORS_DATA_PY')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {

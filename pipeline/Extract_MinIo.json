@@ -1,0 +1,58 @@
+{
+	"name": "Extract_MinIo",
+	"properties": {
+		"activities": [
+			{
+				"name": "Distributors Data MinIo",
+				"type": "SynapseNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "LOAD_DISTRIBUTORS_DATA_PY",
+						"type": "NotebookReference"
+					},
+					"snapshot": true
+				}
+			},
+			{
+				"name": "Pharmacies Data MinIo",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "Distributors Data MinIo",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "LOAD_PHARMACIES_DATA_PY",
+						"type": "NotebookReference"
+					},
+					"snapshot": true
+				}
+			}
+		],
+		"folder": {
+			"name": "Brozne"
+		},
+		"annotations": []
+	}
+}

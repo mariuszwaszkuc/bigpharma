@@ -3646,7 +3646,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "38fd352c-b1f4-4037-8549-ec97e766a297"
+						"spark.autotune.trackingId": "ec0f3412-67f3-4def-ac81-e1ad2b8b24bf"
 					}
 				},
 				"metadata": {
@@ -3729,7 +3729,8 @@
 							"        customer_id,\n",
 							"        TRUNC(order_date, 'MM') AS order_date,\n",
 							"        TRUNC(required_date, 'MM') AS required_date,\n",
-							"        TRUNC(shipped_date, 'MM') AS shipped_date\n",
+							"        TRUNC(shipped_date, 'MM') AS shipped_date,\n",
+							"        update_date AS order_update_date\n",
 							"    FROM bronze_orders\n",
 							"),\n",
 							"joined_orders AS (\n",
@@ -3743,7 +3744,7 @@
 							"        od.discount,\n",
 							"        o.order_date,\n",
 							"        od.update_date AS order_details_update_date,\n",
-							"        o.update_date AS order_update_date\n",
+							"        o.order_update_date\n",
 							"    FROM orders_trunc o\n",
 							"    JOIN bronze_order_details od ON o.order_id = od.order_id\n",
 							"    JOIN d_customers c ON o.customer_id = c.customer_id\n",
@@ -3761,8 +3762,7 @@
 							"        ROUND(SUM(quantity * unit_price) / NULLIF(SUM(quantity), 0), 2) AS unit_price\n",
 							"    FROM joined_orders\n",
 							"    GROUP BY country_id, product_id, shipped_date)\n",
-							"SELECT * FROM final_orders;   \n",
-							"\n",
+							"SELECT * FROM final_orders; \n",
 							"\n",
 							"\n",
 							"CREATE OR REPLACE TEMP VIEW filter_aggregated_bronze_orders AS\n",
@@ -3790,8 +3790,8 @@
 							"        order_update_date = source.order_update_date \n",
 							"WHEN NOT MATCHED THEN\n",
 							"    INSERT (\n",
-							"        target.country_id, target.product_id, target.shipped_date,\n",
-							"        target.quantity, target.discount, target.amount, target.unit_price, target.order_details_update_date, target.order_update_date \n",
+							"        country_id, product_id, shipped_date,\n",
+							"        quantity, discount, amount, unit_price, order_details_update_date, order_update_date \n",
 							"    )\n",
 							"    VALUES (\n",
 							"        source.country_id, source.product_id, source.shipped_date,\n",

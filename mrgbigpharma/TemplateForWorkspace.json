@@ -1264,6 +1264,86 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 10')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "drop table ",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "gold",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 11')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "drop table ",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "default",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 12')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "drop external table [default].[dbo].[d_customers]\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "gold",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 13')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SELECT TOP (100) * FROM [default].[dbo].[d_customers]",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "default",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/SQL script 2')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -1902,7 +1982,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "dbc3b0e4-efb3-472f-bf20-44d1d9fafe33"
+						"spark.autotune.trackingId": "16b225aa-2696-4c93-894a-6b651b8a9605"
 					}
 				},
 				"metadata": {
@@ -1920,7 +2000,10 @@
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
+							"CREATE DATABASE IF NOT EXISTS gold;\n",
+							"\n",
 							"CREATE OR REPLACE VIEW silver_d_products AS\n",
 							"SELECT * FROM delta.`abfss://silver@bigpharma.dfs.core.windows.net/d_products`;\n",
 							"\n",
@@ -1929,7 +2012,7 @@
 							"\n",
 							"-- Tworzenie tabel w warstwie Gold\n",
 							"\n",
-							"CREATE TABLE IF NOT EXISTS d_products\n",
+							"CREATE TABLE IF NOT EXISTS gold.d_products\n",
 							"USING DELTA\n",
 							"LOCATION 'abfss://gold@bigpharma.dfs.core.windows.net/d_products'\n",
 							"AS\n",
@@ -1941,7 +2024,7 @@
 							" FROM silver_d_products\n",
 							"WHERE 1 = 0;\n",
 							"\n",
-							"CREATE TABLE IF NOT EXISTS d_regions\n",
+							"CREATE TABLE IF NOT EXISTS gold.d_regions\n",
 							"USING DELTA\n",
 							"LOCATION 'abfss://gold@bigpharma.dfs.core.windows.net/d_customers'\n",
 							"AS\n",
@@ -1953,7 +2036,7 @@
 							"WHERE 1 = 0;\n",
 							"\n",
 							"-- Zmiana nazw kolumn w tabeli d_products i zapis do warstwy Gold\n",
-							"INSERT OVERWRITE TABLE d_products\n",
+							"INSERT OVERWRITE TABLE gold.d_products\n",
 							"\n",
 							"SELECT \n",
 							"    product_id AS IdProduct,\n",
@@ -1964,7 +2047,7 @@
 							"FROM silver_d_products;\n",
 							"\n",
 							"-- Usuwanie duplikatów w tabeli d_regions i zapis do nowej tabeli Gold\n",
-							"INSERT OVERWRITE TABLE d_regions\n",
+							"INSERT OVERWRITE TABLE gold.d_regions\n",
 							"SELECT DISTINCT \n",
 							"    country_id AS IDCountry,\n",
 							"    cluster AS Claster,\n",
@@ -2935,7 +3018,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "7da97c07-8fe5-44d0-aa7a-47755e301a45"
+						"spark.autotune.trackingId": "612ffe86-9195-4d6e-b235-64f4d7352b02"
 					}
 				},
 				"metadata": {
@@ -2960,13 +3043,15 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"from pyspark.sql import SparkSession\r\n",
 							"from pyspark.sql import SparkSession\r\n",
@@ -3004,6 +3089,7 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"\r\n",
 							"# Pobranie maksymalnej wartości forecast_snapshot z f_forecast\r\n",
@@ -3214,6 +3300,7 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"import pandas as pd\r\n",
 							"\r\n",
@@ -4676,6 +4763,138 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/test 2')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "sparkpool32",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "8589b91d-28af-47cb-9665-64b38ff72ea2"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "sql"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+						"name": "sparkpool32",
+						"type": "Spark",
+						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"collapsed": false
+						},
+						"source": [
+							"drop table gold.d_regions\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"collapsed": false
+						},
+						"source": [
+							"CREATE DATABASE IF NOT EXISTS gold;\n",
+							"\n",
+							"CREATE OR REPLACE VIEW silver_d_products AS\n",
+							"SELECT * FROM delta.`abfss://silver@bigpharma.dfs.core.windows.net/d_products`;\n",
+							"\n",
+							"CREATE OR REPLACE VIEW silver_d_regions AS\n",
+							"SELECT * FROM delta.`abfss://silver@bigpharma.dfs.core.windows.net/d_customers`;\n",
+							"\n",
+							"-- Tworzenie tabel w warstwie Gold\n",
+							"\n",
+							"CREATE TABLE IF NOT EXISTS gold.d_products\n",
+							"USING DELTA\n",
+							"LOCATION 'abfss://gold@bigpharma.dfs.core.windows.net/d_products'\n",
+							"AS\n",
+							"SELECT product_id AS IdProduct,\n",
+							"       product_name AS Name,\n",
+							"       brand_name AS Brand,\n",
+							"       sub_brand_name AS SubBrand,\n",
+							"       category_name AS Category \n",
+							" FROM silver_d_products\n",
+							"WHERE 1 = 0;\n",
+							"\n",
+							"CREATE TABLE IF NOT EXISTS gold.d_regions\n",
+							"USING DELTA\n",
+							"LOCATION 'abfss://gold@bigpharma.dfs.core.windows.net/d_customers'\n",
+							"AS\n",
+							"SELECT country_id AS IDCountry,\n",
+							"       cluster AS Claster,\n",
+							"       region_description AS Region,\n",
+							"       country AS Country\n",
+							"FROM silver_d_regions\n",
+							"WHERE 1 = 0;\n",
+							"\n",
+							"-- Zmiana nazw kolumn w tabeli d_products i zapis do warstwy Gold\n",
+							"INSERT OVERWRITE TABLE gold.d_products\n",
+							"\n",
+							"SELECT \n",
+							"    product_id AS IdProduct,\n",
+							"    product_name AS Name,\n",
+							"    brand_name AS Brand,\n",
+							"    sub_brand_name AS SubBrand,\n",
+							"    category_name AS Category\n",
+							"FROM silver_d_products;\n",
+							"\n",
+							"-- Usuwanie duplikatów w tabeli d_regions i zapis do nowej tabeli Gold\n",
+							"INSERT OVERWRITE TABLE gold.d_regions\n",
+							"SELECT DISTINCT \n",
+							"    country_id AS IDCountry,\n",
+							"    cluster AS Claster,\n",
+							"    region_description AS Region,\n",
+							"    country AS Country\n",
+							"FROM silver_d_regions;"
+						],
+						"outputs": [],
+						"execution_count": 4
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/test')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -4699,7 +4918,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "88179380-3649-4181-924f-1828c706498d"
+						"spark.autotune.trackingId": "f10e5f05-5bd0-49f7-8eca-a69f1267c53e"
 					}
 				},
 				"metadata": {

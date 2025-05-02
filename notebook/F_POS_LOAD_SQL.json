@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e394f089-9337-4d8c-99c7-ced0c0413411"
+				"spark.autotune.trackingId": "58c0a377-3b46-4f51-8eda-c2a3300fb6f2"
 			}
 		},
 		"metadata": {
@@ -81,7 +81,7 @@
 					"where  NOT EXISTS (select product_id From silver.f_pos_data s \n",
 					"                    where s.product_id =n.product_id \n",
 					"                      and s.country_id = n.country_id\n",
-					"                      and s.forecast_update_date = n.forecast_update_date\n",
+					"                      and s.pos_update_date = n.pos_update_date\n",
 					"                      and s.transaction_date = n.transaction_date);\n",
 					"\n",
 					"\n",
@@ -103,7 +103,8 @@
 					"    target.pos_sell_out_amount = source.pos_sell_out_amount,\n",
 					"    target.pos_open_amount = source.pos_open_amount,\n",
 					"    target.pos_end_amount = source.pos_end_amount,\n",
-					"    target.unit_price = source.unit_price\n",
+					"    target.unit_price = source.unit_price,\n",
+					"    target.pos_update_date = source.pos_update_date \n",
 					"\n",
 					"WHEN NOT MATCHED THEN\n",
 					"  INSERT (\n",
@@ -116,7 +117,8 @@
 					"    pos_sell_out_amount,\n",
 					"    pos_open_amount,\n",
 					"    pos_end_amount,\n",
-					"    unit_price\n",
+					"    unit_price,\n",
+					"    pos_update_date \n",
 					"  )\n",
 					"  VALUES (\n",
 					"    source.product_id,\n",
@@ -129,6 +131,7 @@
 					"    source.pos_open_amount,\n",
 					"    source.pos_end_amount,\n",
 					"    source.unit_price\n",
+					"    source.pos_update_date \n",
 					"  );"
 				],
 				"execution_count": null

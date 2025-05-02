@@ -506,7 +506,7 @@
 					"elapsedTimeMetric": {}
 				},
 				"folder": {
-					"name": "Brozne"
+					"name": "Arch"
 				},
 				"annotations": [],
 				"lastPublishTime": "2025-03-26T08:44:54Z"
@@ -685,6 +685,114 @@
 				"[concat(variables('workspaceId'), '/notebooks/D_DIM_PY')]",
 				"[concat(variables('workspaceId'), '/bigDataPools/sparkpool32')]",
 				"[concat(variables('workspaceId'), '/notebooks/F_PLANNING_BOOK_PY')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Orchestrator Pipeline')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Extract_Load_Erp",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Extract_Load_Erp",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Extract_MinIo",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Extract_Load_Erp",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Extract_MinIo",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Transform_Silver",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Extract_MinIo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Transform_Silver",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_To_Gold",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Transform_Silver",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_To_Gold",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/Extract_Load_Erp')]",
+				"[concat(variables('workspaceId'), '/pipelines/Extract_MinIo')]",
+				"[concat(variables('workspaceId'), '/pipelines/Transform_Silver')]",
+				"[concat(variables('workspaceId'), '/pipelines/Load_To_Gold')]"
 			]
 		},
 		{
@@ -6102,18 +6210,6 @@
 			},
 			"dependsOn": [],
 			"location": "polandcentral"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/Pipeline 1')]",
-			"type": "Microsoft.Synapse/workspaces/pipelines",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": []
 		}
 	]
 }

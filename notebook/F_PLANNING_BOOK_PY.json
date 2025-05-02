@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cda9a572-3995-44d5-8364-97cbfd98ea66"
+				"spark.autotune.trackingId": "a3ad86ff-45a0-4195-8bf8-8f9b6221636a"
 			}
 		},
 		"metadata": {
@@ -54,6 +54,11 @@
 		"cells": [
 			{
 				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"outputs_hidden": false
+					}
+				},
 				"source": [
 					"from pyspark.sql import SparkSession\r\n",
 					"from pyspark.sql import SparkSession\r\n",
@@ -348,18 +353,34 @@
 					"# Dodanie kolumny status\r\n",
 					"df_pivoted[\"Version\"] =  df_pivoted[\"forecast_snapshot\"].apply(lambda x: \"Current\" if x == max_forecast_snapshot  else \"Last\")\r\n",
 					"\r\n",
-					"bucket_name_gold = \"abfss://gold@bigpharma.dfs.core.windows.net/\"\r\n",
+					"bucket_name_gold = \"abfss://gold@bigpharma.dfs.core.windows.net/f_planning_book_unpivot\"\r\n",
 					"\r\n",
 					"# Ścieżka do warstwy Gold (f_planning_book)\r\n",
 					"f_sales_path_gold = f\"{bucket_name_gold}/f_planning_book_unpivot\"\r\n",
 					"\r\n",
 					"df_spark = spark.createDataFrame(df_pivoted)\r\n",
-					"df_spark=df_spark.withColumnRenamed('product_id', 'IdProduct').withColumnRenamed('country_id', 'IDCountry').withColumnRenamed('financial_date', 'Date')\r\n",
+					"\r\n",
+					"df_spark=df_spark.withColumnRenamed('product_id', 'IdProduct').withColumnRenamed('country_id', 'IDCountry').withColumnRenamed('financial_date', 'Date').withColumnRenamed('Close Stock', 'Close_Stock').withColumnRenamed('Ex-Factory', 'Ex_Factory').withColumnRenamed('Open Stock', 'Open_Stock').withColumnRenamed('Open Stock Pharmacies', 'Open_Stock_Pharmacies').withColumnRenamed('Sales to pharmacies', 'Sales_to_pharmacies').withColumnRenamed('Close Stock Pharmacies', 'Close_Stock_Pharmacies')\r\n",
 					"\r\n",
 					"\r\n",
-					"df_spark.write.mode(\"overwrite\").format(\"delta\").save(f_sales_path_gold)\r\n",
+					"df_spark.write.mode(\"overwrite\").format(\"delta\").save(\"abfss://gold@bigpharma.dfs.core.windows.net/f_planning_book_unpivot\")\r\n",
 					"\r\n",
-					"df_spark.show()"
+					""
+				],
+				"execution_count": 8
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"\r\n",
+					"spark.sql(\"\"\"\r\n",
+					"CREATE TABLE IF NOT EXISTS gold.f_planning_book_unpivot\r\n",
+					"USING DELTA\r\n",
+					"LOCATION 'abfss://gold@bigpharma.dfs.core.windows.net/f_planning_book_unpivot'\r\n",
+					"\"\"\")\r\n",
+					"\r\n",
+					"\r\n",
+					""
 				],
 				"execution_count": 14
 			}

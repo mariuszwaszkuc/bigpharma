@@ -1,8 +1,8 @@
 {
-	"name": "F_SALES_LOAD",
+	"name": "F_SALES_LOAD_PY",
 	"properties": {
 		"folder": {
-			"name": "Load_Silver"
+			"name": "Arch/Gold/Silver"
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c4b7f2d3-9034-4bbf-8b7a-6f34134a40fb"
+				"spark.autotune.trackingId": "63357187-1908-4994-baf9-53ab7cdf78c5"
 			}
 		},
 		"metadata": {

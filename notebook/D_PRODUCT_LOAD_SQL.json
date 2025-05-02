@@ -1,6 +1,9 @@
 {
 	"name": "D_PRODUCT_LOAD_SQL",
 	"properties": {
+		"folder": {
+			"name": "Load_Silver"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"sessionProperties": {
@@ -13,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "39fb2b16-adf6-48a8-8619-2f2e063389c4"
+				"spark.autotune.trackingId": "34947844-ea69-4a56-bd1b-a925fa24149f"
 			}
 		},
 		"metadata": {

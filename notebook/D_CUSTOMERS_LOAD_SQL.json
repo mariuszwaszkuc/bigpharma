@@ -1,6 +1,9 @@
 {
 	"name": "D_CUSTOMERS_LOAD_SQL",
 	"properties": {
+		"folder": {
+			"name": "Load_Silver"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
@@ -17,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "483613cc-91c9-45da-8035-3441771b7356"
+				"spark.autotune.trackingId": "92ee6f72-6128-47b5-ba9c-2f5467fcf32a"
 			}
 		},
 		"metadata": {

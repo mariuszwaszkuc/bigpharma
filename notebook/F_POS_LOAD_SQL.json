@@ -1,6 +1,9 @@
 {
 	"name": "F_POS_LOAD_SQL",
 	"properties": {
+		"folder": {
+			"name": "Load_Silver"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"sessionProperties": {

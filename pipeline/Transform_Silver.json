@@ -16,14 +16,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "D_CUSTOMERS_LOAD",
+						"referenceName": "D_CUSTOMERS_LOAD_PY",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
-					"sparkPool": {
-						"referenceName": "sprak32small",
-						"type": "BigDataPoolReference"
-					},
 					"executorSize": "Small",
 					"conf": {
 						"spark.dynamicAllocation.enabled": false
@@ -55,14 +51,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "D_PRODUCT_LOAD",
+						"referenceName": "D_PRODUCT_LOAD_PY",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
-					"sparkPool": {
-						"referenceName": "sprak32small",
-						"type": "BigDataPoolReference"
-					},
 					"executorSize": "Small",
 					"conf": {
 						"spark.dynamicAllocation.enabled": false,

@@ -1,8 +1,8 @@
 {
-	"name": "F_FORCAST_LOAD",
+	"name": "F_FORCAST_LOAD_PY",
 	"properties": {
 		"folder": {
-			"name": "Load_Silver"
+			"name": "Arch/Gold/Silver"
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "169a480a-accc-4e84-95e7-967e7c19a178"
+				"spark.autotune.trackingId": "3b4c0281-515b-4971-b576-bdeefeb17ba3"
 			}
 		},
 		"metadata": {

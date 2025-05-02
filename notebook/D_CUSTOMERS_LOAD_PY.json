@@ -1,8 +1,8 @@
 {
-	"name": "D_CUSTOMERS_LOAD",
+	"name": "D_CUSTOMERS_LOAD_PY",
 	"properties": {
 		"folder": {
-			"name": "Load_Silver"
+			"name": "Arch/Gold/Silver"
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "35d38d31-6525-4f4c-9dcc-7d08f3be889e"
+				"spark.autotune.trackingId": "a42bb111-6bcb-46f2-989f-531f833d9d1d"
 			}
 		},
 		"metadata": {

@@ -4041,7 +4041,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "41e3589c-1ef3-4524-ab01-cb148028082f"
+						"spark.autotune.trackingId": "e2fe8e9f-4423-4bcc-bf95-54b5660307e8"
 					}
 				},
 				"metadata": {
@@ -4066,8 +4066,7 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -4670,6 +4669,172 @@
 							"    print(f\"Nie znaleziono tabeli Delta — zostanie utworzona. Szczegóły: {str(e)}\")\n",
 							"    new_bronze_df.write.format(\"delta\").mode(\"overwrite\").save(silver_path)\n",
 							"    print(\"Zapisano nową tabelę Delta.\")"
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/test')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "sparkpool32",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "0de96c67-f422-47f5-b78e-c1047ee7af3b"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_sparksql",
+						"display_name": "sql"
+					},
+					"language_info": {
+						"name": "sql"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+						"name": "sparkpool32",
+						"type": "Spark",
+						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28,
+						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"-- test  D_CUSTOMERS_LOAD_SQL\n",
+							"\n",
+							"CREATE DATABASE IF NOT EXISTS silver;\n",
+							"\n",
+							"\n",
+							"-- 1. Rejestracja bronze_customers jako tymczasowy widok\n",
+							"CREATE OR REPLACE TEMP VIEW bronze_customers\n",
+							"USING parquet\n",
+							"OPTIONS (\n",
+							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/customers/'\n",
+							");\n",
+							"\n",
+							"-- 2. Rejestracja bronze_countries jako tymczasowy widok\n",
+							"CREATE OR REPLACE TEMP VIEW bronze_countries\n",
+							"USING parquet\n",
+							"OPTIONS (\n",
+							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/countries/'\n",
+							");\n",
+							"\n",
+							"-- 3. Przygotowanie danych – JOIN + wybór najnowszych po customer_id\n",
+							"CREATE OR REPLACE TEMP VIEW new_bronze_d_customers AS\n",
+							"SELECT \n",
+							"    c.customer_id,\n",
+							"    c.country_id,\n",
+							"    c.company_name,\n",
+							"    c.address,\n",
+							"    c.city,\n",
+							"    co.region_description,\n",
+							"    co.country,\n",
+							"    co.cluster,\n",
+							"    c.update_date as customer_update_date,\n",
+							"    co.update_date as country_update_date\n",
+							"\n",
+							"FROM bronze_customers c\n",
+							"JOIN bronze_countries co\n",
+							"  ON c.country_id = co.country_id;\n",
+							"\n",
+							"-- 4. Stworzenie tabeli docelowej jako Delta Lake (jeśli nie istnieje)\n",
+							"CREATE TABLE IF NOT EXISTS silver.d_customers\n",
+							"USING delta\n",
+							"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/d_customers'\n",
+							"AS\n",
+							"SELECT * FROM new_bronze_d_customers\n",
+							"WHERE 1 = 0;\n",
+							"\n",
+							"\n",
+							"CREATE OR REPLACE TEMP VIEW filter_bronze_d_customers AS\n",
+							"SELECT *from new_bronze_d_customers n \n",
+							"where  NOT EXISTS (select customer_id From silver.d_customers s \n",
+							"                    where s.customer_id=n.customer_id\n",
+							"                      and s.country_id = s.country_id \n",
+							"                      and s.customer_update_date = n.customer_update_date\n",
+							"                      and s.country_update_date = n.country_update_date )  \n",
+							"\n",
+							"\n",
+							"\n",
+							"-- 5. Merge (UPSERT) danych do tabeli docelowej\n",
+							"MERGE INTO silver.d_customers AS target\n",
+							"USING filter_bronze_d_customers AS source\n",
+							"ON target.customer_id = source.customer_id\n",
+							"\n",
+							"WHEN MATCHED THEN\n",
+							"  UPDATE SET\n",
+							"    target.country_id = source.country_id,\n",
+							"    target.company_name = source.company_name,\n",
+							"    target.address = source.address,\n",
+							"    target.city = source.city,\n",
+							"    target.region_description = source.region_description,\n",
+							"    target.country = source.country,\n",
+							"    target.cluster = source.cluster,\n",
+							"    target.customer_update_date = source.customer_update_date,\n",
+							"    target.country_update_date = source.country_update_date\n",
+							"\n",
+							"WHEN NOT MATCHED THEN\n",
+							"  INSERT (\n",
+							"    customer_id,\n",
+							"    country_id,\n",
+							"    company_name,\n",
+							"    address,\n",
+							"    city,\n",
+							"    region_description,\n",
+							"    country,\n",
+							"    cluster,\n",
+							"    customer_update_date,\n",
+							"    country_update_date\n",
+							"  )\n",
+							"  VALUES (\n",
+							"    source.customer_id,\n",
+							"    source.country_id,\n",
+							"    source.company_name,\n",
+							"    source.address,\n",
+							"    source.city,\n",
+							"    source.region_description,\n",
+							"    source.country,\n",
+							"    source.cluster,\n",
+							"    source.customer_update_date,\n",
+							"    source.country_update_date\n",
+							"  );\n",
+							""
 						],
 						"outputs": [],
 						"execution_count": null

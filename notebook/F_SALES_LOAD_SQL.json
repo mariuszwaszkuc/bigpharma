@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5bb4fd54-c884-4c86-a712-632e39911888"
+				"spark.autotune.trackingId": "89ac6542-d666-44d9-a272-6b35f9fb8106"
 			}
 		},
 		"metadata": {
@@ -96,7 +96,7 @@
 					"USING DELTA\n",
 					"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/f_sales/';\n",
 					"\n",
-					"CREATE OR REPLACE TEMP VIEW orders AS\n",
+					"CREATE OR REPLACE TEMP VIEW aggregated_bronze_orders AS\n",
 					"WITH orders_trunc AS (\n",
 					"    SELECT\n",
 					"        order_id,\n",
@@ -135,10 +135,16 @@
 					"        ROUND(SUM(quantity * unit_price) / NULLIF(SUM(quantity), 0), 2) AS unit_price\n",
 					"    FROM joined_orders\n",
 					"    GROUP BY country_id, product_id, shipped_date\n",
-					")\n",
+					");\n",
 					"\n",
 					"\n",
-					"\n",
+					"CREATE OR REPLACE TEMP VIEW filter_aggregated_bronze_orders AS\n",
+					"SELECT * from aggregated_bronze_orders  n \n",
+					"where  NOT EXISTS (select product_id From silver.f_pos_data s \n",
+					"                    where s.product_id =n.product_id \n",
+					"                      and s.shipped_date = n.shipped_date\n",
+					"                      and s.order_order_details_update_date = n.order_order_details_update_date\n",
+					"                      and s.order_update_date, = n.order_update_date);\n",
 					"\n",
 					"\n",
 					"-- 3. Przekształcenie i zapis danych do tabeli Silver z użyciem MERGE\n",

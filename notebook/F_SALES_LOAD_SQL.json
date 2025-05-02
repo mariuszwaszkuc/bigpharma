@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "55b9b954-d4e2-48fd-b67c-1b9aa2a74d8e"
+				"spark.autotune.trackingId": "00129b5e-581f-4dea-afeb-a0824c43feb0"
 			}
 		},
 		"metadata": {
@@ -45,7 +45,8 @@
 				"sparkVersion": "3.4",
 				"nodeCount": 3,
 				"cores": 4,
-				"memory": 28
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -71,7 +72,7 @@
 					"CREATE OR REPLACE TEMP VIEW bronze_orders\n",
 					"USING parquet\n",
 					"OPTIONS (\n",
-					"  path ${path_bronze_orders }\n",
+					"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/orders'\n",
 					");\n",
 					"\n",
 					"CREATE OR REPLACE TEMP VIEW bronze_order_details\n",

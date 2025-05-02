@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7da97c07-8fe5-44d0-aa7a-47755e301a45"
+				"spark.autotune.trackingId": "cda9a572-3995-44d5-8364-97cbfd98ea66"
 			}
 		},
 		"metadata": {
@@ -84,13 +84,7 @@
 					"f_pos_data = spark.read.parquet(f_pos_data_path)\r\n",
 					"f_wh_data = spark.read.parquet(f_wh_data_path)\r\n",
 					"\r\n",
-					""
-				],
-				"execution_count": 14
-			},
-			{
-				"cell_type": "code",
-				"source": [
+					"\r\n",
 					"\r\n",
 					"# Pobranie maksymalnej wartości forecast_snapshot z f_forecast\r\n",
 					"current_month_snapshot = f_forecast.agg(F.max(\"forecast_snapshot\")).collect()[0][0]\r\n",
@@ -293,13 +287,7 @@
 					"\r\n",
 					"\r\n",
 					"\r\n",
-					""
-				],
-				"execution_count": 15
-			},
-			{
-				"cell_type": "code",
-				"source": [
+					"\r\n",
 					"import pandas as pd\r\n",
 					"\r\n",
 					"# Załaduj dane\r\n",
@@ -373,7 +361,7 @@
 					"\r\n",
 					"df_spark.show()"
 				],
-				"execution_count": 39
+				"execution_count": 14
 			}
 		]
 	}

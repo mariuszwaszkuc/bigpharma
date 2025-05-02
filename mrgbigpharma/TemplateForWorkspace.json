@@ -2705,7 +2705,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "51f22f9b-d335-4e5e-bc7e-161145d83829"
+						"spark.autotune.trackingId": "8c0aab6d-a693-47eb-9052-97d0e1f55ba6"
 					}
 				},
 				"metadata": {
@@ -2723,7 +2723,6 @@
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"set path_bronze_forecast = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/forecast_details';\n",
 							"set path_silver_f_forecast = 'abfss://silver@bigpharma.dfs.core.windows.net/f_forecast';\n",
@@ -4188,7 +4187,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "05bb69f0-9035-4488-9d2d-c3941ff12599"
+						"spark.autotune.trackingId": "4704f51a-4a96-4b8a-a34c-c619cb977c6c"
 					}
 				},
 				"metadata": {
@@ -4213,7 +4212,8 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -4258,7 +4258,7 @@
 							"  unit_price DOUBLE\n",
 							")\n",
 							"USING DELTA\n",
-							"LOCATION {path_silver_f_wh_data};\n",
+							"LOCATION ${path_silver_f_wh_data};\n",
 							"\n",
 							"-- 3. MERGE danych do tabeli Silver z agregacją i filtrowaniem\n",
 							"MERGE INTO silver.f_wh_data AS target\n",

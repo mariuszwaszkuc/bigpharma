@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a3a09c18-6348-408a-93e8-e3e459feed88"
+				"spark.autotune.trackingId": "3da0ce8e-8e58-4718-8475-119a7c30b6b2"
 			}
 		},
 		"metadata": {
@@ -35,8 +35,6 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"set path_bronze_pos = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_pos_history_details';\n",
-					"set path_silver_f_pos_data = 'abfss://silver@bigpharma.dfs.core.windows.net/f_pos_data';\n",
 					"CREATE DATABASE IF NOT EXISTS silver;\n",
 					"\n",
 					"-- ============================================\n",
@@ -45,7 +43,7 @@
 					"CREATE OR REPLACE TEMP VIEW bronze_pos\n",
 					"USING parquet\n",
 					"OPTIONS (\n",
-					"  path '${path_bronze_pos}'\n",
+					"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_pos_history_details'\n",
 					");\n",
 					"-- ============================================\n",
 					"-- 2. Przygotowanie danych – najnowsze update + agregacja miesięczna\n",
@@ -54,6 +52,7 @@
 					"SELECT \n",
 					"    product_id,\n",
 					"    country_id,\n",
+					"    \n",
 					"    TRUNC(transaction_date, \"MM\") AS transaction_date,\n",
 					"    SUM(pos_sell_out_quantity) AS pos_sell_out_quantity,\n",
 					"    SUM(pos_open_quantity) AS pos_open_quantity,\n",
@@ -71,7 +70,7 @@
 					"-- ============================================\n",
 					"CREATE TABLE IF NOT EXISTS silver.f_pos_data\n",
 					"USING delta\n",
-					"LOCATION '${path_silver_f_pos_data}'\n",
+					"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/f_pos_data'\n",
 					"AS\n",
 					"SELECT * FROM aggregated_bronze_pos\n",
 					"WHERE 1 = 0;\n",

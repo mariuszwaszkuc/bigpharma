@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "95eebee8-6831-4c49-8b88-83b506d81a9c"
+				"spark.autotune.trackingId": "50569a41-fd89-46a6-ad11-29a075d7ff24"
 			}
 		},
 		"metadata": {
@@ -90,21 +90,21 @@
 					"WHERE 1 = 0;\n",
 					"\n",
 					"\n",
-					"CREATE OR REPLACE TEMP VIEW filter_d_products AS\n",
-					"SELECT *from new_d_products n \n",
+					"CREATE OR REPLACE TEMP VIEW filter_aggregated_forecast AS\n",
+					"SELECT * from aggregated_forecast n \n",
 					"where  NOT EXISTS (select product_id From silver.f_forecast s \n",
 					"                    where s.product_id =n.product_id \n",
 					"                      and s.country_id = n.country_id\n",
 					"                      and s.forecast_update_date = n.forecast_update_date\n",
 					"                      and s.forecast_date = n.forecast_date\n",
-					"                      and s.forecast_snapshot= n.forecast_snapshot\n",
-					"                   )\n",
+					"                      and s.forecast_snapshot= n.forecast_snapshot)\n",
 					"\n",
 					"-- ============================================\n",
 					"-- 4. Wykonaj MERGE INTO, aby zaktualizować lub dodać nowe dane\n",
 					"-- ============================================\n",
+					"\n",
 					"MERGE INTO silver.f_forecast AS target\n",
-					"USING aggregated_forecast AS source\n",
+					"USING filter_aggregated_forecast AS source\n",
 					"ON target.product_id = source.product_id\n",
 					"   AND target.country_id = source.country_id\n",
 					"   AND target.forecast_date = source.forecast_date\n",
@@ -147,8 +147,7 @@
 					"    source.pos_sell_out_quantity, source.pos_open_quantity, source.pos_end_quantity,\n",
 					"    source.amount, source.whrs_sell_in_amount, source.whrs_open_amount, source.whrs_end_amount,\n",
 					"    source.pos_sell_out_amount, source.pos_open_amount, source.pos_end_amount, source.unit_price,source.forecast_update_date\n",
-					"  );\n",
-					""
+					"  );"
 				],
 				"execution_count": null
 			}

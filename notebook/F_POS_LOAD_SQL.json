@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5e4365eb-7d94-4920-a749-500afd866835"
+				"spark.autotune.trackingId": "3312b0e9-5507-4693-8b7e-7a5708ebf603"
 			}
 		},
 		"metadata": {
@@ -89,8 +89,9 @@
 					"-- ============================================\n",
 					"-- 4. MERGE INTO (UPSERT) danych do tabeli Delta\n",
 					"-- ============================================\n",
-					"MERGE INTO filter_aggregated_bronze_pos AS target\n",
-					"USING aggregated_bronze_pos AS source\n",
+					"\n",
+					"MERGE INTO silver.f_pos_data AS target\n",
+					"USING filter_aggregated_bronze_pos AS source\n",
 					"ON target.product_id = source.product_id\n",
 					"   AND target.country_id = source.country_id\n",
 					"   AND target.transaction_date = source.transaction_date\n",
@@ -130,9 +131,10 @@
 					"    source.pos_sell_out_amount,\n",
 					"    source.pos_open_amount,\n",
 					"    source.pos_end_amount,\n",
-					"    source.unit_price\n",
+					"    source.unit_price,\n",
 					"    source.pos_update_date \n",
-					"  );"
+					"  );\n",
+					""
 				],
 				"execution_count": null
 			}

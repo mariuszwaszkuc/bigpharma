@@ -20,15 +20,15 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "31a75dae-ccd3-4d4d-b58f-30f077d7263d"
+				"spark.autotune.trackingId": "c05bace9-07b9-4f3e-a2c6-4f5cc45a0d4e"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
 			"kernelspec": {
-				"name": "synapse_pyspark",
-				"display_name": "python"
+				"name": "synapse_sparksql",
+				"display_name": "sql"
 			},
 			"language_info": {
 				"name": "sql"
@@ -45,7 +45,8 @@
 				"sparkVersion": "3.4",
 				"nodeCount": 3,
 				"cores": 4,
-				"memory": 28
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -53,8 +54,9 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"CREATE DATABASE IF NOT EXISTS silver;\n",
+					"-- test D_CUSTOMERS_LOAD_SQL\n",
 					"\n",
+					"CREATE DATABASE IF NOT EXISTS silver;\n",
 					"\n",
 					"-- 1. Rejestracja bronze_customers jako tymczasowy widok\n",
 					"CREATE OR REPLACE TEMP VIEW bronze_customers\n",
@@ -83,7 +85,6 @@
 					"    co.cluster,\n",
 					"    c.update_date as customer_update_date,\n",
 					"    co.update_date as country_update_date\n",
-					"\n",
 					"FROM bronze_customers c\n",
 					"JOIN bronze_countries co\n",
 					"  ON c.country_id = co.country_id;\n",
@@ -96,33 +97,33 @@
 					"SELECT * FROM new_bronze_d_customers\n",
 					"WHERE 1 = 0;\n",
 					"\n",
-					"\n",
+					"-- 5. Filtrowanie nowych lub zaktualizowanych rekordów\n",
 					"CREATE OR REPLACE TEMP VIEW filter_bronze_d_customers AS\n",
-					"SELECT *from new_bronze_d_customers n \n",
-					"where  NOT EXISTS (select customer_id From silver.d_customers s \n",
-					"                    where s.customer_id=n.customer_id\n",
-					"                      and s.country_id = s.country_id \n",
-					"                      and s.customer_update_date = n.customer_update_date\n",
-					"                      and s.country_update_date = n.country_update_date )  \n",
+					"SELECT * FROM new_bronze_d_customers n \n",
+					"WHERE NOT EXISTS (\n",
+					"  SELECT 1 FROM silver.d_customers s \n",
+					"  WHERE s.customer_id = n.customer_id\n",
+					"    AND s.country_id = n.country_id\n",
+					"    AND s.customer_update_date = n.customer_update_date\n",
+					"    AND s.country_update_date = n.country_update_date\n",
+					");\n",
 					"\n",
-					"\n",
-					"\n",
-					"-- 5. Merge (UPSERT) danych do tabeli docelowej\n",
+					"-- 6. MERGE (UPSERT)\n",
 					"MERGE INTO silver.d_customers AS target\n",
 					"USING filter_bronze_d_customers AS source\n",
 					"ON target.customer_id = source.customer_id\n",
 					"\n",
 					"WHEN MATCHED THEN\n",
 					"  UPDATE SET\n",
-					"    target.country_id = source.country_id,\n",
-					"    target.company_name = source.company_name,\n",
-					"    target.address = source.address,\n",
-					"    target.city = source.city,\n",
-					"    target.region_description = source.region_description,\n",
-					"    target.country = source.country,\n",
-					"    target.cluster = source.cluster,\n",
-					"    target.customer_update_date = source.customer_update_date,\n",
-					"    target.country_update_date = source.country_update_date\n",
+					"    country_id = source.country_id,\n",
+					"    company_name = source.company_name,\n",
+					"    address = source.address,\n",
+					"    city = source.city,\n",
+					"    region_description = source.region_description,\n",
+					"    country = source.country,\n",
+					"    cluster = source.cluster,\n",
+					"    customer_update_date = source.customer_update_date,\n",
+					"    country_update_date = source.country_update_date\n",
 					"\n",
 					"WHEN NOT MATCHED THEN\n",
 					"  INSERT (\n",
@@ -148,8 +149,7 @@
 					"    source.cluster,\n",
 					"    source.customer_update_date,\n",
 					"    source.country_update_date\n",
-					"  );\n",
-					""
+					"  );"
 				],
 				"execution_count": null
 			}

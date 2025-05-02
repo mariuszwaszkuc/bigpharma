@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "18869d0c-d69f-4f68-86de-75588e8ab2bb"
+				"spark.autotune.trackingId": "8b9a417a-f5c6-4d9c-b6b3-56e9663fb595"
 			}
 		},
 		"metadata": {
@@ -103,9 +103,20 @@
 					"SELECT * FROM new_bronze_d_customers\n",
 					"WHERE 1 = 0;\n",
 					"\n",
+					"\n",
+					"CREATE OR REPLACE TEMP VIEW filter_bronze_d_customers AS\n",
+					"SELECT *from new_bronze_d_customers n \n",
+					"where  NOT EXISTS (select customer_id From silver.d_customers s \n",
+					"                    where s.customer_id=n.customer_id\n",
+					"                      and s.country_id = s.country_id \n",
+					"                      and s.customer_update_date = n.customer_update_date\n",
+					"                      and s.country_update_date = n.country_update_date )  \n",
+					"\n",
+					"\n",
+					"\n",
 					"-- 5. Merge (UPSERT) danych do tabeli docelowej\n",
 					"MERGE INTO silver.d_customers AS target\n",
-					"USING new_bronze_d_customers AS source\n",
+					"USING filter_bronze_d_customers AS source\n",
 					"ON target.customer_id = source.customer_id\n",
 					"\n",
 					"WHEN MATCHED THEN\n",
@@ -144,7 +155,10 @@
 					"    source.cluster,\n",
 					"    source.customer_update_date,\n",
 					"    source.country_update_date\n",
-					"  );\n",
+					"  )\n",
+					"\n",
+					"\n",
+					"  ;\n",
 					""
 				],
 				"execution_count": 6

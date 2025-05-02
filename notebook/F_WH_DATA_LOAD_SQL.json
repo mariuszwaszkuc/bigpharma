@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "22300de2-46a1-4319-bdc9-abd8ee07ceed"
+				"spark.autotune.trackingId": "f34f1674-d0fc-48f0-b9c2-4cbe36babdc8"
 			}
 		},
 		"metadata": {
@@ -123,7 +123,7 @@
 					"            ROUND(SUM(whrs_open_quantity * unit_price), 2) AS whrs_open_amount,\n",
 					"            ROUND(SUM(whrs_end_quantity * unit_price), 2) AS whrs_end_amount,\n",
 					"            ROUND(SUM(whrs_sell_in_quantity * unit_price) / NULLIF(SUM(whrs_sell_in_quantity), 0), 2) AS unit_price\n",
-					"        FROM filtered\n",
+					"        FROM select_wh\n",
 					"        GROUP BY product_id, country_id, transaction_date\n",
 					"    )\n",
 					" SELECT * FROM aggregated;\n",

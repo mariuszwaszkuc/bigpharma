@@ -1623,7 +1623,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "7b61a705-0c5c-47a4-af7a-1214f4d64c74"
+						"spark.autotune.trackingId": "c05bace9-07b9-4f3e-a2c6-4f5cc45a0d4e"
 					}
 				},
 				"metadata": {
@@ -1648,15 +1648,13 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"-- test D_CUSTOMERS_LOAD_SQL\n",
 							"\n",
@@ -2447,7 +2445,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "bb5bab2f-dbac-47c8-a843-cce0a3a05a9a"
+						"spark.autotune.trackingId": "e2d17dce-8ceb-4e12-894f-c90121a08a14"
 					}
 				},
 				"metadata": {
@@ -2490,12 +2488,13 @@
 							"    brand_name,\n",
 							"    sub_brand_name,\n",
 							"    category_name,\n",
-							"    update_date as product_update_date\n",
+							"    update_date AS product_update_date\n",
 							"FROM bronze_products;\n",
 							"\n",
 							"-- ============================================\n",
 							"-- 3. Stworzenie tabeli docelowej (Silver) jeśli nie istnieje\n",
 							"-- ============================================\n",
+							"\n",
 							"CREATE TABLE IF NOT EXISTS silver.d_products\n",
 							"USING delta\n",
 							"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/d_products'\n",
@@ -2503,19 +2502,21 @@
 							"SELECT * FROM new_d_products\n",
 							"WHERE 1 = 0;\n",
 							"\n",
-							"\n",
+							"-- Filtrowanie nowych lub zaktualizowanych rekordów\n",
 							"CREATE OR REPLACE TEMP VIEW filter_d_products AS\n",
-							"SELECT *from new_d_products n \n",
-							"where  NOT EXISTS (select product_id From silver.d_products s \n",
-							"                    where s.product_id =n.product_id \n",
-							"                      and s.product_update_date = n.product_update_date)\n",
-							"\n",
+							"SELECT * FROM new_d_products n \n",
+							"WHERE NOT EXISTS (\n",
+							"  SELECT 1 FROM silver.d_products s \n",
+							"  WHERE s.product_id = n.product_id \n",
+							"    AND s.product_update_date = n.product_update_date\n",
+							");\n",
 							"\n",
 							"-- ============================================\n",
 							"-- 4. MERGE INTO (UPSERT) danych do tabeli Silver\n",
 							"-- ============================================\n",
+							"\n",
 							"MERGE INTO silver.d_products AS target\n",
-							"USING filter_d_products  AS source\n",
+							"USING filter_d_products AS source\n",
 							"ON target.product_id = source.product_id\n",
 							"\n",
 							"WHEN MATCHED THEN\n",
@@ -2541,8 +2542,8 @@
 							"    source.brand_name,\n",
 							"    source.sub_brand_name,\n",
 							"    source.category_name,\n",
-							"    source.product_update_date\n",
-							"  )"
+							"    source.product_update_date)\n",
+							""
 						],
 						"outputs": [],
 						"execution_count": null
@@ -2774,7 +2775,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "11e9b81f-a172-4fb8-b09a-266ae7aa92c4"
+						"spark.autotune.trackingId": "089e1e78-37c3-439b-95d7-492b23275c6d"
 					}
 				},
 				"metadata": {
@@ -2792,6 +2793,7 @@
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"CREATE DATABASE IF NOT EXISTS silver;\n",
 							"\n",
@@ -4703,7 +4705,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "1a6c1666-0e1a-48cc-9ca8-2d4377444c27"
+						"spark.autotune.trackingId": "cce40205-8882-4464-b8bc-5e97a778a805"
 					}
 				},
 				"metadata": {
@@ -4843,13 +4845,144 @@
 					{
 						"cell_type": "code",
 						"metadata": {
+							"jupyter": {
+								"outputs_hidden": true
+							},
 							"collapsed": false
 						},
 						"source": [
-							"drop table silver.d_customers"
+							"drop table silver.d_products"
 						],
 						"outputs": [],
-						"execution_count": 5
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"outputs_hidden": true
+							},
+							"collapsed": false
+						},
+						"source": [
+							"CREATE DATABASE IF NOT EXISTS silver;\n",
+							"\n",
+							"-- ============================================\n",
+							"-- 1. Rejestracja danych z Bronze jako tymczasowy widok\n",
+							"-- ============================================\n",
+							"\n",
+							"CREATE OR REPLACE TEMP VIEW bronze_products\n",
+							"USING parquet\n",
+							"OPTIONS (\n",
+							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/products'\n",
+							");\n",
+							"\n",
+							"-- ============================================\n",
+							"-- 2. Wybór najnowszych danych wg update_date\n",
+							"-- ============================================\n",
+							"\n",
+							"CREATE OR REPLACE TEMP VIEW new_d_products AS\n",
+							"SELECT \n",
+							"    product_id,\n",
+							"    product_name,\n",
+							"    brand_name,\n",
+							"    sub_brand_name,\n",
+							"    category_name,\n",
+							"    update_date AS product_update_date\n",
+							"FROM bronze_products;\n",
+							"\n",
+							"-- ============================================\n",
+							"-- 3. Stworzenie tabeli docelowej (Silver) jeśli nie istnieje\n",
+							"-- ============================================\n",
+							"\n",
+							"CREATE TABLE IF NOT EXISTS silver.d_products\n",
+							"USING delta\n",
+							"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/d_products'\n",
+							"AS\n",
+							"SELECT * FROM new_d_products\n",
+							"WHERE 1 = 0;\n",
+							"\n",
+							"-- Filtrowanie nowych lub zaktualizowanych rekordów\n",
+							"CREATE OR REPLACE TEMP VIEW filter_d_products AS\n",
+							"SELECT * FROM new_d_products n \n",
+							"WHERE NOT EXISTS (\n",
+							"  SELECT 1 FROM silver.d_products s \n",
+							"  WHERE s.product_id = n.product_id \n",
+							"    AND s.product_update_date = n.product_update_date\n",
+							");\n",
+							"\n",
+							"-- ============================================\n",
+							"-- 4. MERGE INTO (UPSERT) danych do tabeli Silver\n",
+							"-- ============================================\n",
+							"\n",
+							"MERGE INTO silver.d_products AS target\n",
+							"USING filter_d_products AS source\n",
+							"ON target.product_id = source.product_id\n",
+							"\n",
+							"WHEN MATCHED THEN\n",
+							"  UPDATE SET\n",
+							"    target.product_name = source.product_name,\n",
+							"    target.brand_name = source.brand_name,\n",
+							"    target.sub_brand_name = source.sub_brand_name,\n",
+							"    target.category_name = source.category_name,\n",
+							"    target.product_update_date = source.product_update_date\n",
+							"\n",
+							"WHEN NOT MATCHED THEN\n",
+							"  INSERT (\n",
+							"    product_id,\n",
+							"    product_name,\n",
+							"    brand_name,\n",
+							"    sub_brand_name,\n",
+							"    category_name,\n",
+							"    product_update_date\n",
+							"  )\n",
+							"  VALUES (\n",
+							"    source.product_id,\n",
+							"    source.product_name,\n",
+							"    source.brand_name,\n",
+							"    source.sub_brand_name,\n",
+							"    source.category_name,\n",
+							"    source.product_update_date)\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 12
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"\n",
+							"MERGE INTO silver.d_products AS target\n",
+							"USING filter_d_products AS source\n",
+							"ON target.product_id = source.product_id\n",
+							"\n",
+							"WHEN MATCHED THEN\n",
+							"  UPDATE SET\n",
+							"    target.product_name = source.product_name,\n",
+							"    target.brand_name = source.brand_name,\n",
+							"    target.sub_brand_name = source.sub_brand_name,\n",
+							"    target.category_name = source.category_name,\n",
+							"    target.product_update_date = source.product_update_date\n",
+							"\n",
+							"WHEN NOT MATCHED THEN\n",
+							"  INSERT (\n",
+							"    product_id,\n",
+							"    product_name,\n",
+							"    brand_name,\n",
+							"    sub_brand_name,\n",
+							"    category_name,\n",
+							"    product_update_date\n",
+							"  )\n",
+							"  VALUES (\n",
+							"    source.product_id,\n",
+							"    source.product_name,\n",
+							"    source.brand_name,\n",
+							"    source.sub_brand_name,\n",
+							"    source.category_name,\n",
+							"    source.product_update_date"
+						],
+						"outputs": [],
+						"execution_count": 11
 					}
 				]
 			},

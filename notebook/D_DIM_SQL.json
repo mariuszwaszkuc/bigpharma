@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ff9910f5-ecc7-41a5-97f5-c877903aee34"
+				"spark.autotune.trackingId": "42544c74-31c7-416c-ab44-e38b2e3d505e"
 			}
 		},
 		"metadata": {
@@ -35,6 +35,7 @@
 			{
 				"cell_type": "code",
 				"source": [
+					"CREATE DATABASE IF NOT EXISTS gold;\n",
 					"set path_silver_d_products = 'abfss://silver@bigpharma.dfs.core.windows.net/d_customers';\n",
 					"set path_silver_d_customers = 'abfss://silver@bigpharma.dfs.core.windows.net/f_wh_data/';\n",
 					"set path_gold_d_products = 'abfss://silver@bigpharma.dfs.core.windows.net/f_wh_data/';\n",

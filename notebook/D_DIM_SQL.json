@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "57adda2a-1ee2-44ef-bebf-090889c0e247"
+				"spark.autotune.trackingId": "dbc3b0e4-efb3-472f-bf20-44d1d9fafe33"
 			}
 		},
 		"metadata": {
@@ -35,18 +35,15 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"-- Tworzenie Widoków Delta w warstwie Silver\n",
-					"CREATE DATABASE IF NOT EXISTS silver;\n",
-					"\n",
 					"CREATE OR REPLACE VIEW silver_d_products AS\n",
 					"SELECT * FROM delta.`abfss://silver@bigpharma.dfs.core.windows.net/d_products`;\n",
 					"\n",
 					"CREATE OR REPLACE VIEW silver_d_regions AS\n",
-					"SELECT * FROM delta.`abfss://silver@bigpharma.dfs.core.windows.net/d_regions`;\n",
+					"SELECT * FROM delta.`abfss://silver@bigpharma.dfs.core.windows.net/d_customers`;\n",
 					"\n",
 					"-- Tworzenie tabel w warstwie Gold\n",
 					"\n",
-					"CREATE TABLE IF NOT EXISTS gold.d_products\n",
+					"CREATE TABLE IF NOT EXISTS d_products\n",
 					"USING DELTA\n",
 					"LOCATION 'abfss://gold@bigpharma.dfs.core.windows.net/d_products'\n",
 					"AS\n",
@@ -58,7 +55,7 @@
 					" FROM silver_d_products\n",
 					"WHERE 1 = 0;\n",
 					"\n",
-					"CREATE TABLE IF NOT EXISTS gold.d_regions\n",
+					"CREATE TABLE IF NOT EXISTS d_regions\n",
 					"USING DELTA\n",
 					"LOCATION 'abfss://gold@bigpharma.dfs.core.windows.net/d_customers'\n",
 					"AS\n",
@@ -70,7 +67,8 @@
 					"WHERE 1 = 0;\n",
 					"\n",
 					"-- Zmiana nazw kolumn w tabeli d_products i zapis do warstwy Gold\n",
-					"INSERT OVERWRITE TABLE gold.d_products\n",
+					"INSERT OVERWRITE TABLE d_products\n",
+					"\n",
 					"SELECT \n",
 					"    product_id AS IdProduct,\n",
 					"    product_name AS Name,\n",
@@ -80,15 +78,13 @@
 					"FROM silver_d_products;\n",
 					"\n",
 					"-- Usuwanie duplikatów w tabeli d_regions i zapis do nowej tabeli Gold\n",
-					"INSERT OVERWRITE TABLE gold.d_regions\n",
+					"INSERT OVERWRITE TABLE d_regions\n",
 					"SELECT DISTINCT \n",
 					"    country_id AS IDCountry,\n",
 					"    cluster AS Claster,\n",
 					"    region_description AS Region,\n",
 					"    country AS Country\n",
-					"FROM silver_d_regions;\n",
-					"\n",
-					""
+					"FROM silver_d_regions;"
 				],
 				"execution_count": null
 			}

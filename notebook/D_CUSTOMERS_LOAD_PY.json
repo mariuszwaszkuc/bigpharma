@@ -2,7 +2,7 @@
 	"name": "D_CUSTOMERS_LOAD_PY",
 	"properties": {
 		"folder": {
-			"name": "Arch/Gold/Silver"
+			"name": "Arch/Silver"
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -46,8 +46,7 @@
 				"sparkVersion": "3.4",
 				"nodeCount": 3,
 				"cores": 4,
-				"memory": 28,
-				"automaticScaleJobs": false
+				"memory": 28
 			},
 			"sessionKeepAliveTimeout": 30
 		},

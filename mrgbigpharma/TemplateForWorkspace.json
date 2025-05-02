@@ -1902,7 +1902,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "ddf4d513-1cc4-43fc-91d1-914a43596886"
+						"spark.autotune.trackingId": "dbc3b0e4-efb3-472f-bf20-44d1d9fafe33"
 					}
 				},
 				"metadata": {
@@ -1920,7 +1920,6 @@
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"CREATE OR REPLACE VIEW silver_d_products AS\n",
 							"SELECT * FROM delta.`abfss://silver@bigpharma.dfs.core.windows.net/d_products`;\n",
@@ -2936,7 +2935,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "e0fd281d-eebc-4343-b72f-f1ce7c6a6d69"
+						"spark.autotune.trackingId": "7da97c07-8fe5-44d0-aa7a-47755e301a45"
 					}
 				},
 				"metadata": {
@@ -2961,15 +2960,13 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"from pyspark.sql import SparkSession\r\n",
 							"from pyspark.sql import SparkSession\r\n",
@@ -3007,7 +3004,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"\r\n",
 							"# Pobranie maksymalnej wartości forecast_snapshot z f_forecast\r\n",
@@ -3218,7 +3214,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"import pandas as pd\r\n",
 							"\r\n",
@@ -4704,7 +4699,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "6d88605d-df17-4dd1-883d-87300660eb8b"
+						"spark.autotune.trackingId": "88179380-3649-4181-924f-1828c706498d"
 					}
 				},
 				"metadata": {
@@ -4740,6 +4735,21 @@
 							"collapsed": false
 						},
 						"source": [
+							"drop table silver.f_wh_data "
+						],
+						"outputs": [],
+						"execution_count": 60
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"collapsed": false
+						},
+						"source": [
+							"-- test D_CUSTOMERS_LOAD_SQL\n",
+							"\n",
+							"CREATE DATABASE IF NOT EXISTS silver;\n",
+							"\n",
 							"-- test D_CUSTOMERS_LOAD_SQL\n",
 							"\n",
 							"CREATE DATABASE IF NOT EXISTS silver;\n",
@@ -4839,7 +4849,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 7
+						"execution_count": 50
 					},
 					{
 						"cell_type": "code",
@@ -4853,7 +4863,7 @@
 							"drop table silver.d_products"
 						],
 						"outputs": [],
-						"execution_count": 8
+						"execution_count": 40
 					},
 					{
 						"cell_type": "code",
@@ -4945,7 +4955,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 12
+						"execution_count": 46
 					},
 					{
 						"cell_type": "code",
@@ -5068,13 +5078,13 @@
 							"  );"
 						],
 						"outputs": [],
-						"execution_count": 13
+						"execution_count": 54
 					},
 					{
 						"cell_type": "code",
 						"metadata": {
 							"jupyter": {
-								"outputs_hidden": true
+								"outputs_hidden": false
 							},
 							"collapsed": false
 						},
@@ -5181,13 +5191,13 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 14
+						"execution_count": 59
 					},
 					{
 						"cell_type": "code",
 						"metadata": {
 							"jupyter": {
-								"outputs_hidden": true
+								"outputs_hidden": false
 							},
 							"collapsed": false
 						},
@@ -5306,7 +5316,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 15
+						"execution_count": 58
 					},
 					{
 						"cell_type": "code",
@@ -5429,7 +5439,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 16
+						"execution_count": 61
 					},
 					{
 						"cell_type": "code",

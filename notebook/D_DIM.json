@@ -1,5 +1,5 @@
 {
-	"name": "D_DIM_SQL",
+	"name": "D_DIM",
 	"properties": {
 		"folder": {
 			"name": "Load Gold"
@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "4d5bac21-6d4e-4ed4-b967-27ed36d64549"
+				"spark.autotune.trackingId": "49c6d6cf-b07c-4209-9b1f-00a909c2ad18"
 			}
 		},
 		"metadata": {

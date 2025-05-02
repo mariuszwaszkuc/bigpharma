@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b226a0af-ef5b-4644-9ac1-34ac90934131"
+				"spark.autotune.trackingId": "483613cc-91c9-45da-8035-3441771b7356"
 			}
 		},
 		"metadata": {
@@ -57,9 +57,6 @@
 					"collapsed": false
 				},
 				"source": [
-					"set path_bronze_customers = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/customers/';\n",
-					"set path_bronze_countries = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/countries/';\n",
-					"set path_silver_customers = 'abfss://silver@bigpharma.dfs.core.windows.net/d_customers';\n",
 					"\n",
 					"CREATE DATABASE IF NOT EXISTS silver;\n",
 					"\n",

@@ -1244,266 +1244,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/silver/d_customers/part-00000-9a15f7cc-1eac-449b-a175-79469d168038-c000.snappy.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "master",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 10')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "drop table ",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "gold",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 11')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "drop table ",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "default",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 12')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "drop external table [default].[dbo].[d_customers]\n\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "gold",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 13')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "SELECT TOP (100) * FROM [default].[dbo].[d_customers]",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "default",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 2')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/silver/d_customers/',\n        FORMAT = 'DELTA'\n    ) AS [result]\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "master",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 3')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "-- This is auto-generated code\nSELECT\n    \nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/orders/**',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "master",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 4')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "master",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 5')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/order_details/**',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "master",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 6')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/gold/d_products/',\n        FORMAT = 'DELTA'\n    ) AS [result]\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "master",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 7')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/gold/d_customers/',\n        FORMAT = 'DELTA'\n    ) AS [result]\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "master",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 8')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/customers/customers_2025-03-27.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n    update_date\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "master",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 9')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/customers/customers_2025-03-24.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "master",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/D_CUSTOMERS_LOAD_PY')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -3017,7 +2757,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "cda9a572-3995-44d5-8364-97cbfd98ea66"
+						"spark.autotune.trackingId": "a3ad86ff-45a0-4195-8bf8-8f9b6221636a"
 					}
 				},
 				"metadata": {
@@ -3049,6 +2789,11 @@
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"outputs_hidden": false
+							}
+						},
 						"source": [
 							"from pyspark.sql import SparkSession\r\n",
 							"from pyspark.sql import SparkSession\r\n",
@@ -3343,18 +3088,35 @@
 							"# Dodanie kolumny status\r\n",
 							"df_pivoted[\"Version\"] =  df_pivoted[\"forecast_snapshot\"].apply(lambda x: \"Current\" if x == max_forecast_snapshot  else \"Last\")\r\n",
 							"\r\n",
-							"bucket_name_gold = \"abfss://gold@bigpharma.dfs.core.windows.net/\"\r\n",
+							"bucket_name_gold = \"abfss://gold@bigpharma.dfs.core.windows.net/f_planning_book_unpivot\"\r\n",
 							"\r\n",
 							"# Ścieżka do warstwy Gold (f_planning_book)\r\n",
 							"f_sales_path_gold = f\"{bucket_name_gold}/f_planning_book_unpivot\"\r\n",
 							"\r\n",
 							"df_spark = spark.createDataFrame(df_pivoted)\r\n",
-							"df_spark=df_spark.withColumnRenamed('product_id', 'IdProduct').withColumnRenamed('country_id', 'IDCountry').withColumnRenamed('financial_date', 'Date')\r\n",
+							"\r\n",
+							"df_spark=df_spark.withColumnRenamed('product_id', 'IdProduct').withColumnRenamed('country_id', 'IDCountry').withColumnRenamed('financial_date', 'Date').withColumnRenamed('Close Stock', 'Close_Stock').withColumnRenamed('Ex-Factory', 'Ex_Factory').withColumnRenamed('Open Stock', 'Open_Stock').withColumnRenamed('Open Stock Pharmacies', 'Open_Stock_Pharmacies').withColumnRenamed('Sales to pharmacies', 'Sales_to_pharmacies').withColumnRenamed('Close Stock Pharmacies', 'Close_Stock_Pharmacies')\r\n",
 							"\r\n",
 							"\r\n",
-							"df_spark.write.mode(\"overwrite\").format(\"delta\").save(f_sales_path_gold)\r\n",
+							"df_spark.write.mode(\"overwrite\").format(\"delta\").save(\"abfss://gold@bigpharma.dfs.core.windows.net/f_planning_book_unpivot\")\r\n",
 							"\r\n",
-							"df_spark.show()"
+							""
+						],
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"\r\n",
+							"spark.sql(\"\"\"\r\n",
+							"CREATE TABLE IF NOT EXISTS gold.f_planning_book_unpivot\r\n",
+							"USING DELTA\r\n",
+							"LOCATION 'abfss://gold@bigpharma.dfs.core.windows.net/f_planning_book_unpivot'\r\n",
+							"\"\"\")\r\n",
+							"\r\n",
+							"\r\n",
+							""
 						],
 						"outputs": [],
 						"execution_count": 14

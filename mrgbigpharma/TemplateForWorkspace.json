@@ -523,44 +523,9 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "D_Customer_Load",
+						"name": "Notebook1",
 						"type": "SynapseNotebook",
 						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 2,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebook": {
-								"referenceName": "D_CUSTOMERS_LOAD_PY",
-								"type": "NotebookReference"
-							},
-							"snapshot": true,
-							"executorSize": "Small",
-							"conf": {
-								"spark.dynamicAllocation.enabled": false
-							},
-							"driverSize": "Small",
-							"authentication": {
-								"type": "MSI"
-							}
-						}
-					},
-					{
-						"name": "D_Products",
-						"type": "SynapseNotebook",
-						"dependsOn": [
-							{
-								"activity": "D_Customer_Load",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -571,20 +536,24 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebook": {
-								"referenceName": "D_PRODUCT_LOAD_PY",
+								"referenceName": "Notebook 1",
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "sparkpool32",
+								"type": "BigDataPoolReference"
+							},
 							"executorSize": "Small",
 							"conf": {
-								"spark.dynamicAllocation.enabled": false,
-								"spark.dynamicAllocation.minExecutors": 2,
-								"spark.dynamicAllocation.maxExecutors": 2
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
 							},
 							"driverSize": "Small",
-							"numExecutors": 2,
+							"numExecutors": null,
 							"authentication": {
-								"type": "UserAssignedManagedIdentity"
+								"type": "MSI"
 							}
 						}
 					}
@@ -599,8 +568,8 @@
 				"lastPublishTime": "2025-04-02T06:40:26Z"
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/notebooks/D_CUSTOMERS_LOAD_PY')]",
-				"[concat(variables('workspaceId'), '/notebooks/D_PRODUCT_LOAD_PY')]"
+				"[concat(variables('workspaceId'), '/notebooks/Notebook 1')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/sparkpool32')]"
 			]
 		},
 		{
@@ -1415,12 +1384,52 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 8')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/customers/customers_2025-03-27.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n    update_date\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 9')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/customers/customers_2025-03-24.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/D_CUSTOMERS_LOAD_PY')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"folder": {
-					"name": "Arch/Gold/Silver"
+					"name": "Arch/Silver"
 				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
@@ -1585,166 +1594,6 @@
 						],
 						"outputs": [],
 						"execution_count": 30
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/D_CUSTOMERS_LOAD')]",
-			"type": "Microsoft.Synapse/workspaces/notebooks",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"folder": {
-					"name": "Load_Silver"
-				},
-				"nbformat": 4,
-				"nbformat_minor": 2,
-				"bigDataPool": {
-					"referenceName": "sparkpool32",
-					"type": "BigDataPoolReference"
-				},
-				"sessionProperties": {
-					"driverMemory": "28g",
-					"driverCores": 4,
-					"executorMemory": "28g",
-					"executorCores": 4,
-					"numExecutors": 2,
-					"conf": {
-						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "2",
-						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "92ee6f72-6128-47b5-ba9c-2f5467fcf32a"
-					}
-				},
-				"metadata": {
-					"saveOutput": true,
-					"enableDebugMode": false,
-					"kernelspec": {
-						"name": "synapse_sparksql",
-						"display_name": "sql"
-					},
-					"language_info": {
-						"name": "sql"
-					},
-					"a365ComputeOptions": {
-						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
-						"name": "sparkpool32",
-						"type": "Spark",
-						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
-						"auth": {
-							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net"
-						},
-						"sparkVersion": "3.4",
-						"nodeCount": 3,
-						"cores": 4,
-						"memory": 28
-					},
-					"sessionKeepAliveTimeout": 30
-				},
-				"cells": [
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"outputs_hidden": false
-							},
-							"collapsed": false
-						},
-						"source": [
-							"\n",
-							"CREATE DATABASE IF NOT EXISTS silver;\n",
-							"\n",
-							"\n",
-							"-- 1. Rejestracja bronze_customers jako tymczasowy widok\n",
-							"CREATE OR REPLACE TEMP VIEW bronze_customers\n",
-							"USING parquet\n",
-							"OPTIONS (\n",
-							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/customers/'\n",
-							");\n",
-							"\n",
-							"-- 2. Rejestracja bronze_countries jako tymczasowy widok\n",
-							"CREATE OR REPLACE TEMP VIEW bronze_countries\n",
-							"USING parquet\n",
-							"OPTIONS (\n",
-							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/countries/'\n",
-							");\n",
-							"\n",
-							"-- 3. Przygotowanie danych – JOIN + wybór najnowszych po customer_id\n",
-							"CREATE OR REPLACE TEMP VIEW new_bronze_d_customers AS\n",
-							"SELECT \n",
-							"    c.customer_id,\n",
-							"    c.country_id,\n",
-							"    c.company_name,\n",
-							"    c.address,\n",
-							"    c.city,\n",
-							"    co.region_description,\n",
-							"    co.country,\n",
-							"    co.cluster\n",
-							"FROM bronze_customers c\n",
-							"JOIN bronze_countries co\n",
-							"  ON c.country_id = co.country_id;\n",
-							"\n",
-							"-- 4. Stworzenie tabeli docelowej jako Delta Lake (jeśli nie istnieje)\n",
-							"CREATE TABLE IF NOT EXISTS silver.d_customers\n",
-							"USING delta\n",
-							"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/d_customers'\n",
-							"AS\n",
-							"SELECT * FROM new_bronze_d_customers\n",
-							"WHERE 1 = 0;\n",
-							"\n",
-							"-- 5. Merge (UPSERT) danych do tabeli docelowej\n",
-							"MERGE INTO silver.d_customers AS target\n",
-							"USING new_bronze_d_customers AS source\n",
-							"ON target.customer_id = source.customer_id\n",
-							"\n",
-							"WHEN MATCHED THEN\n",
-							"  UPDATE SET\n",
-							"    target.country_id = source.country_id,\n",
-							"    target.company_name = source.company_name,\n",
-							"    target.address = source.address,\n",
-							"    target.city = source.city,\n",
-							"    target.region_description = source.region_description,\n",
-							"    target.country = source.country,\n",
-							"    target.cluster = source.cluster\n",
-							"\n",
-							"WHEN NOT MATCHED THEN\n",
-							"  INSERT (\n",
-							"    customer_id,\n",
-							"    country_id,\n",
-							"    company_name,\n",
-							"    address,\n",
-							"    city,\n",
-							"    region_description,\n",
-							"    country,\n",
-							"    cluster\n",
-							"  )\n",
-							"  VALUES (\n",
-							"    source.customer_id,\n",
-							"    source.country_id,\n",
-							"    source.company_name,\n",
-							"    source.address,\n",
-							"    source.city,\n",
-							"    source.region_description,\n",
-							"    source.country,\n",
-							"    source.cluster\n",
-							"  );\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": 6
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"collapsed": false
-						},
-						"source": [
-							""
-						],
-						"outputs": [],
-						"execution_count": 5
 					}
 				]
 			},
@@ -1979,7 +1828,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"folder": {
-					"name": "Arch/Gold/Silver"
+					"name": "Arch/Silver"
 				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
@@ -2229,7 +2078,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"folder": {
-					"name": "Arch/Gold/Silver"
+					"name": "Arch/Silver"
 				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
@@ -2435,7 +2284,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "34947844-ea69-4a56-bd1b-a925fa24149f"
+						"spark.autotune.trackingId": "da4b4807-102f-4e9c-b894-9fd17abb31e4"
 					}
 				},
 				"metadata": {
@@ -2453,10 +2302,8 @@
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
-							"set path_bronze_products = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/products';\n",
-							"set path_silver_products = 'abfss://silver@bigpharma.dfs.core.windows.net/d_products';\n",
-							"\n",
 							"CREATE DATABASE IF NOT EXISTS silver;\n",
 							"\n",
 							"-- ============================================\n",
@@ -2466,7 +2313,7 @@
 							"CREATE OR REPLACE TEMP VIEW bronze_products\n",
 							"USING parquet\n",
 							"OPTIONS (\n",
-							"  path ${path_bronze_products}\n",
+							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/products'\n",
 							");\n",
 							"\n",
 							"-- ============================================\n",
@@ -2479,7 +2326,8 @@
 							"    product_name,\n",
 							"    brand_name,\n",
 							"    sub_brand_name,\n",
-							"    category_name\n",
+							"    category_name,\n",
+							"    update_date as product_update_date\n",
 							"FROM bronze_products;\n",
 							"\n",
 							"-- ============================================\n",
@@ -2487,16 +2335,24 @@
 							"-- ============================================\n",
 							"CREATE TABLE IF NOT EXISTS silver.d_products\n",
 							"USING delta\n",
-							"LOCATION ${path_silver_products}\n",
+							"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/d_products'\n",
 							"AS\n",
-							"SELECT * FROM d_products\n",
+							"SELECT * FROM new_d_products\n",
 							"WHERE 1 = 0;\n",
+							"\n",
+							"\n",
+							"CREATE OR REPLACE TEMP VIEW filter_d_products AS\n",
+							"SELECT *from new_d_products n \n",
+							"where  NOT EXISTS (select product_id From silver.d_products s \n",
+							"                    where s.product_id =n.product_id \n",
+							"                      and s.product_update_date = n.product_update_date)\n",
+							"\n",
 							"\n",
 							"-- ============================================\n",
 							"-- 4. MERGE INTO (UPSERT) danych do tabeli Silver\n",
 							"-- ============================================\n",
 							"MERGE INTO silver.d_products AS target\n",
-							"USING new_d_products AS source\n",
+							"USING filter_d_products  AS source\n",
 							"ON target.product_id = source.product_id\n",
 							"\n",
 							"WHEN MATCHED THEN\n",
@@ -2504,7 +2360,8 @@
 							"    target.product_name = source.product_name,\n",
 							"    target.brand_name = source.brand_name,\n",
 							"    target.sub_brand_name = source.sub_brand_name,\n",
-							"    target.category_name = source.category_name\n",
+							"    target.category_name = source.category_name,\n",
+							"    target.product_update_date = source.product_update_date\n",
 							"\n",
 							"WHEN NOT MATCHED THEN\n",
 							"  INSERT (\n",
@@ -2512,14 +2369,16 @@
 							"    product_name,\n",
 							"    brand_name,\n",
 							"    sub_brand_name,\n",
-							"    category_name\n",
+							"    category_name,\n",
+							"    product_update_date\n",
 							"  )\n",
 							"  VALUES (\n",
 							"    source.product_id,\n",
 							"    source.product_name,\n",
 							"    source.brand_name,\n",
 							"    source.sub_brand_name,\n",
-							"    source.category_name\n",
+							"    source.category_name,\n",
+							"    source.product_update_date\n",
 							"  )"
 						],
 						"outputs": [],
@@ -2535,7 +2394,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"folder": {
-					"name": "Arch/Gold/Silver"
+					"name": "Arch/Silver"
 				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
@@ -2752,7 +2611,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "8c0aab6d-a693-47eb-9052-97d0e1f55ba6"
+						"spark.autotune.trackingId": "630d541c-eb75-41b1-bf4d-fa4c6fe09fd9"
 					}
 				},
 				"metadata": {
@@ -2770,10 +2629,8 @@
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
-							"set path_bronze_forecast = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/forecast_details';\n",
-							"set path_silver_f_forecast = 'abfss://silver@bigpharma.dfs.core.windows.net/f_forecast';\n",
-							"\n",
 							"CREATE DATABASE IF NOT EXISTS silver;\n",
 							"\n",
 							"-- ============================================\n",
@@ -2782,7 +2639,7 @@
 							"CREATE OR REPLACE TEMP VIEW bronze_forecast\n",
 							"USING parquet\n",
 							"OPTIONS (\n",
-							"  path ${path_bronze_forecast}\n",
+							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/forecast_details'\n",
 							");\n",
 							"\n",
 							"-- ============================================\n",
@@ -2792,6 +2649,7 @@
 							"SELECT \n",
 							"    product_id,\n",
 							"    country_id,\n",
+							"    max(update_date) as forecast_update_date,\n",
 							"    TRUNC(forecast_date, \"MM\") AS forecast_date,\n",
 							"    TRUNC(forecast_snapshot, \"MM\") AS forecast_snapshot,\n",
 							"    \n",
@@ -2815,23 +2673,34 @@
 							"    \n",
 							"    ROUND(SUM(quantity * unit_price) / NULLIF(SUM(quantity), 0), 2) AS unit_price\n",
 							"FROM  bronze_forecast\n",
-							"GROUP BY product_id, country_id, TRUNC(forecast_date, \"MM\"), TRUNC(forecast_snapshot, \"MM\");\n",
+							"GROUP BY product_id, country_id, TRUNC(forecast_date, 'MM'), TRUNC(forecast_snapshot, 'MM');\n",
 							"\n",
 							"-- ============================================\n",
 							"-- 3. Stwórz tabelę Silver, jeśli nie istnieje\n",
 							"-- ============================================\n",
 							"CREATE TABLE IF NOT EXISTS silver.f_forecast\n",
 							"USING delta\n",
-							"LOCATION ${path_silver_f_forecast}\n",
+							"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/f_forecast'\n",
 							"AS\n",
 							"SELECT * FROM aggregated_forecast\n",
 							"WHERE 1 = 0;\n",
 							"\n",
+							"\n",
+							"CREATE OR REPLACE TEMP VIEW filter_aggregated_forecast AS\n",
+							"SELECT * from aggregated_forecast n \n",
+							"where  NOT EXISTS (select product_id From silver.f_forecast s \n",
+							"                    where s.product_id =n.product_id \n",
+							"                      and s.country_id = n.country_id\n",
+							"                      and s.forecast_update_date = n.forecast_update_date\n",
+							"                      and s.forecast_date = n.forecast_date\n",
+							"                      and s.forecast_snapshot= n.forecast_snapshot);\n",
+							"\n",
 							"-- ============================================\n",
 							"-- 4. Wykonaj MERGE INTO, aby zaktualizować lub dodać nowe dane\n",
 							"-- ============================================\n",
+							"\n",
 							"MERGE INTO silver.f_forecast AS target\n",
-							"USING aggregated_forecast AS source\n",
+							"USING filter_aggregated_forecast AS source\n",
 							"ON target.product_id = source.product_id\n",
 							"   AND target.country_id = source.country_id\n",
 							"   AND target.forecast_date = source.forecast_date\n",
@@ -2857,7 +2726,8 @@
 							"    target.pos_open_amount = source.pos_open_amount,\n",
 							"    target.pos_end_amount = source.pos_end_amount,\n",
 							"    \n",
-							"    target.unit_price = source.unit_price\n",
+							"    target.unit_price = source.unit_price,\n",
+							"    target.forecast_update_date = source.forecast_update_date\n",
 							"\n",
 							"WHEN NOT MATCHED THEN\n",
 							"  INSERT (\n",
@@ -2865,16 +2735,15 @@
 							"    quantity, whrs_sell_in_quantity, whrs_open_quantity, whrs_end_quantity,\n",
 							"    pos_sell_out_quantity, pos_open_quantity, pos_end_quantity,\n",
 							"    amount, whrs_sell_in_amount, whrs_open_amount, whrs_end_amount,\n",
-							"    pos_sell_out_amount, pos_open_amount, pos_end_amount, unit_price\n",
+							"    pos_sell_out_amount, pos_open_amount, pos_end_amount, unit_price,forecast_update_date\n",
 							"  )\n",
 							"  VALUES (\n",
 							"    source.product_id, source.country_id, source.forecast_date, source.forecast_snapshot,\n",
 							"    source.quantity, source.whrs_sell_in_quantity, source.whrs_open_quantity, source.whrs_end_quantity,\n",
 							"    source.pos_sell_out_quantity, source.pos_open_quantity, source.pos_end_quantity,\n",
 							"    source.amount, source.whrs_sell_in_amount, source.whrs_open_amount, source.whrs_end_amount,\n",
-							"    source.pos_sell_out_amount, source.pos_open_amount, source.pos_end_amount, source.unit_price\n",
-							"  );\n",
-							""
+							"    source.pos_sell_out_amount, source.pos_open_amount, source.pos_end_amount, source.unit_price,source.forecast_update_date\n",
+							"  );"
 						],
 						"outputs": [],
 						"execution_count": null
@@ -3288,7 +3157,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "a3a09c18-6348-408a-93e8-e3e459feed88"
+						"spark.autotune.trackingId": "3312b0e9-5507-4693-8b7e-7a5708ebf603"
 					}
 				},
 				"metadata": {
@@ -3307,8 +3176,6 @@
 					{
 						"cell_type": "code",
 						"source": [
-							"set path_bronze_pos = 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_pos_history_details';\n",
-							"set path_silver_f_pos_data = 'abfss://silver@bigpharma.dfs.core.windows.net/f_pos_data';\n",
 							"CREATE DATABASE IF NOT EXISTS silver;\n",
 							"\n",
 							"-- ============================================\n",
@@ -3317,7 +3184,7 @@
 							"CREATE OR REPLACE TEMP VIEW bronze_pos\n",
 							"USING parquet\n",
 							"OPTIONS (\n",
-							"  path '${path_bronze_pos}'\n",
+							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_pos_history_details'\n",
 							");\n",
 							"-- ============================================\n",
 							"-- 2. Przygotowanie danych – najnowsze update + agregacja miesięczna\n",
@@ -3326,6 +3193,7 @@
 							"SELECT \n",
 							"    product_id,\n",
 							"    country_id,\n",
+							"    max(update_date) as pos_update_date,    \n",
 							"    TRUNC(transaction_date, \"MM\") AS transaction_date,\n",
 							"    SUM(pos_sell_out_quantity) AS pos_sell_out_quantity,\n",
 							"    SUM(pos_open_quantity) AS pos_open_quantity,\n",
@@ -3343,16 +3211,28 @@
 							"-- ============================================\n",
 							"CREATE TABLE IF NOT EXISTS silver.f_pos_data\n",
 							"USING delta\n",
-							"LOCATION '${path_silver_f_pos_data}'\n",
+							"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/f_pos_data'\n",
 							"AS\n",
 							"SELECT * FROM aggregated_bronze_pos\n",
 							"WHERE 1 = 0;\n",
 							"\n",
+							"\n",
+							"CREATE OR REPLACE TEMP VIEW filter_aggregated_bronze_pos AS\n",
+							"SELECT * from aggregated_bronze_pos n \n",
+							"where  NOT EXISTS (select product_id From silver.f_pos_data s \n",
+							"                    where s.product_id =n.product_id \n",
+							"                      and s.country_id = n.country_id\n",
+							"                      and s.pos_update_date = n.pos_update_date\n",
+							"                      and s.transaction_date = n.transaction_date);\n",
+							"\n",
+							"\n",
+							"\n",
 							"-- ============================================\n",
 							"-- 4. MERGE INTO (UPSERT) danych do tabeli Delta\n",
 							"-- ============================================\n",
+							"\n",
 							"MERGE INTO silver.f_pos_data AS target\n",
-							"USING aggregated_bronze_pos AS source\n",
+							"USING filter_aggregated_bronze_pos AS source\n",
 							"ON target.product_id = source.product_id\n",
 							"   AND target.country_id = source.country_id\n",
 							"   AND target.transaction_date = source.transaction_date\n",
@@ -3365,7 +3245,8 @@
 							"    target.pos_sell_out_amount = source.pos_sell_out_amount,\n",
 							"    target.pos_open_amount = source.pos_open_amount,\n",
 							"    target.pos_end_amount = source.pos_end_amount,\n",
-							"    target.unit_price = source.unit_price\n",
+							"    target.unit_price = source.unit_price,\n",
+							"    target.pos_update_date = source.pos_update_date \n",
 							"\n",
 							"WHEN NOT MATCHED THEN\n",
 							"  INSERT (\n",
@@ -3378,7 +3259,8 @@
 							"    pos_sell_out_amount,\n",
 							"    pos_open_amount,\n",
 							"    pos_end_amount,\n",
-							"    unit_price\n",
+							"    unit_price,\n",
+							"    pos_update_date \n",
 							"  )\n",
 							"  VALUES (\n",
 							"    source.product_id,\n",
@@ -3390,8 +3272,10 @@
 							"    source.pos_sell_out_amount,\n",
 							"    source.pos_open_amount,\n",
 							"    source.pos_end_amount,\n",
-							"    source.unit_price\n",
-							"  );"
+							"    source.unit_price,\n",
+							"    source.pos_update_date \n",
+							"  );\n",
+							""
 						],
 						"outputs": [],
 						"execution_count": null
@@ -3406,7 +3290,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"folder": {
-					"name": "Arch/Gold/Silver"
+					"name": "Arch/Silver"
 				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
@@ -3425,7 +3309,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "42ce48cb-5523-4aae-b315-7fada578a865"
+						"spark.autotune.trackingId": "63357187-1908-4994-baf9-53ab7cdf78c5"
 					}
 				},
 				"metadata": {
@@ -3450,15 +3334,13 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"from pyspark.sql import SparkSession\r\n",
 							"from pyspark.sql.functions import col, max, coalesce, trunc\r\n",
@@ -3604,7 +3486,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "55b9b954-d4e2-48fd-b67c-1b9aa2a74d8e"
+						"spark.autotune.trackingId": "00129b5e-581f-4dea-afeb-a0824c43feb0"
 					}
 				},
 				"metadata": {
@@ -3655,7 +3537,7 @@
 							"CREATE OR REPLACE TEMP VIEW bronze_orders\n",
 							"USING parquet\n",
 							"OPTIONS (\n",
-							"  path ${path_bronze_orders }\n",
+							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/orders'\n",
 							");\n",
 							"\n",
 							"CREATE OR REPLACE TEMP VIEW bronze_order_details\n",
@@ -3755,7 +3637,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"folder": {
-					"name": "Arch/Gold/Silver"
+					"name": "Arch/Silver"
 				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
@@ -4604,6 +4486,168 @@
 							"    print(f\"Nie znaleziono tabeli Delta — zostanie utworzona. Szczegóły: {str(e)}\")\n",
 							"    new_bronze_df.write.format(\"delta\").mode(\"overwrite\").save(silver_path)\n",
 							"    print(\"Zapisano nową tabelę Delta.\")"
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Notebook 2')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "sparkpool32",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "31a75dae-ccd3-4d4d-b58f-30f077d7263d"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
+					"language_info": {
+						"name": "sql"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+						"name": "sparkpool32",
+						"type": "Spark",
+						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"CREATE DATABASE IF NOT EXISTS silver;\n",
+							"\n",
+							"\n",
+							"-- 1. Rejestracja bronze_customers jako tymczasowy widok\n",
+							"CREATE OR REPLACE TEMP VIEW bronze_customers\n",
+							"USING parquet\n",
+							"OPTIONS (\n",
+							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/customers/'\n",
+							");\n",
+							"\n",
+							"-- 2. Rejestracja bronze_countries jako tymczasowy widok\n",
+							"CREATE OR REPLACE TEMP VIEW bronze_countries\n",
+							"USING parquet\n",
+							"OPTIONS (\n",
+							"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/countries/'\n",
+							");\n",
+							"\n",
+							"-- 3. Przygotowanie danych – JOIN + wybór najnowszych po customer_id\n",
+							"CREATE OR REPLACE TEMP VIEW new_bronze_d_customers AS\n",
+							"SELECT \n",
+							"    c.customer_id,\n",
+							"    c.country_id,\n",
+							"    c.company_name,\n",
+							"    c.address,\n",
+							"    c.city,\n",
+							"    co.region_description,\n",
+							"    co.country,\n",
+							"    co.cluster,\n",
+							"    c.update_date as customer_update_date,\n",
+							"    co.update_date as country_update_date\n",
+							"\n",
+							"FROM bronze_customers c\n",
+							"JOIN bronze_countries co\n",
+							"  ON c.country_id = co.country_id;\n",
+							"\n",
+							"-- 4. Stworzenie tabeli docelowej jako Delta Lake (jeśli nie istnieje)\n",
+							"CREATE TABLE IF NOT EXISTS silver.d_customers\n",
+							"USING delta\n",
+							"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/d_customers'\n",
+							"AS\n",
+							"SELECT * FROM new_bronze_d_customers\n",
+							"WHERE 1 = 0;\n",
+							"\n",
+							"\n",
+							"CREATE OR REPLACE TEMP VIEW filter_bronze_d_customers AS\n",
+							"SELECT *from new_bronze_d_customers n \n",
+							"where  NOT EXISTS (select customer_id From silver.d_customers s \n",
+							"                    where s.customer_id=n.customer_id\n",
+							"                      and s.country_id = s.country_id \n",
+							"                      and s.customer_update_date = n.customer_update_date\n",
+							"                      and s.country_update_date = n.country_update_date )  \n",
+							"\n",
+							"\n",
+							"\n",
+							"-- 5. Merge (UPSERT) danych do tabeli docelowej\n",
+							"MERGE INTO silver.d_customers AS target\n",
+							"USING filter_bronze_d_customers AS source\n",
+							"ON target.customer_id = source.customer_id\n",
+							"\n",
+							"WHEN MATCHED THEN\n",
+							"  UPDATE SET\n",
+							"    target.country_id = source.country_id,\n",
+							"    target.company_name = source.company_name,\n",
+							"    target.address = source.address,\n",
+							"    target.city = source.city,\n",
+							"    target.region_description = source.region_description,\n",
+							"    target.country = source.country,\n",
+							"    target.cluster = source.cluster,\n",
+							"    target.customer_update_date = source.customer_update_date,\n",
+							"    target.country_update_date = source.country_update_date\n",
+							"\n",
+							"WHEN NOT MATCHED THEN\n",
+							"  INSERT (\n",
+							"    customer_id,\n",
+							"    country_id,\n",
+							"    company_name,\n",
+							"    address,\n",
+							"    city,\n",
+							"    region_description,\n",
+							"    country,\n",
+							"    cluster,\n",
+							"    customer_update_date,\n",
+							"    country_update_date\n",
+							"  )\n",
+							"  VALUES (\n",
+							"    source.customer_id,\n",
+							"    source.country_id,\n",
+							"    source.company_name,\n",
+							"    source.address,\n",
+							"    source.city,\n",
+							"    source.region_description,\n",
+							"    source.country,\n",
+							"    source.cluster,\n",
+							"    source.customer_update_date,\n",
+							"    source.country_update_date\n",
+							"  );\n",
+							""
 						],
 						"outputs": [],
 						"execution_count": null

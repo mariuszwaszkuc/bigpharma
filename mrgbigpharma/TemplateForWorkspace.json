@@ -536,7 +536,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebook": {
-								"referenceName": "D_CUSTOMERS_LOAD",
+								"referenceName": "D_CUSTOMERS_LOAD_PY",
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
@@ -571,7 +571,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebook": {
-								"referenceName": "D_PRODUCT_LOAD",
+								"referenceName": "D_PRODUCT_LOAD_PY",
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
@@ -599,8 +599,8 @@
 				"lastPublishTime": "2025-04-02T06:40:26Z"
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/notebooks/D_CUSTOMERS_LOAD')]",
-				"[concat(variables('workspaceId'), '/notebooks/D_PRODUCT_LOAD')]"
+				"[concat(variables('workspaceId'), '/notebooks/D_CUSTOMERS_LOAD_PY')]",
+				"[concat(variables('workspaceId'), '/notebooks/D_PRODUCT_LOAD_PY')]"
 			]
 		},
 		{
@@ -1415,12 +1415,12 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/D_CUSTOMERS_LOAD')]",
+			"name": "[concat(parameters('workspaceName'), '/D_CUSTOMERS_LOAD_PY')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"folder": {
-					"name": "Load_Silver"
+					"name": "Arch/Gold/Silver"
 				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
@@ -1439,7 +1439,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "35d38d31-6525-4f4c-9dcc-7d08f3be889e"
+						"spark.autotune.trackingId": "a42bb111-6bcb-46f2-989f-531f833d9d1d"
 					}
 				},
 				"metadata": {
@@ -1591,10 +1591,13 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/D_CUSTOMERS_LOAD_SQL')]",
+			"name": "[concat(parameters('workspaceName'), '/D_CUSTOMERS_LOAD')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
 				"bigDataPool": {
@@ -1611,7 +1614,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "483613cc-91c9-45da-8035-3441771b7356"
+						"spark.autotune.trackingId": "92ee6f72-6128-47b5-ba9c-2f5467fcf32a"
 					}
 				},
 				"metadata": {
@@ -1767,7 +1770,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "5e044da9-2b97-448d-a8cf-8aceec1d3230"
+						"spark.autotune.trackingId": "3ee50ee0-210b-4877-b1b4-5985d9a852f8"
 					}
 				},
 				"metadata": {
@@ -1785,7 +1788,6 @@
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"-- Tworzenie Widoków Delta w warstwie Silver\n",
 							"CREATE DATABASE IF NOT EXISTS silver;\n",
@@ -1972,12 +1974,12 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/D_POS_LOAD')]",
+			"name": "[concat(parameters('workspaceName'), '/D_POS_LOAD_PY')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"folder": {
-					"name": "Load_Silver"
+					"name": "Arch/Gold/Silver"
 				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
@@ -2222,12 +2224,12 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/D_PRODUCT_LOAD')]",
+			"name": "[concat(parameters('workspaceName'), '/D_PRODUCT_LOAD_PY')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"folder": {
-					"name": "Load_Silver"
+					"name": "Arch/Gold/Silver"
 				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
@@ -2418,6 +2420,9 @@
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
 				"sessionProperties": {
@@ -2430,7 +2435,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "39fb2b16-adf6-48a8-8619-2f2e063389c4"
+						"spark.autotune.trackingId": "34947844-ea69-4a56-bd1b-a925fa24149f"
 					}
 				},
 				"metadata": {
@@ -2525,12 +2530,12 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/F_FORCAST_LOAD')]",
+			"name": "[concat(parameters('workspaceName'), '/F_FORCAST_LOAD_PY')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"folder": {
-					"name": "Load_Silver"
+					"name": "Arch/Gold/Silver"
 				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
@@ -2549,7 +2554,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "169a480a-accc-4e84-95e7-967e7c19a178"
+						"spark.autotune.trackingId": "3b4c0281-515b-4971-b576-bdeefeb17ba3"
 					}
 				},
 				"metadata": {
@@ -2732,6 +2737,9 @@
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
 				"sessionProperties": {
@@ -3265,6 +3273,9 @@
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
 				"sessionProperties": {
@@ -3390,12 +3401,12 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/F_SALES_LOAD')]",
+			"name": "[concat(parameters('workspaceName'), '/F_SALES_LOAD_PY')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"folder": {
-					"name": "Load_Silver"
+					"name": "Arch/Gold/Silver"
 				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
@@ -3414,7 +3425,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "c4b7f2d3-9034-4bbf-8b7a-6f34134a40fb"
+						"spark.autotune.trackingId": "42ce48cb-5523-4aae-b315-7fada578a865"
 					}
 				},
 				"metadata": {
@@ -3439,13 +3450,15 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"from pyspark.sql import SparkSession\r\n",
 							"from pyspark.sql.functions import col, max, coalesce, trunc\r\n",
@@ -3572,6 +3585,9 @@
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
 				"bigDataPool": {
@@ -3734,12 +3750,12 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/F_WH_DATA_LOAD')]",
+			"name": "[concat(parameters('workspaceName'), '/F_WH_DATA_LOAD_PY')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"folder": {
-					"name": "Load_Silver"
+					"name": "Arch/Gold/Silver"
 				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
@@ -3950,6 +3966,9 @@
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
+				"folder": {
+					"name": "Load_Silver"
+				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
 				"bigDataPool": {

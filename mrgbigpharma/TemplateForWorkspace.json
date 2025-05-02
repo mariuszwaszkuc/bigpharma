@@ -3646,7 +3646,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "ee754884-9f1e-4d30-a298-26f3d68cda33"
+						"spark.autotune.trackingId": "4f5e03b3-dc32-40ce-9b1b-1d1dade259b4"
 					}
 				},
 				"metadata": {
@@ -3760,8 +3760,9 @@
 							"        ROUND(SUM(quantity * unit_price), 2) AS amount,\n",
 							"        ROUND(SUM(quantity * unit_price) / NULLIF(SUM(quantity), 0), 2) AS unit_price\n",
 							"    FROM joined_orders\n",
-							"    GROUP BY country_id, product_id, shipped_date\n",
-							");\n",
+							"    GROUP BY country_id, product_id, shipped_date)\n",
+							"SELECT * FROM final_orders;   \n",
+							"\n",
 							"\n",
 							"\n",
 							"CREATE OR REPLACE TEMP VIEW filter_aggregated_bronze_orders AS\n",
@@ -3770,7 +3771,7 @@
 							"                    where s.product_id =n.product_id \n",
 							"                      and s.shipped_date = n.shipped_date\n",
 							"                      and s.order_order_details_update_date = n.order_order_details_update_date\n",
-							"                      and s.order_update_date, = n.order_update_date);\n",
+							"                      and s.order_update_date = n.order_update_date);\n",
 							"\n",
 							"\n",
 							"-- 3. Przekształcenie i zapis danych do tabeli Silver z użyciem MERGE\n",

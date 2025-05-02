@@ -1375,6 +1375,46 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 6')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/gold/d_products/',\n        FORMAT = 'DELTA'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 7')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/gold/d_customers/',\n        FORMAT = 'DELTA'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/D_CUSTOMERS_LOAD')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -1727,7 +1767,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "36596b11-48bf-4e85-8089-611ecb275ab1"
+						"spark.autotune.trackingId": "5e044da9-2b97-448d-a8cf-8aceec1d3230"
 					}
 				},
 				"metadata": {
@@ -1762,14 +1802,23 @@
 							"USING DELTA\n",
 							"LOCATION 'abfss://gold@bigpharma.dfs.core.windows.net/d_products'\n",
 							"AS\n",
-							"SELECT * FROM silver_d_products\n",
+							"SELECT product_id AS IdProduct,\n",
+							"       product_name AS Name,\n",
+							"       brand_name AS Brand,\n",
+							"       sub_brand_name AS SubBrand,\n",
+							"       category_name AS Category \n",
+							" FROM silver_d_products\n",
 							"WHERE 1 = 0;\n",
 							"\n",
 							"CREATE TABLE IF NOT EXISTS gold.d_regions\n",
 							"USING DELTA\n",
 							"LOCATION 'abfss://gold@bigpharma.dfs.core.windows.net/d_customers'\n",
 							"AS\n",
-							"SELECT * FROM silver_d_regions\n",
+							"SELECT country_id AS IDCountry,\n",
+							"       cluster AS Claster,\n",
+							"       region_description AS Region,\n",
+							"       country AS Country\n",
+							"FROM silver_d_regions\n",
 							"WHERE 1 = 0;\n",
 							"\n",
 							"-- Zmiana nazw kolumn w tabeli d_products i zapis do warstwy Gold\n",
@@ -1806,7 +1855,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"folder": {
-					"name": "Arch"
+					"name": "Arch/Gold"
 				},
 				"nbformat": 4,
 				"nbformat_minor": 2,

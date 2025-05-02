@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a0e7ad6a-ba66-4600-a220-642834dffb8c"
+				"spark.autotune.trackingId": "e2fe8e9f-4423-4bcc-bf95-54b5660307e8"
 			}
 		},
 		"metadata": {
@@ -129,7 +129,7 @@
 					"\n",
 					"CREATE OR REPLACE TEMP VIEW filter_aggregated_bronze_wh AS\n",
 					"SELECT * from aggregated_bronze_wh  n \n",
-					"where  NOT EXISTS (select product_id From silver.f_sales s \n",
+					"where  NOT EXISTS (select product_id From silver.f_wh_data s \n",
 					"                    where s.product_id =n.product_id \n",
 					"                      and s.country_id = n.country_id\n",
 					"                      and s.transaction_date = n.transaction_date\n",

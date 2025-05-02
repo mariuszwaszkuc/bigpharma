@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6d88605d-df17-4dd1-883d-87300660eb8b"
+				"spark.autotune.trackingId": "88179380-3649-4181-924f-1828c706498d"
 			}
 		},
 		"metadata": {
@@ -57,6 +57,20 @@
 					"collapsed": false
 				},
 				"source": [
+					"drop table silver.f_wh_data "
+				],
+				"execution_count": 60
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"-- test D_CUSTOMERS_LOAD_SQL\n",
+					"\n",
+					"CREATE DATABASE IF NOT EXISTS silver;\n",
+					"\n",
 					"-- test D_CUSTOMERS_LOAD_SQL\n",
 					"\n",
 					"CREATE DATABASE IF NOT EXISTS silver;\n",
@@ -155,7 +169,7 @@
 					"  );\n",
 					""
 				],
-				"execution_count": 7
+				"execution_count": 50
 			},
 			{
 				"cell_type": "code",
@@ -168,7 +182,7 @@
 				"source": [
 					"drop table silver.d_products"
 				],
-				"execution_count": 8
+				"execution_count": 40
 			},
 			{
 				"cell_type": "code",
@@ -259,7 +273,7 @@
 					"    source.product_update_date)\n",
 					""
 				],
-				"execution_count": 12
+				"execution_count": 46
 			},
 			{
 				"cell_type": "code",
@@ -381,13 +395,13 @@
 					"    source.pos_sell_out_amount, source.pos_open_amount, source.pos_end_amount, source.unit_price,source.forecast_update_date\n",
 					"  );"
 				],
-				"execution_count": 13
+				"execution_count": 54
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
 					"jupyter": {
-						"outputs_hidden": true
+						"outputs_hidden": false
 					},
 					"collapsed": false
 				},
@@ -493,13 +507,13 @@
 					"  );\n",
 					""
 				],
-				"execution_count": 14
+				"execution_count": 59
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
 					"jupyter": {
-						"outputs_hidden": true
+						"outputs_hidden": false
 					},
 					"collapsed": false
 				},
@@ -617,7 +631,7 @@
 					"    );\n",
 					""
 				],
-				"execution_count": 15
+				"execution_count": 58
 			},
 			{
 				"cell_type": "code",
@@ -739,7 +753,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 16
+				"execution_count": 61
 			},
 			{
 				"cell_type": "code",

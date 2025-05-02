@@ -1571,7 +1571,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "c0e40551-22b2-446d-853b-be56690ff873"
+						"spark.autotune.trackingId": "1b1e679b-6ac9-45b6-9948-20863ee3ff6f"
 					}
 				},
 				"metadata": {
@@ -1596,8 +1596,7 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1853,7 +1852,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "a1e750c6-37dd-40f6-81de-ae7139cd91e9"
+						"spark.autotune.trackingId": "1f79191e-e824-493b-bf3e-87dbaed04db0"
 					}
 				},
 				"metadata": {
@@ -1891,13 +1890,23 @@
 							"LOCATION ${path_silver_d_customers};\n",
 							"\n",
 							"-- Tworzenie tabel w warstwie Gold\n",
-							"CREATE OR REPLACE TABLE d_products\n",
+							"CREATE TABLE IF NOT EXIST gold.d_products\n",
 							"USING DELTA\n",
-							"LOCATION ${path_gold_d_products};\n",
+							"LOCATION ${path_gold_d_products}\n",
+							"AS\n",
+							"SELECT * FROM silver_d_products\n",
+							"WHERE 1 = 0;\n",
 							"\n",
-							"CREATE OR REPLACE TABLE d_regions_gold\n",
+							";\n",
+							"\n",
+							"CREATE TABLE IF NOT  TABLE gold.d_regions\n",
 							"USING DELTA\n",
-							"LOCATION ${path_gold_d_customers};\n",
+							"LOCATION ${path_gold_d_customers}\n",
+							"AS\n",
+							"SELECT * FROM silver_d_regions\n",
+							"WHERE 1 = 0;\n",
+							"\n",
+							";\n",
 							"\n",
 							"-- Zmiana nazw kolumn w tabeli d_products i zapis do warstwy Gold\n",
 							"INSERT OVERWRITE TABLE gold.d_products\n",
@@ -1909,17 +1918,14 @@
 							"    category_name AS Category\n",
 							"FROM silver.d_products;\n",
 							"\n",
-							"\n",
 							"-- Usuwanie duplikatów w tabeli d_regions i zapis do nowej tabeli Gold\n",
-							"CREATE OR REPLACE TABLE gold.d_regions\n",
-							"USING DELTA\n",
-							"AS\n",
+							"INSERT OVERWRITE TABLE gold.d_regions\n",
 							"SELECT DISTINCT \n",
 							"    country_id AS IDCountry,\n",
 							"    cluster AS Claster,\n",
 							"    region_description AS Region,\n",
 							"    country AS Country\n",
-							"FROM silver.d_regions;\n",
+							"FROM silver_d_regions;\n",
 							""
 						],
 						"outputs": [],

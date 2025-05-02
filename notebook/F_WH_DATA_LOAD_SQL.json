@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f34f1674-d0fc-48f0-b9c2-4cbe36babdc8"
+				"spark.autotune.trackingId": "31a7495c-2ede-464a-88da-7171c7557bc0"
 			}
 		},
 		"metadata": {
@@ -84,7 +84,7 @@
 					"  whrs_open_amount DOUBLE,\n",
 					"  whrs_end_amount DOUBLE,\n",
 					"  unit_price DOUBLE,\n",
-					"  wh_update_date DATE\n",
+					"  whrs_update_date DATE\n",
 					")\n",
 					"USING DELTA\n",
 					"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/f_wh_data/';\n",

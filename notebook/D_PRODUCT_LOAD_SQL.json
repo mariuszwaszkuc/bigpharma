@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8507e131-30af-41c7-8e10-2f64180729d0"
+				"spark.autotune.trackingId": "c7bb7a83-1978-4a91-9b09-de02e92d1831"
 			}
 		},
 		"metadata": {
@@ -71,7 +71,7 @@
 					"USING delta\n",
 					"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/d_products'\n",
 					"AS\n",
-					"SELECT * FROM d_products\n",
+					"SELECT * FROM new_d_products\n",
 					"WHERE 1 = 0;\n",
 					"\n",
 					"\n",

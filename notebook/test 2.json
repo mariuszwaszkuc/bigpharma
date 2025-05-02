@@ -1,11 +1,15 @@
 {
-	"name": "D_DIM_SQL",
+	"name": "test 2",
 	"properties": {
 		"folder": {
-			"name": "Load Gold"
+			"name": "Load_Silver"
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkpool32",
+			"type": "BigDataPoolReference"
+		},
 		"sessionProperties": {
 			"driverMemory": "28g",
 			"driverCores": 4,
@@ -16,24 +20,53 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "de8090f0-3f53-43d4-ac6f-91eaad5f06b5"
+				"spark.autotune.trackingId": "8589b91d-28af-47cb-9665-64b38ff72ea2"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
 			"kernelspec": {
-				"name": "synapse_sparksql",
-				"display_name": "sql"
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "sql"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+				"name": "sparkpool32",
+				"type": "Spark",
+				"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
 		"cells": [
 			{
 				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"drop table gold.d_regions\n",
+					""
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
 				"source": [
 					"CREATE DATABASE IF NOT EXISTS gold;\n",
 					"\n",
@@ -88,7 +121,7 @@
 					"    country AS Country\n",
 					"FROM silver_d_regions;"
 				],
-				"execution_count": null
+				"execution_count": 4
 			}
 		]
 	}

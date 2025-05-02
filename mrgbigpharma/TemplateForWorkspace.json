@@ -1571,7 +1571,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "1b1e679b-6ac9-45b6-9948-20863ee3ff6f"
+						"spark.autotune.trackingId": "c0e40551-22b2-446d-853b-be56690ff873"
 					}
 				},
 				"metadata": {
@@ -1596,7 +1596,8 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1852,7 +1853,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "1ec2f641-198b-4f1a-bf53-417397e47534"
+						"spark.autotune.trackingId": "a1e750c6-37dd-40f6-81de-ae7139cd91e9"
 					}
 				},
 				"metadata": {
@@ -1872,6 +1873,7 @@
 						"cell_type": "code",
 						"metadata": {},
 						"source": [
+							"CREATE DATABASE IF NOT EXISTS gold;\n",
 							"set path_silver_d_products = 'abfss://silver@bigpharma.dfs.core.windows.net/d_customers';\n",
 							"set path_silver_d_customers = 'abfss://silver@bigpharma.dfs.core.windows.net/f_wh_data/';\n",
 							"set path_gold_d_products = 'abfss://silver@bigpharma.dfs.core.windows.net/f_wh_data/';\n",

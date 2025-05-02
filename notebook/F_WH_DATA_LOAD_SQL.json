@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5e7d983c-6dcb-4b3d-995f-e50f005ff988"
+				"spark.autotune.trackingId": "59bdcdc5-039e-4dad-863d-a21204f6aaf0"
 			}
 		},
 		"metadata": {
@@ -98,7 +98,7 @@
 					"            inv.*,\n",
 					"            c.country_id\n",
 					"        FROM bronze_inventory inv\n",
-					"        JOIN silver_customers c ON inv.customer_id = c.customer_id\n",
+					"        JOIN silver_d_customers c ON inv.customer_id = c.customer_id\n",
 					"    ),\n",
 					"    filtered AS (\n",
 					"        SELECT\n",

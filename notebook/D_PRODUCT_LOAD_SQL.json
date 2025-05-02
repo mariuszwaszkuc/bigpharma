@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c7bb7a83-1978-4a91-9b09-de02e92d1831"
+				"spark.autotune.trackingId": "cca4f639-e53e-4db7-bd79-5b1a21bc8739"
 			}
 		},
 		"metadata": {
@@ -94,7 +94,8 @@
 					"    target.product_name = source.product_name,\n",
 					"    target.brand_name = source.brand_name,\n",
 					"    target.sub_brand_name = source.sub_brand_name,\n",
-					"    target.category_name = source.category_name\n",
+					"    target.category_name = source.category_name,\n",
+					"    target.product_update_date = source.product_update_date\n",
 					"\n",
 					"WHEN NOT MATCHED THEN\n",
 					"  INSERT (\n",
@@ -102,14 +103,16 @@
 					"    product_name,\n",
 					"    brand_name,\n",
 					"    sub_brand_name,\n",
-					"    category_name\n",
+					"    category_name,\n",
+					"    product_update_date\n",
 					"  )\n",
 					"  VALUES (\n",
 					"    source.product_id,\n",
 					"    source.product_name,\n",
 					"    source.brand_name,\n",
 					"    source.sub_brand_name,\n",
-					"    source.category_name\n",
+					"    source.category_name,\n",
+					"    source.product_update_date\n",
 					"  )"
 				],
 				"execution_count": null

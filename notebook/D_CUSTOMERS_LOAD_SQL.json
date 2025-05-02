@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1b1e679b-6ac9-45b6-9948-20863ee3ff6f"
+				"spark.autotune.trackingId": "b226a0af-ef5b-4644-9ac1-34ac90934131"
 			}
 		},
 		"metadata": {
@@ -68,14 +68,14 @@
 					"CREATE OR REPLACE TEMP VIEW bronze_customers\n",
 					"USING parquet\n",
 					"OPTIONS (\n",
-					"  path ${path_bronze_customers}\n",
+					"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/customers/'\n",
 					");\n",
 					"\n",
 					"-- 2. Rejestracja bronze_countries jako tymczasowy widok\n",
 					"CREATE OR REPLACE TEMP VIEW bronze_countries\n",
 					"USING parquet\n",
 					"OPTIONS (\n",
-					"  path ${path_bronze_countries}\n",
+					"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/countries/'\n",
 					");\n",
 					"\n",
 					"-- 3. Przygotowanie danych – JOIN + wybór najnowszych po customer_id\n",
@@ -96,7 +96,7 @@
 					"-- 4. Stworzenie tabeli docelowej jako Delta Lake (jeśli nie istnieje)\n",
 					"CREATE TABLE IF NOT EXISTS silver.d_customers\n",
 					"USING delta\n",
-					"LOCATION ${path_silver_customers}\n",
+					"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/d_customers'\n",
 					"AS\n",
 					"SELECT * FROM new_bronze_d_customers\n",
 					"WHERE 1 = 0;\n",

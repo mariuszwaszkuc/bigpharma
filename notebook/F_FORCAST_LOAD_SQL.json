@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "50569a41-fd89-46a6-ad11-29a075d7ff24"
+				"spark.autotune.trackingId": "11e9b81f-a172-4fb8-b09a-266ae7aa92c4"
 			}
 		},
 		"metadata": {
@@ -77,7 +77,7 @@
 					"    \n",
 					"    ROUND(SUM(quantity * unit_price) / NULLIF(SUM(quantity), 0), 2) AS unit_price\n",
 					"FROM  bronze_forecast\n",
-					"GROUP BY product_id, country_id, TRUNC(forecast_date, \"MM\"), TRUNC(forecast_snapshot, \"MM\");\n",
+					"GROUP BY product_id, country_id, TRUNC(forecast_date, 'MM'), TRUNC(forecast_snapshot, 'MM');\n",
 					"\n",
 					"-- ============================================\n",
 					"-- 3. Stwórz tabelę Silver, jeśli nie istnieje\n",
@@ -97,7 +97,7 @@
 					"                      and s.country_id = n.country_id\n",
 					"                      and s.forecast_update_date = n.forecast_update_date\n",
 					"                      and s.forecast_date = n.forecast_date\n",
-					"                      and s.forecast_snapshot= n.forecast_snapshot)\n",
+					"                      and s.forecast_snapshot= n.forecast_snapshot);\n",
 					"\n",
 					"-- ============================================\n",
 					"-- 4. Wykonaj MERGE INTO, aby zaktualizować lub dodać nowe dane\n",

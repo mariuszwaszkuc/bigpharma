@@ -1,5 +1,5 @@
 {
-	"name": "Extract_Load_Erp",
+	"name": "Extract_Load_Erp_copy1",
 	"properties": {
 		"activities": [
 			{
@@ -56,7 +56,7 @@
 								},
 								"ifFalseActivities": [
 									{
-										"name": "Extract Table Copy To ADLS",
+										"name": "Export Table Copy",
 										"type": "Copy",
 										"dependsOn": [],
 										"policy": {
@@ -71,7 +71,7 @@
 											"source": {
 												"type": "MySqlSource",
 												"query": {
-													"value": "@concat(\n    'SELECT * FROM ', \n    item().table_name,\n    ' WHERE \n    update_date <=  \n    (SELECT MAX(update_date) AS update_date  \n     FROM logs \n     WHERE table_name = ''', item().table_name, ''' )\n    AND update_date >= STR_TO_DATE(''', item().last_date, ''', ''%Y-%m-%dT%H:%i:%s'')\n    LIMIT 10;'\n)",
+													"value": "@concat(\n    'SELECT * FROM ', \n    item().table_name,\n    ' WHERE \n    create_date <=  \n    (SELECT MAX(create_date) AS create_date  \n     FROM logs \n     WHERE table_name = ''', item().table_name, ''' )\n    AND create_date >= STR_TO_DATE(''', item().last_date, ''', ''%Y-%m-%dT%H:%i:%s'')\n    LIMIT 10;'\n)",
 													"type": "Expression"
 												}
 											},
@@ -118,7 +118,7 @@
 								],
 								"ifTrueActivities": [
 									{
-										"name": "Logs To ADLS",
+										"name": "Export Table Logs",
 										"type": "Copy",
 										"dependsOn": [],
 										"policy": {
@@ -168,7 +168,7 @@
 												"type": "DatasetReference",
 												"parameters": {
 													"filename": {
-														"value": "@if( equals(item().table_name, 'logs') , \n     concat(item().table_name,'.parquet'),\n     concat(item().table_name,'_',formatDateTime(item().update_date,'yyyy-MM-ddTHH:mm:s'),'.parquet'))",
+														"value": "@if( equals(item().table_name, 'logs') , \n     concat(item().table_name,'.parquet'),\n     concat(item().table_name,'_',formatDateTime(item().create_date,'yyyy-MM-ddTHH:mm:s'),'.parquet'))",
 														"type": "Expression"
 													},
 													"foldername": "@item().table_name"
@@ -214,7 +214,7 @@
 			}
 		],
 		"folder": {
-			"name": "Brozne"
+			"name": "Arch"
 		},
 		"annotations": [],
 		"lastPublishTime": "2025-03-27T05:52:42Z"

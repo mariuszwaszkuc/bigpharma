@@ -27,7 +27,7 @@
 				}
 			},
 			{
-				"name": "For Each Table",
+				"name": "Copy For Each Table",
 				"type": "ForEach",
 				"dependsOn": [
 					{
@@ -183,11 +183,11 @@
 				}
 			},
 			{
-				"name": "Setup Max Id",
+				"name": "Setup Last Update Date In Logs Table",
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "For Each Table",
+						"activity": "Copy For Each Table",
 						"dependencyConditions": [
 							"Succeeded"
 						]

@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "567f8ef5-9a68-476b-b7de-f0d087e369e3"
+				"spark.autotune.trackingId": "e080601b-4f2d-4ec0-abf2-86877e2c08fa"
 			}
 		},
 		"metadata": {
@@ -28,7 +28,7 @@
 			"enableDebugMode": false,
 			"kernelspec": {
 				"name": "synapse_pyspark",
-				"display_name": "python"
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "python"
@@ -61,10 +61,26 @@
 				"source": [
 					"%%pyspark\n",
 					"## 1. Załaduj dane z Bronze i Customers jako tymczasowe widoki\n",
-					"df_bronze = spark.read.parquet(\"abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Distributors/**\")\n",
+					"df_bronze = spark.read.option(\"header\", \"true\").csv(\n",
+					"    \"abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Distributors/*/*/*.csv\"\n",
+					")\n",
 					"df_bronze.createOrReplaceTempView(\"bronze_inventory\")"
 				],
-				"execution_count": null
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"microsoft": {
+						"language": "sparksql"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%sql\n",
+					"select *From bronze_inventory"
+				],
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -186,7 +202,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 2
+				"execution_count": 6
 			}
 		]
 	}

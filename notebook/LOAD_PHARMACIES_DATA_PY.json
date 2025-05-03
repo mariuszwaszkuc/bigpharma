@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2ddd0b6e-dc64-49e4-b86c-4026f3d4a5f5"
+				"spark.autotune.trackingId": "d61b4abe-8c3a-4e4c-a91a-aadff261ef77"
 			}
 		},
 		"metadata": {
@@ -126,7 +126,7 @@
 					"\n",
 					"    try:\n",
 					"        df_new = spark.read.option(\"header\", \"true\").csv(unquote(file_path))\n",
-					"        df_new.write.mode(\"overwrite\").csv(unquote(target_path))\n",
+					"        df_new.write.option(\"header\", \"true\").mode(\"overwrite\").csv(unquote(target_path))\n",
 					"        print(f\"Zapisano plik do ADLS: {target_path}\")\n",
 					"    except Exception as e:\n",
 					"        print(f\"Błąd podczas przetwarzania pliku {file_path}: {e}\")\n",

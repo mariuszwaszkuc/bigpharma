@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e5baf4c8-e235-44e0-8f19-16725eb91c59"
+				"spark.autotune.trackingId": "0e6c4d55-676a-42c5-9f90-0e887a766d6a"
 			}
 		},
 		"metadata": {
@@ -108,7 +108,7 @@
 					"processed_filenames = [row.filepaths for row in processed_df.collect()]\n",
 					"\n",
 					"# Wyszukanie nowych plików do przetworzenia\n",
-					"new_paths = [paths for paths in all_paths if  paths not in processed_filenames]\n",
+					"new_paths = [paths for paths in all_paths if  unquote(paths) not in processed_filenames]\n",
 					"\n",
 					"print(f\"Znaleziono {len(new_paths)} nowych sciezek do przetworzenia.\")\n",
 					"# Przetwarzanie nowych plików\n",
@@ -128,8 +128,8 @@
 					"    print(f\" Wczytywanie pliku: {file_path}\")\n",
 					"\n",
 					"    try:\n",
-					"        df_new = spark.read.option(\"header\", \"true\").csv(file_path)\n",
-					"        df_new.write.mode(\"overwrite\").csv(target_path)\n",
+					"        df_new = spark.read.option(\"header\", \"true\").csv(unquote(file_path))\n",
+					"        df_new.write.mode(\"overwrite\").csv(unquote(target_path))\n",
 					"        print(f\"Zapisano plik do ADLS: {target_path}\")\n",
 					"    except Exception as e:\n",
 					"        print(f\"Błąd podczas przetwarzania pliku {file_path}: {e}\")\n",

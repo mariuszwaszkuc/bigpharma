@@ -1,5 +1,5 @@
 {
-	"name": "Run All Gold_Copy1",
+	"name": "Run All Gold 1",
 	"properties": {
 		"folder": {
 			"name": "Archive"
@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7b3d2217-9e63-4c9e-bd7b-1eab7b7431d1"
+				"spark.autotune.trackingId": "8b07016b-b24e-4d76-8622-c5477d6db29b"
 			}
 		},
 		"metadata": {

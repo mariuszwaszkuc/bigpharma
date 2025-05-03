@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9e5ecb59-505a-4faf-91bc-b070b8e96fdd"
+				"spark.autotune.trackingId": "fc9fdecd-e186-460a-8f46-d2e3d105dba7"
 			}
 		},
 		"metadata": {
@@ -31,7 +31,7 @@
 				"display_name": "sql"
 			},
 			"language_info": {
-				"name": "sql"
+				"name": "python"
 			},
 			"a365ComputeOptions": {
 				"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
@@ -54,9 +54,27 @@
 			{
 				"cell_type": "code",
 				"metadata": {
+					"microsoft": {
+						"language": "python"
+					}
+				},
+				"source": [
+					"%%pyspark\n",
+					"df_bronze = spark.read.parquet(\"abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Distributors/**\")\n",
+					"df_bronze.createOrReplaceTempView(\"bronze_inventory\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"microsoft": {
+						"language": "sparksql"
+					},
 					"collapsed": false
 				},
 				"source": [
+					"%%sql\n",
 					"CREATE DATABASE IF NOT EXISTS silver;\n",
 					"\n",
 					"-- 1. Załaduj dane z Bronze i Customers jako tymczasowe widoki\n",

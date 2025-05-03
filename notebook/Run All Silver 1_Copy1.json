@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "edadccbf-e7a7-467c-8f13-8103432c23cc"
+				"spark.autotune.trackingId": "fdbfeb59-b2fb-4e20-bd4a-e6787e68594c"
 			}
 		},
 		"metadata": {
@@ -368,7 +368,9 @@
 				"source": [
 					"%%pyspark\n",
 					"## 1. Załaduj dane z Bronze i Customers jako tymczasowe widoki\n",
-					"df_bronze = spark.read.parquet(\"abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Pharmacies/**\")\n",
+					"df_bronze = spark.read.option(\"header\", \"true\").csv(\n",
+					"    \"abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Pharmacies/*/*/*.csv\"\n",
+					")\n",
 					"df_bronze.createOrReplaceTempView(\"bronze_pos\")"
 				],
 				"execution_count": null
@@ -597,6 +599,23 @@
 					"        source.quantity, source.discount, source.amount, source.unit_price,source.order_details_update_date,source.order_update_date \n",
 					"    );\n",
 					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"microsoft": {
+						"language": "python"
+					}
+				},
+				"source": [
+					"%%pyspark\n",
+					"## 1. Załaduj dane z Bronze i Customers jako tymczasowe widoki\n",
+					"df_bronze = spark.read.option(\"header\", \"true\").csv(\n",
+					"    \"abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Distributors/*/*/*.csv\"\n",
+					")\n",
+					"df_bronze.createOrReplaceTempView(\"bronze_inventory\")"
 				],
 				"execution_count": null
 			},

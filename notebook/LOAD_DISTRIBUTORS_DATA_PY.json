@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0e6c4d55-676a-42c5-9f90-0e887a766d6a"
+				"spark.autotune.trackingId": "b76d2336-1302-4484-bc70-9701b71b4f91"
 			}
 		},
 		"metadata": {
@@ -148,7 +148,7 @@
 					"else:\n",
 					"    print(\"Brak nowych plików do przetworzenia.\")"
 				],
-				"execution_count": 8
+				"execution_count": 1
 			}
 		]
 	}

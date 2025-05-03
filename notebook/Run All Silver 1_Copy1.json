@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5aae9b23-4adf-4096-aec2-e744a4106a7c"
+				"spark.autotune.trackingId": "edadccbf-e7a7-467c-8f13-8103432c23cc"
 			}
 		},
 		"metadata": {
@@ -355,6 +355,21 @@
 					"    source.pos_sell_out_amount, source.pos_open_amount, source.pos_end_amount, source.unit_price,source.forecast_update_date\n",
 					"  );\n",
 					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"microsoft": {
+						"language": "python"
+					}
+				},
+				"source": [
+					"%%pyspark\n",
+					"## 1. Załaduj dane z Bronze i Customers jako tymczasowe widoki\n",
+					"df_bronze = spark.read.parquet(\"abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Pharmacies/**\")\n",
+					"df_bronze.createOrReplaceTempView(\"bronze_pos\")"
 				],
 				"execution_count": null
 			},

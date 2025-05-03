@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3a66c2fc-1ee9-438f-95f9-fe6923d0b604"
+				"spark.autotune.trackingId": "6d533fac-d2ac-473b-b4b5-8f6a4f7f7a93"
 			}
 		},
 		"metadata": {
@@ -42,7 +42,9 @@
 				"source": [
 					"%%pyspark\n",
 					"## 1. Załaduj dane z Bronze i Customers jako tymczasowe widoki\n",
-					"df_bronze = spark.read.parquet(\"abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Pharmacies/**\")\n",
+					"df_bronze = spark.read.option(\"header\", \"true\").csv(\n",
+					"    \"abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Pharmacies/*/*/*.csv\"\n",
+					")\n",
 					"df_bronze.createOrReplaceTempView(\"bronze_pos\")"
 				],
 				"execution_count": null

@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e080601b-4f2d-4ec0-abf2-86877e2c08fa"
+				"spark.autotune.trackingId": "440d254b-5d4c-4b68-b40d-ad6c169a0bab"
 			}
 		},
 		"metadata": {
@@ -78,27 +78,7 @@
 				},
 				"source": [
 					"%%sql\n",
-					"select *From bronze_inventory"
-				],
-				"execution_count": 7
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"microsoft": {
-						"language": "sparksql"
-					},
-					"collapsed": false
-				},
-				"source": [
-					"%%sql\n",
 					"CREATE DATABASE IF NOT EXISTS silver;\n",
-					"-- 1. Załaduj dane z Bronze i Customers jako tymczasowe widoki\n",
-					"--CREATE OR REPLACE TEMP VIEW bronze_inventory\n",
-					"--USING parquet\n",
-					"--OPTIONS (\n",
-					"--  path 'abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Distributors/**'\n",
-					"--);\n",
 					"\n",
 					"CREATE OR REPLACE TEMP VIEW silver_d_customers\n",
 					"USING delta\n",

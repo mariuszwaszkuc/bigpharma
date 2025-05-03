@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6d533fac-d2ac-473b-b4b5-8f6a4f7f7a93"
+				"spark.autotune.trackingId": "0f135922-13d2-4bd4-81b1-3ed88cd17aab"
 			}
 		},
 		"metadata": {
@@ -60,14 +60,6 @@
 					"%%sql\n",
 					"CREATE DATABASE IF NOT EXISTS silver;\n",
 					"\n",
-					"-- ============================================\n",
-					"-- 1. Rejestracja danych z Bronze jako widok tymczasowy\n",
-					"-- ============================================\n",
-					"--CREATE OR REPLACE TEMP VIEW bronze_pos\n",
-					"--USING parquet\n",
-					"--OPTIONS (\n",
-					"--  path 'abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Pharmacies/**'\n",
-					"--);\n",
 					"-- ============================================\n",
 					"-- 2. Przygotowanie danych – najnowsze update + agregacja miesięczna\n",
 					"-- ============================================\n",

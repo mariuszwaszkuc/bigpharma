@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6173a5a0-1a98-4e12-8d12-11b212a5e242"
+				"spark.autotune.trackingId": "5aae9b23-4adf-4096-aec2-e744a4106a7c"
 			}
 		},
 		"metadata": {
@@ -370,7 +370,7 @@
 					"CREATE OR REPLACE TEMP VIEW bronze_pos\n",
 					"USING parquet\n",
 					"OPTIONS (\n",
-					"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_pos_history_details'\n",
+					"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Pharmacies'\n",
 					");\n",
 					"-- ============================================\n",
 					"-- 2. Przygotowanie danych – najnowsze update + agregacja miesięczna\n",
@@ -595,7 +595,7 @@
 					"CREATE OR REPLACE TEMP VIEW bronze_inventory\n",
 					"USING parquet\n",
 					"OPTIONS (\n",
-					"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_wholesaler_history_details'\n",
+					"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Distributors/**'\n",
 					");\n",
 					"\n",
 					"CREATE OR REPLACE TEMP VIEW silver_d_customers\n",

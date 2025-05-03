@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b76d2336-1302-4484-bc70-9701b71b4f91"
+				"spark.autotune.trackingId": "b435eaa0-f25f-4d27-a016-25e869a25534"
 			}
 		},
 		"metadata": {
@@ -57,7 +57,7 @@
 					"collapsed": false
 				},
 				"source": [
-					"##LOAD_DISTRIBUTORS_DATA_PY\n",
+					" ##LOAD_DISTRIBUTORS_DATA_PY\n",
 					"\n",
 					"from notebookutils import mssparkutils\n",
 					"from urllib.parse import unquote\n",

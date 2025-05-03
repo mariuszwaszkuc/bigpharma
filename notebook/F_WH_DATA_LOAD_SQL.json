@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e2fe8e9f-4423-4bcc-bf95-54b5660307e8"
+				"spark.autotune.trackingId": "9e5ecb59-505a-4faf-91bc-b070b8e96fdd"
 			}
 		},
 		"metadata": {
@@ -63,7 +63,7 @@
 					"CREATE OR REPLACE TEMP VIEW bronze_inventory\n",
 					"USING parquet\n",
 					"OPTIONS (\n",
-					"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_wholesaler_history_details'\n",
+					"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Distributors/**'\n",
 					");\n",
 					"\n",
 					"CREATE OR REPLACE TEMP VIEW silver_d_customers\n",

@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3312b0e9-5507-4693-8b7e-7a5708ebf603"
+				"spark.autotune.trackingId": "31204f8a-230e-462c-a5b7-502f385c527b"
 			}
 		},
 		"metadata": {
@@ -43,7 +43,7 @@
 					"CREATE OR REPLACE TEMP VIEW bronze_pos\n",
 					"USING parquet\n",
 					"OPTIONS (\n",
-					"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/Erp/inventory_pos_history_details'\n",
+					"  path 'abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Pharmacies/**'\n",
 					");\n",
 					"-- ============================================\n",
 					"-- 2. Przygotowanie danych – najnowsze update + agregacja miesięczna\n",

@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7fff4c96-0a69-4ccc-a534-209fc4d362a5"
+				"spark.autotune.trackingId": "f11d4838-b1c1-46f0-9b9e-45767b027994"
 			}
 		},
 		"metadata": {
@@ -51,18 +51,6 @@
 			"sessionKeepAliveTimeout": 30
 		},
 		"cells": [
-			{
-				"cell_type": "code",
-				"source": [
-					"%%configure -f\n",
-					"{\n",
-					"    \"conf\": {\n",
-					"        \"spark.jars.packages\": \"org.apache.hadoop:hadoop-aws:3.3.1\"\n",
-					"    }\n",
-					"}"
-				],
-				"execution_count": null
-			},
 			{
 				"cell_type": "code",
 				"source": [

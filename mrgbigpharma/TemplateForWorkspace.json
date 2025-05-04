@@ -110,7 +110,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@activity('List of Tables With New Max Date').output.value",
+								"value": "@activity('List of Tables With New Max Update Date').output.value",
 								"type": "Expression"
 							},
 							"activities": [
@@ -4436,7 +4436,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "8789c33e-b728-48e6-91ed-338cad540433"
+						"spark.autotune.trackingId": "929a4b46-c807-4e79-9deb-cc5bf819cacc"
 					}
 				},
 				"metadata": {
@@ -4717,10 +4717,10 @@
 							"    'whrs_sell_in_amount': 'Sales to pharmacies',\r\n",
 							"    'whrs_open_amount': 'Open Stock',\r\n",
 							"    'whrs_end_amount': 'Close Stock',\r\n",
-							"    'pos_sell_out_quantity': 'Sales to pharmacies',\r\n",
+							"    'pos_sell_out_quantity': 'Consumer Off Take',\r\n",
 							"    'pos_open_quantity': 'Open Stock Pharmacies',\r\n",
 							"    'pos_end_quantity': 'Close Stock Pharmacies',\r\n",
-							"    'pos_sell_out_amount': 'Sales to pharmacies',\r\n",
+							"    'pos_sell_out_amount': 'Consumer Off Take',\r\n",
 							"    'pos_open_amount': 'Open Stock Pharmacies',\r\n",
 							"    'pos_end_amount': 'Close Stock Pharmacies'\r\n",
 							"}\r\n",
@@ -4765,9 +4765,10 @@
 							"    .withColumnRenamed('Open Stock', 'Open_Stock') \\\r\n",
 							"    .withColumnRenamed('Open Stock Pharmacies', 'Open_Stock_Pharmacies') \\\r\n",
 							"    .withColumnRenamed('Sales to pharmacies', 'Sales_to_pharmacies') \\\r\n",
-							"    .withColumnRenamed('Close Stock Pharmacies', 'Close_Stock_Pharmacies')\r\n",
+							"    .withColumnRenamed('Close Stock Pharmacies', 'Close_Stock_Pharmacies')\\\r\n",
+							"     .withColumnRenamed('Consumer Off Take', 'Consumer_Off_Take')\r\n",
 							"\r\n",
-							"df_spark.write.mode(\"overwrite\").format(\"delta\").save(\"abfss://gold@bigpharma.dfs.core.windows.net/f_planning_book_unpivot\")\r\n",
+							"df_spark.write.mode(\"overwrite\")..option(\"mergeSchema\", \"true\").format(\"delta\").save(\"abfss://gold@bigpharma.dfs.core.windows.net/f_planning_book_unpivot\")\r\n",
 							"\r\n",
 							""
 						],
@@ -7346,7 +7347,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "d1dd2bca-5dcc-4998-8b31-0a4a5100425d"
+						"spark.autotune.trackingId": "9e013c1d-5e9a-4e23-964e-0c6e7de49617"
 					}
 				},
 				"metadata": {
@@ -7371,15 +7372,13 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"##LOAD_DISTRIBUTORS_DATA_PY\n",
 							"\n",
@@ -8426,15 +8425,15 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "86a3f54d-04a1-4f27-91f7-218fa68bb80d"
+						"spark.autotune.trackingId": "0a6af3f7-f7f9-40ce-a1cc-f172f229d749"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
 					"kernelspec": {
-						"name": "synapse_sparksql",
-						"display_name": "sql"
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
 					},
 					"language_info": {
 						"name": "sql"
@@ -8451,8 +8450,7 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},

@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "929a4b46-c807-4e79-9deb-cc5bf819cacc"
+				"spark.autotune.trackingId": "d829cf06-f94d-4cd8-bd98-1b931a14e992"
 			}
 		},
 		"metadata": {
@@ -352,13 +352,13 @@
 					"    .withColumnRenamed('Open Stock Pharmacies', 'Open_Stock_Pharmacies') \\\r\n",
 					"    .withColumnRenamed('Sales to pharmacies', 'Sales_to_pharmacies') \\\r\n",
 					"    .withColumnRenamed('Close Stock Pharmacies', 'Close_Stock_Pharmacies')\\\r\n",
-					"     .withColumnRenamed('Consumer Off Take', 'Consumer_Off_Take')\r\n",
+					"    .withColumnRenamed('Consumer Off Take', 'Consumer_Off_Take')\r\n",
 					"\r\n",
-					"df_spark.write.mode(\"overwrite\")..option(\"mergeSchema\", \"true\").format(\"delta\").save(\"abfss://gold@bigpharma.dfs.core.windows.net/f_planning_book_unpivot\")\r\n",
+					"df_spark.write.mode(\"overwrite\").option(\"mergeSchema\", \"true\").format(\"delta\").save(\"abfss://gold@bigpharma.dfs.core.windows.net/f_planning_book_unpivot\")\r\n",
 					"\r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 3
 			}
 		]
 	}

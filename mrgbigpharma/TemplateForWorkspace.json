@@ -72,7 +72,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "List of Tables With New Max Update Date",
+						"name": "List of Tables",
 						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
@@ -101,7 +101,7 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "List of Tables With New Max Update Date",
+								"activity": "List of Tables",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -110,7 +110,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@activity('List of Tables With New Max Update Date').output.value",
+								"value": "@activity('List of Tables').output.value",
 								"type": "Expression"
 							},
 							"activities": [
@@ -255,7 +255,7 @@
 						}
 					},
 					{
-						"name": "Setup Last Update Date In Logs Table",
+						"name": "Setup Last Update Date",
 						"type": "Lookup",
 						"dependsOn": [
 							{
@@ -2360,7 +2360,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "90beaff3-60fa-4cd9-8a28-56287105d220"
+						"spark.autotune.trackingId": "ac6f74d9-8136-457b-a5e1-90c548ebc370"
 					}
 				},
 				"metadata": {
@@ -2385,15 +2385,13 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"-- test D_CUSTOMERS_LOAD_SQL\n",
 							"\n",
@@ -2497,7 +2495,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"-- test D_CUSTOMERS_LOAD_SQL\n",
 							"\n",

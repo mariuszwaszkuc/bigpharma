@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "MySqlSource",
-						"query": "call GetMaxIdForAllTables();\n\nSELECT table_name, create_date, update_date, \n\nlast_date FROM logs;"
+						"query": "call Set_Initial_Dates_In_Tables();\n\nSELECT table_name, create_date, update_date, \n\nlast_date FROM logs;"
 					},
 					"dataset": {
 						"referenceName": "MySql_Erp_List_Tables",

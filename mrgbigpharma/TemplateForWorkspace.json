@@ -66,7 +66,7 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('workspaceName'), '/Extract_Load_Erp')]",
+			"name": "[concat(parameters('workspaceName'), '/Extract Erp Data')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -299,6 +299,85 @@
 				"[concat(variables('workspaceId'), '/datasets/MySql_Erp_List_Tables')]",
 				"[concat(variables('workspaceId'), '/datasets/MySql_Erp_Dynamic_Load')]",
 				"[concat(variables('workspaceId'), '/datasets/Bronze_Parquet')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Extract MinIO Data')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Distributors Data MinIo",
+						"type": "SynapseNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "LOAD_DISTRIBUTORS_DATA_PY",
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"numExecutors": null
+						}
+					},
+					{
+						"name": "Pharmacies Data MinIo",
+						"type": "SynapseNotebook",
+						"dependsOn": [
+							{
+								"activity": "Distributors Data MinIo",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "LOAD_PHARMACIES_DATA_PY",
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"numExecutors": null
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Brozne"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/notebooks/LOAD_DISTRIBUTORS_DATA_PY')]",
+				"[concat(variables('workspaceId'), '/notebooks/LOAD_PHARMACIES_DATA_PY')]"
 			]
 		},
 		{
@@ -753,85 +832,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Extract_MinIo')]",
-			"type": "Microsoft.Synapse/workspaces/pipelines",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"activities": [
-					{
-						"name": "Distributors Data MinIo",
-						"type": "SynapseNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebook": {
-								"referenceName": "LOAD_DISTRIBUTORS_DATA_PY",
-								"type": "NotebookReference"
-							},
-							"snapshot": true,
-							"conf": {
-								"spark.dynamicAllocation.enabled": null,
-								"spark.dynamicAllocation.minExecutors": null,
-								"spark.dynamicAllocation.maxExecutors": null
-							},
-							"numExecutors": null
-						}
-					},
-					{
-						"name": "Pharmacies Data MinIo",
-						"type": "SynapseNotebook",
-						"dependsOn": [
-							{
-								"activity": "Distributors Data MinIo",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebook": {
-								"referenceName": "LOAD_PHARMACIES_DATA_PY",
-								"type": "NotebookReference"
-							},
-							"snapshot": true,
-							"conf": {
-								"spark.dynamicAllocation.enabled": null,
-								"spark.dynamicAllocation.minExecutors": null,
-								"spark.dynamicAllocation.maxExecutors": null
-							},
-							"numExecutors": null
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "Brozne"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/notebooks/LOAD_DISTRIBUTORS_DATA_PY')]",
-				"[concat(variables('workspaceId'), '/notebooks/LOAD_PHARMACIES_DATA_PY')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/Load_To_Gold')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -939,7 +939,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "Extract_Load_Erp",
+								"referenceName": "Extract Erp Data",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": true,
@@ -963,7 +963,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "Extract_MinIo",
+								"referenceName": "Extract MinIO Data",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": true,
@@ -1025,8 +1025,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/pipelines/Extract_Load_Erp')]",
-				"[concat(variables('workspaceId'), '/pipelines/Extract_MinIo')]",
+				"[concat(variables('workspaceId'), '/pipelines/Extract Erp Data')]",
+				"[concat(variables('workspaceId'), '/pipelines/Extract MinIO Data')]",
 				"[concat(variables('workspaceId'), '/pipelines/Transform_Silver')]",
 				"[concat(variables('workspaceId'), '/pipelines/Load_To_Gold')]"
 			]

@@ -1,5 +1,5 @@
 {
-	"name": "Extract_MinIo",
+	"name": "Extract MinIO Data",
 	"properties": {
 		"activities": [
 			{
@@ -19,7 +19,13 @@
 						"referenceName": "LOAD_DISTRIBUTORS_DATA_PY",
 						"type": "NotebookReference"
 					},
-					"snapshot": true
+					"snapshot": true,
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"numExecutors": null
 				}
 			},
 			{
@@ -46,7 +52,13 @@
 						"referenceName": "LOAD_PHARMACIES_DATA_PY",
 						"type": "NotebookReference"
 					},
-					"snapshot": true
+					"snapshot": true,
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"numExecutors": null
 				}
 			}
 		],

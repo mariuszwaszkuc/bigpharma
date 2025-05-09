@@ -183,7 +183,7 @@
 				}
 			},
 			{
-				"name": "Setup Last Update Date",
+				"name": "Set Last Update Date",
 				"type": "Lookup",
 				"dependsOn": [
 					{

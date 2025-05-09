@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "List of Tables With New Max Update Date",
+				"name": "List of Tables",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -31,7 +31,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "List of Tables With New Max Update Date",
+						"activity": "List of Tables",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -183,7 +183,7 @@
 				}
 			},
 			{
-				"name": "Setup Last Update Date In Logs Table",
+				"name": "Setup Last Update Date",
 				"type": "Lookup",
 				"dependsOn": [
 					{

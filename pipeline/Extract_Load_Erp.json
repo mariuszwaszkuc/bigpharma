@@ -40,7 +40,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('List of Tables With New Max Update Date').output.value",
+						"value": "@activity('List of Tables').output.value",
 						"type": "Expression"
 					},
 					"activities": [

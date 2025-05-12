@@ -237,7 +237,7 @@
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
-							"retry": 0,
+							"retry": 1,
 							"retryIntervalInSeconds": 30,
 							"secureOutput": false,
 							"secureInput": false
@@ -256,11 +256,11 @@
 							"executorSize": "Small",
 							"conf": {
 								"spark.dynamicAllocation.enabled": false,
-								"spark.dynamicAllocation.minExecutors": 1,
-								"spark.dynamicAllocation.maxExecutors": 1
+								"spark.dynamicAllocation.minExecutors": 2,
+								"spark.dynamicAllocation.maxExecutors": 2
 							},
 							"driverSize": "Small",
-							"numExecutors": 1,
+							"numExecutors": 2,
 							"authentication": {
 								"type": "MSI"
 							}
@@ -279,7 +279,7 @@
 						],
 						"policy": {
 							"timeout": "0.12:00:00",
-							"retry": 0,
+							"retry": 1,
 							"retryIntervalInSeconds": 30,
 							"secureOutput": false,
 							"secureInput": false
@@ -298,11 +298,11 @@
 							"executorSize": "Small",
 							"conf": {
 								"spark.dynamicAllocation.enabled": false,
-								"spark.dynamicAllocation.minExecutors": 1,
-								"spark.dynamicAllocation.maxExecutors": 1
+								"spark.dynamicAllocation.minExecutors": 2,
+								"spark.dynamicAllocation.maxExecutors": 2
 							},
 							"driverSize": "Small",
-							"numExecutors": 1,
+							"numExecutors": 2,
 							"authentication": {
 								"type": "MSI"
 							}
@@ -7348,7 +7348,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "0b0a43be-2209-46e3-8916-4782e8c3bd93"
+						"spark.autotune.trackingId": "acc14716-b0ff-477a-a160-897652f33da8"
 					}
 				},
 				"metadata": {
@@ -7373,15 +7373,13 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"##LOAD_DISTRIBUTORS_DATA_PY\n",
 							"\n",

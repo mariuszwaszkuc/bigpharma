@@ -20,6 +20,9 @@
 		"AmazonS3Compatible2_properties_typeProperties_accessKeyId": {
 			"value": "minioadmin"
 		},
+		"AzureKeyVault_properties_typeProperties_baseUrl": {
+			"value": "https://keylakehouse.vault.azure.net/"
+		},
 		"MinIoS3_properties_typeProperties_accessKeyId": {
 			"value": "minioadmin"
 		},

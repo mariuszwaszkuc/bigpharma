@@ -26,9 +26,9 @@
 					},
 					"executorSize": "Small",
 					"conf": {
-						"spark.dynamicAllocation.enabled": true,
+						"spark.dynamicAllocation.enabled": false,
 						"spark.dynamicAllocation.minExecutors": 1,
-						"spark.dynamicAllocation.maxExecutors": 3
+						"spark.dynamicAllocation.maxExecutors": 1
 					},
 					"driverSize": "Small",
 					"numExecutors": 1,
@@ -40,6 +40,8 @@
 			{
 				"name": "Pharmacies Data MinIo",
 				"type": "SynapseNotebook",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Distributors Data MinIo",
@@ -68,9 +70,9 @@
 					},
 					"executorSize": "Small",
 					"conf": {
-						"spark.dynamicAllocation.enabled": true,
+						"spark.dynamicAllocation.enabled": false,
 						"spark.dynamicAllocation.minExecutors": 1,
-						"spark.dynamicAllocation.maxExecutors": 3
+						"spark.dynamicAllocation.maxExecutors": 1
 					},
 					"driverSize": "Small",
 					"numExecutors": 1,

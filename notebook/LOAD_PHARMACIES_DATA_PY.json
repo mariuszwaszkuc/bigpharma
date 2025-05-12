@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e910b386-7a7e-4f6b-b46d-080f9eb565ae"
+				"spark.autotune.trackingId": "c640eccc-be4a-4f18-9b5f-e47d529d7005"
 			}
 		},
 		"metadata": {
@@ -64,8 +64,9 @@
 					"\n",
 					"#secret_key = mssparkutils.credentials.getSecret('keylakehouse','s3-secret-key')\n",
 					"\n",
-					"access_key='minioadmin'\n",
-					"secret_key='minioadmin'\n",
+					"\n",
+					"access_key=\"minioadmin\"\n",
+					"secret_key='minioadmin\"\n",
 					"\n",
 					"spark._jsc.hadoopConfiguration().set(\"fs.s3a.access.key\", access_key)\n",
 					"spark._jsc.hadoopConfiguration().set(\"fs.s3a.secret.key\", secret_key)\n",

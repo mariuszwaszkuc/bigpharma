@@ -7348,7 +7348,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "9e013c1d-5e9a-4e23-964e-0c6e7de49617"
+						"spark.autotune.trackingId": "d685b332-1e50-452b-8134-4de8f12933db"
 					}
 				},
 				"metadata": {
@@ -7373,13 +7373,15 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"##LOAD_DISTRIBUTORS_DATA_PY\n",
 							"\n",
@@ -7457,7 +7459,7 @@
 							"\n",
 							"# Update the list of processed files\n",
 							"if new_paths:\n",
-							"    new_files_df = spark.createDataFrame([(path,) for path in new_paths], [\"filepaths\"])\n",
+							"    new_files_df = spark.createDataFrame([unquote(path,) for path in new_paths], [\"filepaths\"])\n",
 							"    processed_files_updated = processed_df.union(new_files_df)\n",
 							"    processed_files_updated.show()\n",
 							"    # Save updated list in Delta format\n",
@@ -7471,7 +7473,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 3
 					}
 				]
 			},

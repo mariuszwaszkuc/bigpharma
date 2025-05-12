@@ -33,7 +33,7 @@
 					{
 						"activity": "List of Tables",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],

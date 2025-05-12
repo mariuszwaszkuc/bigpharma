@@ -20,12 +20,21 @@
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkpool32",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
 					"conf": {
-						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.enabled": false,
 						"spark.dynamicAllocation.minExecutors": null,
 						"spark.dynamicAllocation.maxExecutors": null
 					},
-					"numExecutors": null
+					"driverSize": "Small",
+					"numExecutors": null,
+					"authentication": {
+						"type": "MSI"
+					}
 				}
 			},
 			{
@@ -53,12 +62,21 @@
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkpool32",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
 					"conf": {
-						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.enabled": false,
 						"spark.dynamicAllocation.minExecutors": null,
 						"spark.dynamicAllocation.maxExecutors": null
 					},
-					"numExecutors": null
+					"driverSize": "Small",
+					"numExecutors": null,
+					"authentication": {
+						"type": "MSI"
+					}
 				}
 			}
 		],

@@ -7348,7 +7348,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "4d5497bf-c84b-4211-9110-d8057c476c92"
+						"spark.autotune.trackingId": "131440f2-26da-40ad-b2bc-937fd84c7dc1"
 					}
 				},
 				"metadata": {
@@ -7373,15 +7373,13 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"##LOAD_DISTRIBUTORS_DATA_PY\n",
 							"\n",
@@ -7393,8 +7391,8 @@
 							"#secret_key = mssparkutils.credentials.getSecret('keylakehouse','s3-secret-key')\n",
 							"\n",
 							"\n",
-							"access_key='minioadmin'\n",
-							"secret_key='minioadmin'\n",
+							"access_key=\"minioadmin\"\n",
+							"secret_key='minioadmin\"\n",
 							"\n",
 							"spark._jsc.hadoopConfiguration().set(\"fs.s3a.access.key\", access_key)\n",
 							"spark._jsc.hadoopConfiguration().set(\"fs.s3a.secret.key\", secret_key)\n",
@@ -7761,7 +7759,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "e910b386-7a7e-4f6b-b46d-080f9eb565ae"
+						"spark.autotune.trackingId": "5706dac3-d882-43b5-882f-1d92c698544a"
 					}
 				},
 				"metadata": {
@@ -7786,13 +7784,15 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"#LOAD_PHARMACIES_DATA_PY\n",
 							"\n",
@@ -7803,8 +7803,9 @@
 							"\n",
 							"#secret_key = mssparkutils.credentials.getSecret('keylakehouse','s3-secret-key')\n",
 							"\n",
-							"access_key='minioadmin'\n",
-							"secret_key='minioadmin'\n",
+							"\n",
+							"access_key=\"minioadmin\"\n",
+							"secret_key='minioadmin\"\n",
 							"\n",
 							"spark._jsc.hadoopConfiguration().set(\"fs.s3a.access.key\", access_key)\n",
 							"spark._jsc.hadoopConfiguration().set(\"fs.s3a.secret.key\", secret_key)\n",

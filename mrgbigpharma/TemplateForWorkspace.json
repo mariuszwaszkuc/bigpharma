@@ -7348,7 +7348,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "0e92cc63-94d3-46f4-8756-908631ecf49c"
+						"spark.autotune.trackingId": "7c2f103c-7ef3-4377-ba3c-dbfa07911ed8"
 					}
 				},
 				"metadata": {
@@ -7394,7 +7394,7 @@
 							"\n",
 							"\n",
 							"access_key=\"minioadmin\"\n",
-							"secret_key='minioadmin\"\n",
+							"secret_key=\"minioadmin\"\n",
 							"\n",
 							"spark._jsc.hadoopConfiguration().set(\"fs.s3a.access.key\", access_key)\n",
 							"spark._jsc.hadoopConfiguration().set(\"fs.s3a.secret.key\", secret_key)\n",
@@ -7761,7 +7761,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "24dccb9a-be3f-471c-8595-50aa685f8e0e"
+						"spark.autotune.trackingId": "915bfa24-63a5-4fde-892d-87e17803e5ed"
 					}
 				},
 				"metadata": {
@@ -7786,15 +7786,13 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#LOAD_PHARMACIES_DATA_PY\n",
 							"\n",

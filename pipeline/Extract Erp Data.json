@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "MySqlSource",
-						"query": "call Set_Initial_Dates_In_Tables();\n\nselect last_create_date,elt_last_update_date From serwer296707_pharma.logs;"
+						"query": "call Set_Initial_Dates_In_Tables();\n\nselect last_update_date,elt_last_update_date From serwer296707_pharma.logs;"
 					},
 					"dataset": {
 						"referenceName": "MySql_Erp_List_Tables",
@@ -129,7 +129,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "MySqlSource",
-						"query": "call serwer296707_pharma.Set_Last_Update_Date;\n\nselect last_create_date,elt_last_update_date From serwer296707_pharma.logs;\n"
+						"query": "call serwer296707_pharma.Set_Last_Update_Date;\n\nselect last_update_date,elt_last_update_date From serwer296707_pharma.logs;"
 					},
 					"dataset": {
 						"referenceName": "MySql_Erp_List_Tables",

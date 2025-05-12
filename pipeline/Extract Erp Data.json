@@ -79,7 +79,7 @@
 												"type": "ParquetSink",
 												"storeSettings": {
 													"type": "AzureBlobFSWriteSettings",
-													"copyBehavior": "MergeFiles"
+													"copyBehavior": "FlattenHierarchy"
 												},
 												"formatSettings": {
 													"type": "ParquetWriteSettings"
@@ -107,7 +107,7 @@
 												"type": "DatasetReference",
 												"parameters": {
 													"filename": {
-														"value": "@if( equals(item().table_name, 'logs') , \n     concat(item().table_name,'.parquet'),\n     concat(item().table_name,'_',formatDateTime(item().last_date,'yyyy-MM-dd'),'.parquet'))",
+														"value": "@if( equals(item().table_name, 'logs') , \n     concat(item().table_name,'.parquet'),\n     concat(item().table_name,'_',pipeline().TriggerTime,'.parquet'))",
 														"type": "Expression"
 													},
 													"foldername": "@item().table_name"

@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9e013c1d-5e9a-4e23-964e-0c6e7de49617"
+				"spark.autotune.trackingId": "0bc93ab7-9adb-4970-8c2b-b51f9011f523"
 			}
 		},
 		"metadata": {
@@ -130,7 +130,7 @@
 					"\n",
 					"# Update the list of processed files\n",
 					"if new_paths:\n",
-					"    new_files_df = spark.createDataFrame([(path,) for path in new_paths], [\"filepaths\"])\n",
+					"    new_files_df = spark.createDataFrame([unquote(path,) for path in new_paths], [\"filepaths\"])\n",
 					"    processed_files_updated = processed_df.union(new_files_df)\n",
 					"    processed_files_updated.show()\n",
 					"    # Save updated list in Delta format\n",
@@ -143,7 +143,7 @@
 					"    print(\"No new files to process.\")\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 2
 			}
 		]
 	}

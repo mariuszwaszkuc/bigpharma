@@ -71,7 +71,7 @@
 											"source": {
 												"type": "MySqlSource",
 												"query": {
-													"value": "@concat(\n    'SELECT * FROM ', \n    item().table_name,\n    ' WHERE \n    update_date <=  STR_TO_DATE(''', item().update_date, ''', ''%Y-%m-%dT%H:%i:%s'')\n    AND update_date >= STR_TO_DATE(''', item().last_date, ''', ''%Y-%m-%dT%H:%i:%s'');'\n)",
+													"value": "@concat(\n    'SELECT * FROM ', \n    item().table_name,\n    ' WHERE \n    update_date <=  STR_TO_DATE(''', item().update_date, ''', ''%Y-%m-%dT%H:%i:%s'')\n    AND update_date > STR_TO_DATE(''', item().last_date, ''', ''%Y-%m-%dT%H:%i:%s'');'\n)",
 													"type": "Expression"
 												}
 											},

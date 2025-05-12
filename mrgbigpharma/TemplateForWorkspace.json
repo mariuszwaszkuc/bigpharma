@@ -276,7 +276,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "MySqlSource",
-								"query": "call serwer296707_pharma.Set_Last_Update_Date;\n\n"
+								"query": "call serwer296707_pharma.Set_Last_Update_Date;\n\nSELECT table_name, create_date, update_date, \n\nlast_date FROM logs;\n\n"
 							},
 							"dataset": {
 								"referenceName": "MySql_Erp_List_Tables",

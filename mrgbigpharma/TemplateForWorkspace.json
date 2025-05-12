@@ -178,7 +178,7 @@
 														"type": "DatasetReference",
 														"parameters": {
 															"filename": {
-																"value": "@if( equals(item().table_name, 'logs') , \n     concat(item().table_name,'.parquet'),\n     concat(item().table_name,'_',formatDateTime(item().last_date,'yyyy-MM-dd'),'.parquet'))",
+																"value": "@if( equals(item().table_name, 'logs') , \n     concat(item().table_name,'.parquet'),\n     concat(item().table_name,'_',pipeline().TriggerTime,'.parquet'))",
 																"type": "Expression"
 															},
 															"foldername": "@item().table_name"
@@ -1985,6 +1985,46 @@
 			"properties": {
 				"content": {
 					"query": "-- This is auto-generated code\nSELECT\n    count(*)\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/order_details/order_details_2021-12-25.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 3')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/customers/customers_2025-03-24.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 4')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/bronze/Erp/customers/customers_2025-03-27.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
 					"metadata": {
 						"language": "sql"
 					},

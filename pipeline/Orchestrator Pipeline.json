@@ -58,7 +58,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "Transform_Silver",
+						"referenceName": "Transform In Silver",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true
@@ -81,7 +81,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "Load_To_Gold",
+						"referenceName": "Load To Gold",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true

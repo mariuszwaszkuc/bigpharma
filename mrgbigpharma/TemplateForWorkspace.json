@@ -273,7 +273,7 @@
 							{
 								"activity": "Distributors Data MinIo",
 								"dependencyConditions": [
-									"Completed"
+									"Succeeded"
 								]
 							}
 						],

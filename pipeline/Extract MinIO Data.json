@@ -26,12 +26,12 @@
 					},
 					"executorSize": "Small",
 					"conf": {
-						"spark.dynamicAllocation.enabled": false,
-						"spark.dynamicAllocation.minExecutors": null,
-						"spark.dynamicAllocation.maxExecutors": null
+						"spark.dynamicAllocation.enabled": true,
+						"spark.dynamicAllocation.minExecutors": 1,
+						"spark.dynamicAllocation.maxExecutors": 3
 					},
 					"driverSize": "Small",
-					"numExecutors": null,
+					"numExecutors": 1,
 					"authentication": {
 						"type": "MSI"
 					}
@@ -68,12 +68,12 @@
 					},
 					"executorSize": "Small",
 					"conf": {
-						"spark.dynamicAllocation.enabled": false,
-						"spark.dynamicAllocation.minExecutors": null,
-						"spark.dynamicAllocation.maxExecutors": null
+						"spark.dynamicAllocation.enabled": true,
+						"spark.dynamicAllocation.minExecutors": 1,
+						"spark.dynamicAllocation.maxExecutors": 3
 					},
 					"driverSize": "Small",
-					"numExecutors": null,
+					"numExecutors": 1,
 					"authentication": {
 						"type": "MSI"
 					}

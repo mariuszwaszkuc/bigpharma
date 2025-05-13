@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ff4131b5-2156-4771-aa83-c4f9f21883bb"
+				"spark.autotune.trackingId": "7b91d138-1ba2-49e2-9358-19f4b554f274"
 			}
 		},
 		"metadata": {
@@ -79,6 +79,8 @@
 					"\n",
 					"# Optional: reorder columns to desired output format\n",
 					"columns_order = [\"Year\", \"QuarterStr\", \"Month\", \"Date\", \"YTD_BTG\"]\n",
+					"\n",
+					"df = df.select(*columns_order)\n",
 					"\n",
 					"# Save the resulting date dimension to a Delta Lake table in Azure Data Lake Storage\n",
 					"df.write.mode(\"overwrite\").option(\"mergeSchema\", \"true\").format(\"delta\").save(\"abfss://gold@bigpharma.dfs.core.windows.net/d_dates\")\n",

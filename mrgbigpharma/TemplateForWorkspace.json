@@ -1687,6 +1687,26 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    count(*)\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/silver/d_customers/',\n        FORMAT = 'DELTA'\n    ) AS [result]\n276\n\n-- This is auto-generated code\n--44 \n\nSELECT\n    count(*)\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/silver/d_products/',\n        FORMAT = 'DELTA'\n    ) AS [result]\n\n--5346\n\nSELECT\n    count(*)\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/silver/f_forecast/',\n        FORMAT = 'DELTA'\n    ) AS [result]\n43604\n\nSELECT\n    count(*)\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/silver/f_pos_data/',\n        FORMAT = 'DELTA'\n    ) AS [result]  \n\n45144\n\nSELECT\n    count(*)\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/silver/f_sales/',\n        FORMAT = 'DELTA'\n    ) AS [result]  \n\n\n\n45144\n\nSELECT\n    count(*)\nFROM\n    OPENROWSET(\n        BULK 'https://bigpharma.dfs.core.windows.net/silver/f_wh_data/',\n        FORMAT = 'DELTA'\n    ) AS [result]  \n\n\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/D_CUSTOMERS_LOAD_SQL')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -3053,7 +3073,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "0d1f04fd-d2dd-4661-b9bf-de1cd543577b"
+						"spark.autotune.trackingId": "c6396589-4ea6-4f0e-a6ed-753f09312c1b"
 					}
 				},
 				"metadata": {
@@ -3078,13 +3098,15 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"CREATE DATABASE IF NOT EXISTS silver;\n",
 							"\n",
@@ -3205,7 +3227,6 @@
 							"        order_update_date,\n",
 							"        quantity,\n",
 							"        discount,\n",
-							"        amount,\n",
 							"        unit_price,\n",
 							"        MAX(order_details_update_date) OVER (PARTITION BY product_id, country_id, shipped_date) AS max_order_details_update_date,\n",
 							"        MAX(order_update_date) OVER (PARTITION BY product_id, country_id, shipped_date) AS max_order_update_date\n",

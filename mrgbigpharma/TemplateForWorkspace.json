@@ -2277,7 +2277,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "add54548-616c-4901-a8ce-efa41730bf2a"
+						"spark.autotune.trackingId": "43f7e592-c61b-43ea-94ac-a5e4e3e05539"
 					}
 				},
 				"metadata": {
@@ -2295,7 +2295,6 @@
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"CREATE DATABASE IF NOT EXISTS silver;\n",
 							"\n",
@@ -2854,7 +2853,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "dbe43474-9f22-4c92-b436-ebc035177a18"
+						"spark.autotune.trackingId": "31751ac6-5546-4e59-9fb4-5f7159cd5d8d"
 					}
 				},
 				"metadata": {
@@ -2903,11 +2902,42 @@
 							"-- ============================================\n",
 							"-- 2. Prepare data – latest update + monthly aggregation\n",
 							"-- ============================================\n",
+							"--CREATE OR REPLACE TEMP VIEW aggregated_bronze_pos AS\n",
+							"--SELECT \n",
+							"--    product_id,\n",
+							"--    country_id,\n",
+							"--    max(update_date) as pos_update_date,    \n",
+							"--    TRUNC(transaction_date, \"MM\") AS transaction_date,\n",
+							"--    SUM(pos_sell_out_quantity) AS pos_sell_out_quantity,\n",
+							"--    SUM(pos_open_quantity) AS pos_open_quantity,\n",
+							"--    SUM(pos_end_quantity) AS pos_end_quantity,\n",
+							"--    ROUND(SUM(pos_sell_out_quantity * unit_price), 2) AS pos_sell_out_amount,\n",
+							"--    ROUND(SUM(pos_open_quantity * unit_price), 2) AS pos_open_amount,\n",
+							"--    ROUND(SUM(pos_end_quantity * unit_price), 2) AS pos_end_amount,\n",
+							"--    ROUND(SUM(pos_sell_out_quantity * unit_price) / NULLIF(SUM(pos_sell_out_quantity), 0), 2) AS unit_price\n",
+							"--FROM  bronze_pos\n",
+							"--GROUP BY product_id, country_id, TRUNC(transaction_date, \"MM\");\n",
+							"\n",
+							"\n",
+							"\n",
 							"CREATE OR REPLACE TEMP VIEW aggregated_bronze_pos AS\n",
+							"WITH pos_with_max_date AS (\n",
+							"    SELECT \n",
+							"        product_id,\n",
+							"        country_id,\n",
+							"        update_date,\n",
+							"        transaction_date,\n",
+							"        pos_sell_out_quantity,\n",
+							"        pos_open_quantity,\n",
+							"        pos_end_quantity,\n",
+							"        unit_price,\n",
+							"        MAX(update_date) OVER (PARTITION BY product_id, country_id, TRUNC(transaction_date, \"MM\")) AS max_update_date\n",
+							"    FROM bronze_pos\n",
+							")\n",
 							"SELECT \n",
 							"    product_id,\n",
 							"    country_id,\n",
-							"    max(update_date) as pos_update_date,    \n",
+							"    MAX(update_date) AS pos_update_date,    \n",
 							"    TRUNC(transaction_date, \"MM\") AS transaction_date,\n",
 							"    SUM(pos_sell_out_quantity) AS pos_sell_out_quantity,\n",
 							"    SUM(pos_open_quantity) AS pos_open_quantity,\n",
@@ -2916,8 +2946,10 @@
 							"    ROUND(SUM(pos_open_quantity * unit_price), 2) AS pos_open_amount,\n",
 							"    ROUND(SUM(pos_end_quantity * unit_price), 2) AS pos_end_amount,\n",
 							"    ROUND(SUM(pos_sell_out_quantity * unit_price) / NULLIF(SUM(pos_sell_out_quantity), 0), 2) AS unit_price\n",
-							"FROM  bronze_pos\n",
+							"FROM pos_with_max_date\n",
+							"WHERE update_date = max_update_date\n",
 							"GROUP BY product_id, country_id, TRUNC(transaction_date, \"MM\");\n",
+							"\n",
 							"\n",
 							"-- ============================================\n",
 							"-- 3. Create the target table (Silver) if it does not exist\n",
@@ -3021,7 +3053,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "93155bff-ba01-40f8-98df-6113ebf0084b"
+						"spark.autotune.trackingId": "41e88855-9b8a-4fbf-9c58-6adfe0ae0339"
 					}
 				},
 				"metadata": {
@@ -3046,13 +3078,15 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"CREATE DATABASE IF NOT EXISTS silver;\n",
 							"\n",

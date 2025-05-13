@@ -1,25 +1,90 @@
 {
-	"name": "Pipeline 1",
+	"name": "Orchestrator Pipeline",
 	"properties": {
 		"activities": [
 			{
-				"name": "LOAD_DISTRIBUTORS_DATA_PY",
-				"type": "SynapseNotebook",
+				"name": "Extract Erp Data",
+				"type": "ExecutePipeline",
 				"dependsOn": [],
 				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
 					"secureInput": false
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebook": {
-						"referenceName": "LOAD_DISTRIBUTORS_DATA_PY",
-						"type": "NotebookReference"
+					"pipeline": {
+						"referenceName": "Extract Erp Data",
+						"type": "PipelineReference"
 					},
-					"snapshot": true
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Extract MinIO Data",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Extract Erp Data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Extract MinIO Data",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Load To Gold",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Transform In Silver",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Load To Gold",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Transform In Silver",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Extract MinIO Data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Transform In Silver",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
 				}
 			}
 		],

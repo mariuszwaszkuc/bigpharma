@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0d1f04fd-d2dd-4661-b9bf-de1cd543577b"
+				"spark.autotune.trackingId": "c5138b6f-e6ed-4ac8-9d66-4f61e327c727"
 			}
 		},
 		"metadata": {
@@ -173,7 +173,6 @@
 					"        order_update_date,\n",
 					"        quantity,\n",
 					"        discount,\n",
-					"        amount,\n",
 					"        unit_price,\n",
 					"        MAX(order_details_update_date) OVER (PARTITION BY product_id, country_id, shipped_date) AS max_order_details_update_date,\n",
 					"        MAX(order_update_date) OVER (PARTITION BY product_id, country_id, shipped_date) AS max_order_update_date\n",

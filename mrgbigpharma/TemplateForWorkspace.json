@@ -880,7 +880,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Extract_Load_Erp",
+						"name": "Extract Erp Data",
 						"type": "ExecutePipeline",
 						"dependsOn": [],
 						"policy": {
@@ -897,11 +897,11 @@
 						}
 					},
 					{
-						"name": "Extract_MinIo",
+						"name": "Extract MinIO Data",
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
-								"activity": "Extract_Load_Erp",
+								"activity": "Extract Erp Data",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -921,11 +921,11 @@
 						}
 					},
 					{
-						"name": "Transform_Silver",
+						"name": "Transform In Silver",
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
-								"activity": "Extract_MinIo",
+								"activity": "Extract MinIO Data",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -945,11 +945,11 @@
 						}
 					},
 					{
-						"name": "Load_To_Gold",
+						"name": "Load To Gold",
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
-								"activity": "Transform_Silver",
+								"activity": "Transform In Silver",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -4496,7 +4496,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "d829cf06-f94d-4cd8-bd98-1b931a14e992"
+						"spark.autotune.trackingId": "513611e9-eecd-4376-a441-dae5613b6e2a"
 					}
 				},
 				"metadata": {
@@ -4521,13 +4521,15 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"from pyspark.sql import SparkSession\r\n",
 							"from pyspark.sql.functions import col, max, coalesce, trunc, lit, add_months\r\n",
@@ -4716,8 +4718,6 @@
 							"\r\n",
 							"bucket_name_gold = \"gold\"\r\n",
 							"\r\n",
-							"# Load Data\r\n",
-							"f_sales_path = f\"s3a://{bucket_name}/f_planning_book\"\r\n",
 							"\r\n",
 							"aggregated_df = final_df.groupBy(\r\n",
 							"    \"product_id\", \"country_id\", \"financial_date\", \"forecast_snapshot\"\r\n",
@@ -4745,8 +4745,6 @@
 							"    # Aggregation for discount (average)\r\n",
 							"    F.sum(\"discount\").alias(\"discount\")\r\n",
 							")\r\n",
-							"\r\n",
-							"aggregated_df.write.mode(\"overwrite\").parquet(f_sales_path_gold)\r\n",
 							"\r\n",
 							"import pandas as pd\r\n",
 							"\r\n",
@@ -4810,7 +4808,6 @@
 							"    lambda x: \"Current\" if x == max_forecast_snapshot else \"Last\"\r\n",
 							")\r\n",
 							"\r\n",
-							"bucket_name_gold = \"abfss://gold@bigpharma.dfs.core.windows.net/f_planning_book_unpivot\"\r\n",
 							"\r\n",
 							"# Path to the Gold layer (f_planning_book)\r\n",
 							"f_sales_path_gold = f\"{bucket_name_gold}/f_planning_book_unpivot\"\r\n",
@@ -4828,7 +4825,7 @@
 							"    .withColumnRenamed('Close Stock Pharmacies', 'Close_Stock_Pharmacies')\\\r\n",
 							"    .withColumnRenamed('Consumer Off Take', 'Consumer_Off_Take')\r\n",
 							"\r\n",
-							"df_spark.write.mode(\"overwrite\").option(\"mergeSchema\", \"true\").format(\"delta\").save(\"abfss://gold@bigpharma.dfs.core.windows.net/f_planning_book_unpivot\")\r\n",
+							"df_spark.write.mode(\"overwrite\").option(\"mergeSchema\", \"true\").format(\"delta\").save(\"abfss://gold@bigpharma.dfs.core.windows.net/f_planning_book\")\r\n",
 							"\r\n",
 							""
 						],

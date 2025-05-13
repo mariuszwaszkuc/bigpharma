@@ -1710,7 +1710,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "2a7bbe4c-2300-450f-bced-2a79b7893a27"
+						"spark.autotune.trackingId": "d513b18c-5707-44ef-b566-26e664b565ce"
 					}
 				},
 				"metadata": {
@@ -1735,13 +1735,15 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"-- test D_CUSTOMERS_LOAD_SQL\n",
 							"\n",
@@ -2084,7 +2086,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "246692f1-644b-4b6d-9551-3844358198b9"
+						"spark.autotune.trackingId": "31848ad0-2728-4f5d-8fc5-bd7019a41363"
 					}
 				},
 				"metadata": {
@@ -2102,6 +2104,7 @@
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"CREATE DATABASE IF NOT EXISTS silver;\n",
 							"\n",
@@ -2119,15 +2122,37 @@
 							"-- 2. Select the most recent data by update_date\n",
 							"-- ============================================\n",
 							"\n",
+							"--CREATE OR REPLACE TEMP VIEW new_d_products AS\n",
+							"--SELECT \n",
+							"--    product_id,\n",
+							"--    product_name,\n",
+							"--    brand_name,\n",
+							"--    sub_brand_name,\n",
+							"--    category_name,\n",
+							"--    update_date AS product_update_date\n",
+							"--FROM bronze_products;\n",
+							"\n",
 							"CREATE OR REPLACE TEMP VIEW new_d_products AS\n",
+							"WITH products_with_max_date AS (\n",
+							"    SELECT \n",
+							"        product_id,\n",
+							"        product_name,\n",
+							"        brand_name,\n",
+							"        sub_brand_name,\n",
+							"        category_name,\n",
+							"        update_date AS product_update_date,\n",
+							"        MAX(update_date) OVER (PARTITION BY product_id) AS max_update_date\n",
+							"    FROM bronze_products\n",
+							")\n",
 							"SELECT \n",
 							"    product_id,\n",
 							"    product_name,\n",
 							"    brand_name,\n",
 							"    sub_brand_name,\n",
 							"    category_name,\n",
-							"    update_date AS product_update_date\n",
-							"FROM bronze_products;\n",
+							"    product_update_date\n",
+							"FROM products_with_max_date\n",
+							"WHERE product_update_date = max_update_date;\n",
 							"\n",
 							"-- ============================================\n",
 							"-- 3. Create the target (Silver) table if it does not exist\n",
@@ -3434,7 +3459,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "0421b4e6-df70-439d-8136-febe33049fca"
+						"spark.autotune.trackingId": "437bbfc6-5857-4e4e-a293-636062b082d7"
 					}
 				},
 				"metadata": {
@@ -3459,15 +3484,13 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#LOAD_PHARMACIES_DATA_PY\n",
 							"\n",
@@ -3563,7 +3586,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							""
 						],

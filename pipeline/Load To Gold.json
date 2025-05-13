@@ -15,10 +15,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebook": {
-						"referenceName": "D_DIM_PY",
-						"type": "NotebookReference"
-					},
 					"snapshot": true,
 					"sparkPool": {
 						"referenceName": "sparkpool32",

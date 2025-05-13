@@ -549,7 +549,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Load Dimensions",
+						"name": "Dimensions",
 						"type": "SynapseNotebook",
 						"dependsOn": [],
 						"policy": {
@@ -584,11 +584,11 @@
 						}
 					},
 					{
-						"name": "Load D_Dates",
+						"name": "Dates",
 						"type": "SynapseNotebook",
 						"dependsOn": [
 							{
-								"activity": "Load Dimensions",
+								"activity": "Dimensions",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -626,11 +626,11 @@
 						}
 					},
 					{
-						"name": "Load F_Planning_Book",
+						"name": "Planning Book",
 						"type": "SynapseNotebook",
 						"dependsOn": [
 							{
-								"activity": "Load D_Dates",
+								"activity": "Dates",
 								"dependencyConditions": [
 									"Succeeded"
 								]

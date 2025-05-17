@@ -6,6 +6,10 @@
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkpool32",
+			"type": "BigDataPoolReference"
+		},
 		"sessionProperties": {
 			"driverMemory": "28g",
 			"driverCores": 4,
@@ -16,24 +20,45 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b9b2d180-3362-46f2-a3b4-137baa4857c0"
+				"spark.autotune.trackingId": "ef00c2e6-f1f6-4f71-8815-9c34a3c60fcf"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
 			"kernelspec": {
-				"name": "synapse_sparksql",
-				"display_name": "sql"
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "sql"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+				"name": "sparkpool32",
+				"type": "Spark",
+				"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
 		"cells": [
 			{
 				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"outputs_hidden": true
+					},
+					"collapsed": false
+				},
 				"source": [
 					"CREATE DATABASE IF NOT EXISTS gold;\n",
 					"\n",
@@ -60,7 +85,7 @@
 					"\n",
 					"CREATE TABLE IF NOT EXISTS gold.d_regions\n",
 					"USING DELTA\n",
-					"LOCATION 'abfss://gold@bigpharma.dfs.core.windows.net/d_customers'\n",
+					"LOCATION 'abfss://gold@bigpharma.dfs.core.windows.net/d_regions'\n",
 					"AS\n",
 					"SELECT \n",
 					"  country_id AS IDCountry,\n",
@@ -90,7 +115,29 @@
 					"FROM silver_d_regions;\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 8
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"    CREATE TABLE IF NOT EXISTS gold.d_dates\n",
+					"    USING DELTA\n",
+					"    LOCATION 'abfss://gold@bigpharma.dfs.core.windows.net/d_dates/'"
+				],
+				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"drop table gold.d_dates"
+				],
+				"execution_count": 9
 			}
 		]
 	}

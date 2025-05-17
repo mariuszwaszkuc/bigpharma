@@ -1936,7 +1936,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f1b5f100-266a-4183-815d-ce67fb77e0fd"
+						"spark.autotune.trackingId": "14cd35ad-be85-48a5-aa6f-b6dd28ab0a2a"
 					}
 				},
 				"metadata": {
@@ -1961,13 +1961,15 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"from pyspark.sql.functions import (\n",
 							"    col, lit, year, month, quarter, weekofyear, dayofmonth,\n",
@@ -2012,7 +2014,7 @@
 							"df = df.drop(\"KeyYearMonth\", \"KeyYearQuarter\", \"KeyYearYTDBTG\", \"KeyYearFY\")\n",
 							"\n",
 							"# Optional: reorder columns to desired output format\n",
-							"columns_order = [\"Year\", \"QuarterStr\", \"Month\", \"Date\", \"YTD_BTG\"]\n",
+							"columns_order = [\"Year\", \"Quarter\", \"Month\", \"Date\", \"YTD_BTG\"]\n",
 							"\n",
 							"df = df.select(*columns_order)\n",
 							"\n",
@@ -3073,7 +3075,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "c6396589-4ea6-4f0e-a6ed-753f09312c1b"
+						"spark.autotune.trackingId": "c5138b6f-e6ed-4ac8-9d66-4f61e327c727"
 					}
 				},
 				"metadata": {
@@ -3098,15 +3100,13 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"CREATE DATABASE IF NOT EXISTS silver;\n",
 							"\n",

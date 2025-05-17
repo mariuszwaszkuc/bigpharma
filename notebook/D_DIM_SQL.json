@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5bda386d-0296-493b-b121-f498829254b2"
+				"spark.autotune.trackingId": "2c79fc99-88b0-44c3-9295-608116ac6a10"
 			}
 		},
 		"metadata": {
@@ -123,9 +123,7 @@
 					"collapsed": false
 				},
 				"source": [
-					"    CREATE TABLE IF NOT EXISTS gold.d_dates\n",
-					"    USING DELTA\n",
-					"    LOCATION 'abfss://gold@bigpharma.dfs.core.windows.net/d_dates/'"
+					""
 				],
 				"execution_count": 10
 			},
@@ -135,7 +133,7 @@
 					"collapsed": false
 				},
 				"source": [
-					"drop table gold.d_dates"
+					""
 				],
 				"execution_count": 9
 			}

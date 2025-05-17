@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f1b5f100-266a-4183-815d-ce67fb77e0fd"
+				"spark.autotune.trackingId": "88c17d57-ddc0-4108-a818-7d4ad62daae3"
 			}
 		},
 		"metadata": {
@@ -97,7 +97,7 @@
 					"df = df.drop(\"KeyYearMonth\", \"KeyYearQuarter\", \"KeyYearYTDBTG\", \"KeyYearFY\")\n",
 					"\n",
 					"# Optional: reorder columns to desired output format\n",
-					"columns_order = [\"Year\", \"QuarterStr\", \"Month\", \"Date\", \"YTD_BTG\"]\n",
+					"columns_order = [\"Year\", \"Quarter\", \"Month\", \"Date\", \"YTD_BTG\"]\n",
 					"\n",
 					"df = df.select(*columns_order)\n",
 					"\n",

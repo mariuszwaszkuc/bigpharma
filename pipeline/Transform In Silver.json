@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "D_CUSTOMERS_LOAD_SQL",
+						"referenceName": "D_CUSTOMERS_SQL",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
@@ -58,7 +58,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "D_PRODUCT_LOAD_SQL",
+						"referenceName": "D_PRODUCT_SQL",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
@@ -100,7 +100,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "F_FORCAST_LOAD_SQL",
+						"referenceName": "F_FORCAST_SQL",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
@@ -142,7 +142,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "F_SALES_LOAD_SQL",
+						"referenceName": "F_SALES_SQL",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
@@ -184,7 +184,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "F_POS_LOAD_SQL",
+						"referenceName": "F_POS_SQL",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
@@ -226,7 +226,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "F_WH_DATA_LOAD_SQL",
+						"referenceName": "F_WH_DATA_SQL",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,

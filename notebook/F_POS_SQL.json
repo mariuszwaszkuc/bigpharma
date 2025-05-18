@@ -1,5 +1,5 @@
 {
-	"name": "F_POS_LOAD_SQL",
+	"name": "F_POS_SQL",
 	"properties": {
 		"folder": {
 			"name": "Load_Silver"

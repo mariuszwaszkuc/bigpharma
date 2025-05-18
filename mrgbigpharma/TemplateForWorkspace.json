@@ -249,7 +249,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebook": {
-								"referenceName": "LOAD_DISTRIBUTORS_DATA_PY",
+								"referenceName": "DISTRIBUTORS_DATA_PY",
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
@@ -291,7 +291,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebook": {
-								"referenceName": "LOAD_PHARMACIES_DATA_PY",
+								"referenceName": "PHARMACIES_DATA_PY",
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
@@ -322,9 +322,9 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/notebooks/LOAD_DISTRIBUTORS_DATA_PY')]",
+				"[concat(variables('workspaceId'), '/notebooks/DISTRIBUTORS_DATA_PY')]",
 				"[concat(variables('workspaceId'), '/bigDataPools/sparkpool32')]",
-				"[concat(variables('workspaceId'), '/notebooks/LOAD_PHARMACIES_DATA_PY')]"
+				"[concat(variables('workspaceId'), '/notebooks/PHARMACIES_DATA_PY')]"
 			]
 		},
 		{
@@ -811,7 +811,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebook": {
-								"referenceName": "D_CUSTOMERS_LOAD_SQL",
+								"referenceName": "D_CUSTOMERS_SQL",
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
@@ -853,7 +853,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebook": {
-								"referenceName": "D_PRODUCT_LOAD_SQL",
+								"referenceName": "D_PRODUCT_SQL",
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
@@ -895,7 +895,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebook": {
-								"referenceName": "F_FORCAST_LOAD_SQL",
+								"referenceName": "F_FORCAST_SQL",
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
@@ -937,7 +937,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebook": {
-								"referenceName": "F_SALES_LOAD_SQL",
+								"referenceName": "F_SALES_SQL",
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
@@ -979,7 +979,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebook": {
-								"referenceName": "F_POS_LOAD_SQL",
+								"referenceName": "F_POS_SQL",
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
@@ -1021,7 +1021,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebook": {
-								"referenceName": "F_WH_DATA_LOAD_SQL",
+								"referenceName": "F_WH_DATA_SQL",
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
@@ -1053,13 +1053,13 @@
 				"lastPublishTime": "2025-04-02T06:40:26Z"
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/notebooks/D_CUSTOMERS_LOAD_SQL')]",
+				"[concat(variables('workspaceId'), '/notebooks/D_CUSTOMERS_SQL')]",
 				"[concat(variables('workspaceId'), '/bigDataPools/sparkpool32')]",
-				"[concat(variables('workspaceId'), '/notebooks/D_PRODUCT_LOAD_SQL')]",
-				"[concat(variables('workspaceId'), '/notebooks/F_FORCAST_LOAD_SQL')]",
-				"[concat(variables('workspaceId'), '/notebooks/F_SALES_LOAD_SQL')]",
-				"[concat(variables('workspaceId'), '/notebooks/F_POS_LOAD_SQL')]",
-				"[concat(variables('workspaceId'), '/notebooks/F_WH_DATA_LOAD_SQL')]"
+				"[concat(variables('workspaceId'), '/notebooks/D_PRODUCT_SQL')]",
+				"[concat(variables('workspaceId'), '/notebooks/F_FORCAST_SQL')]",
+				"[concat(variables('workspaceId'), '/notebooks/F_SALES_SQL')]",
+				"[concat(variables('workspaceId'), '/notebooks/F_POS_SQL')]",
+				"[concat(variables('workspaceId'), '/notebooks/F_WH_DATA_SQL')]"
 			]
 		},
 		{
@@ -1707,7 +1707,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/D_CUSTOMERS_LOAD_SQL')]",
+			"name": "[concat(parameters('workspaceName'), '/D_CUSTOMERS_SQL')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -2195,7 +2195,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/D_PRODUCT_LOAD_SQL')]",
+			"name": "[concat(parameters('workspaceName'), '/D_PRODUCT_SQL')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -2344,7 +2344,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/F_FORCAST_LOAD_SQL')]",
+			"name": "[concat(parameters('workspaceName'), '/F_FORCAST_SQL')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -2920,7 +2920,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/F_POS_LOAD_SQL')]",
+			"name": "[concat(parameters('workspaceName'), '/F_POS_SQL')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -3116,7 +3116,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/F_SALES_LOAD_SQL')]",
+			"name": "[concat(parameters('workspaceName'), '/F_SALES_SQL')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -3358,7 +3358,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/F_WH_DATA_LOAD_SQL')]",
+			"name": "[concat(parameters('workspaceName'), '/F_WH_DATA_SQL')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -3607,7 +3607,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/LOAD_DISTRIBUTORS_DATA_PY')]",
+			"name": "[concat(parameters('workspaceName'), '/DISTRIBUTORS_DATA_PY')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -3760,7 +3760,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/LOAD_PHARMACIES_DATA_PY')]",
+			"name": "[concat(parameters('workspaceName'), '/PHARMACIES_DATA_PY')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {

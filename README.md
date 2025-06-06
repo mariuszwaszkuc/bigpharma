@@ -2,13 +2,25 @@
 
 This project implements an automated ETL/ELT pipeline in Azure Synapse Analytics for a pharmaceutical company operating in the EU. It standardizes data processing across multiple sources: ERP system, distributors, and pharmacy market sales.
 
-## 🧱 Architecture
+## 🧱 Lakehouse Architecture (Medallion)
 
-The pipeline follows the Lakehouse architecture using the Medallion structure:
+The data pipeline is structured into three layers following the Medallion architecture pattern:
 
-- **Bronze layer**: Raw data ingestion (MySQL, MinIO, CSV)
-- **Silver layer**: Data cleaning, deduplication, validation
-- **Gold layer**: Analytical star-schema model for reporting
+### 🟫 Bronze Layer – Raw Ingestion
+- Raw data is ingested without transformation.
+- Sources: ERP (MySQL), distributors (MinIO), and CSV exports from pharmacy data providers.
+- Stored in Delta Lake format on Azure Data Lake Gen2.
+
+### 🪙 Silver Layer – Cleaned and Standardized
+- Data is validated, deduplicated, typecasted, and joined into consistent structures.
+- Business rules and quality checks are applied.
+- Output: reliable, unified, and queryable Delta tables.
+
+### ⭐ Gold Layer – Analytical Model
+- Analytical star-schema model for reporting (fact and dimension tables).
+- Pre-aggregated KPIs: e.g., sales volume, value, market share.
+- Ready for reporting in Power BI.
+
 
 ## 🎯 Objectives
 

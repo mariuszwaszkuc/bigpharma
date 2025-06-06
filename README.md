@@ -6,20 +6,26 @@ This project implements an automated ETL/ELT pipeline in Azure Synapse Analytics
 
 The data pipeline is structured into three layers following the Medallion architecture pattern:
 
-### 🟫 Bronze Layer – Raw Ingestion
-- Raw data is ingested without transformation.
-- Sources: ERP (MySQL), distributors (MinIO), and CSV exports from pharmacy data providers.
-- Stored in Delta Lake format on Azure Data Lake Gen2.
+🟤 Bronze Layer – Raw Ingestion
+Raw data is ingested without transformation.
 
-### 🪙 Silver Layer – Cleaned and Standardized
-- Data is validated, deduplicated, typecasted, and joined into consistent structures.
-- Business rules and quality checks are applied.
-- Output: reliable, unified, and queryable Delta tables.
+Sources: ERP (MySQL), distributors (MinIO), and CSV exports from pharmacy data providers.
 
-### ⭐ Gold Layer – Analytical Model
-- Analytical star-schema model for reporting (fact and dimension tables).
-- Pre-aggregated KPIs: e.g., sales volume, value, market share.
-- Ready for reporting in Power BI.
+Stored in Delta Lake format on Azure Data Lake Gen2.
+
+⚪ Silver Layer – Cleaned and Standardized
+Data is validated, deduplicated, typecasted, and joined into consistent structures.
+
+Business rules and quality checks are applied.
+
+Output: reliable, unified, and queryable Delta tables.
+
+🟡 Gold Layer – Analytical Model
+Analytical star-schema model for reporting (fact and dimension tables).
+
+Pre-aggregated KPIs: e.g., sales volume, value, market share.
+
+Ready for reporting in Power BI.
 
 
 ## 🎯 Objectives

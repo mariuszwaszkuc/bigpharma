@@ -36,7 +36,8 @@ The pipeline follows the Lakehouse architecture using the Medallion structure:
 
 - `/minio`: CSV files
 - `/MySql`: sample database
-- `/powerbi`: Dashboards and visuals
+- `/PowerBi`: Dashboards and visuals
+- `/SynapseAnalytics`: ETL/ELT
 
 ## 📜 License
 

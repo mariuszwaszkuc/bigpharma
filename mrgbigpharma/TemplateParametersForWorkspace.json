@@ -5,6 +5,12 @@
 		"workspaceName": {
 			"value": "mrgbigpharma"
 		},
+		"AmazonS31_secretAccessKey": {
+			"value": ""
+		},
+		"AmazonS3Compatible1_secretAccessKey": {
+			"value": ""
+		},
 		"AmazonS3Compatible2_secretAccessKey": {
 			"value": ""
 		},
@@ -16,6 +22,12 @@
 		},
 		"mrgbigpharma-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:mrgbigpharma.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"AmazonS31_properties_typeProperties_accessKeyId": {
+			"value": "minioadmin"
+		},
+		"AmazonS3Compatible1_properties_typeProperties_accessKeyId": {
+			"value": "31ILhoCRecFlSUi1GQHP"
 		},
 		"AmazonS3Compatible2_properties_typeProperties_accessKeyId": {
 			"value": "minioadmin"

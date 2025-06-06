@@ -58,7 +58,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "LOAD_PHARMACIES_DATA_BRONZEPY",
+						"referenceName": "LOAD_PHARMACIES_DATA_BRONZE_PY",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,

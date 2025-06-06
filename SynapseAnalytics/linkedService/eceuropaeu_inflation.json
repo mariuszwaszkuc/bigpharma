@@ -1,0 +1,17 @@
+{
+	"name": "eceuropaeu_inflation",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ei_cphi_m$defaultview/?format=TSV&compressed=false",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

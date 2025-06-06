@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "LOAD_DISTRIBUTORS_DATA_PY",
+						"referenceName": "LOAD_DISTRIBUTORS_DATA_BRONZE_PY",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
@@ -58,7 +58,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "LOAD_PHARMACIES_DATA_PY",
+						"referenceName": "LOAD_PHARMACIES_DATA_BRONZEPY",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,

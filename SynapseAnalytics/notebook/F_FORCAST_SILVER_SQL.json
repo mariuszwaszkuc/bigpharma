@@ -1,5 +1,5 @@
 {
-	"name": "F_FORCAST_SQL",
+	"name": "F_FORCAST_SILVER_SQL",
 	"properties": {
 		"folder": {
 			"name": "Load_Silver"
@@ -17,12 +17,16 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "43f7e592-c61b-43ea-94ac-a5e4e3e05539"
+				"spark.autotune.trackingId": "2d0fabc1-004c-4924-8c7c-c5cf4545d57e"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_sparksql",
+				"display_name": "sql"
+			},
 			"language_info": {
 				"name": "sql"
 			},
@@ -198,7 +202,8 @@
 					"    source.pos_sell_out_amount, source.pos_open_amount, source.pos_end_amount, source.unit_price, source.forecast_update_date\n",
 					"  );\n",
 					""
-				]
+				],
+				"execution_count": null
 			}
 		]
 	}

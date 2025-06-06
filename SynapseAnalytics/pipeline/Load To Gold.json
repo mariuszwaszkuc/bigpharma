@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "D_DIM_SQL",
+						"referenceName": "D_DIM_GOLD_SQL",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
@@ -58,7 +58,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "D_DATES_PY",
+						"referenceName": "D_DATES_GOLD_PY",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
@@ -100,7 +100,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "F_PLANNING_BOOK_PY",
+						"referenceName": "F_PLANNING_BOOK_GOLD_PY",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,

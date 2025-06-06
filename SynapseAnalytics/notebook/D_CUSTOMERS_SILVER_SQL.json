@@ -1,5 +1,5 @@
 {
-	"name": "D_CUSTOMERS_SQL",
+	"name": "D_CUSTOMERS_SILVER_SQL",
 	"properties": {
 		"folder": {
 			"name": "Load_Silver"
@@ -21,12 +21,16 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "fa97b0f8-8054-411d-8484-8e105ac20cd8"
+				"spark.autotune.trackingId": "a122c16d-eebf-4d57-8d4d-4427a1a2253d"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_sparksql",
+				"display_name": "sql"
+			},
 			"language_info": {
 				"name": "sql"
 			},
@@ -37,14 +41,13 @@
 				"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
 				"auth": {
 					"type": "AAD",
-					"authResource": "https://dev.azuresynapse.net",
-					"authHeader": null
+					"authResource": "https://dev.azuresynapse.net"
 				},
 				"sparkVersion": "3.4",
 				"nodeCount": 3,
 				"cores": 4,
 				"memory": 28,
-				"extraHeader": null
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -193,7 +196,8 @@
 					"    source.country_update_date\n",
 					"  );\n",
 					""
-				]
+				],
+				"execution_count": null
 			}
 		]
 	}

@@ -1,5 +1,5 @@
 {
-	"name": "F_WH_DATA_SQL",
+	"name": "F_WH_DATA_SILVER_SQL",
 	"properties": {
 		"folder": {
 			"name": "Load_Silver"

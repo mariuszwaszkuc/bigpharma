@@ -1,5 +1,5 @@
 {
-	"name": "LOAD_PHARMACIES_DATA_PY",
+	"name": "LOAD_PHARMACIES_DATA_BRONZEPY",
 	"properties": {
 		"folder": {
 			"name": "Load_Bronze"
@@ -21,12 +21,16 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0421b4e6-df70-439d-8136-febe33049fca"
+				"spark.autotune.trackingId": "16c9bc40-2fb8-4867-a2b6-abc897c0be26"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
 			"language_info": {
 				"name": "python"
 			},
@@ -37,14 +41,13 @@
 				"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
 				"auth": {
 					"type": "AAD",
-					"authResource": "https://dev.azuresynapse.net",
-					"authHeader": null
+					"authResource": "https://dev.azuresynapse.net"
 				},
 				"sparkVersion": "3.4",
 				"nodeCount": 3,
 				"cores": 4,
 				"memory": 28,
-				"extraHeader": null
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -147,7 +150,8 @@
 				"cell_type": "code",
 				"source": [
 					""
-				]
+				],
+				"execution_count": null
 			}
 		]
 	}

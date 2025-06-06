@@ -1,5 +1,5 @@
 {
-	"name": "LOAD_DISTRIBUTORS_DATA_PY",
+	"name": "LOAD_DISTRIBUTORS_DATA_BRONZE_PY",
 	"properties": {
 		"folder": {
 			"name": "Load_Bronze"

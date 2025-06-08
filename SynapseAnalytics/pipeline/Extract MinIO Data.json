@@ -15,6 +15,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"notebook": {
+						"referenceName": "LOAD_DISTRIBUTORS_DATA_BRONZE_PY",
+						"type": "NotebookReference"
+					},
 					"snapshot": true,
 					"sparkPool": {
 						"referenceName": "sparkpool32",

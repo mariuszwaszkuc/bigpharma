@@ -15,6 +15,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"notebook": {
+						"referenceName": "D_DIM_GOLD_SQL",
+						"type": "NotebookReference"
+					},
 					"snapshot": true,
 					"sparkPool": {
 						"referenceName": "sparkpool32",
@@ -53,6 +57,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"notebook": {
+						"referenceName": "D_DATES_GOLD_PY",
+						"type": "NotebookReference"
+					},
 					"snapshot": true,
 					"sparkPool": {
 						"referenceName": "sparkpool32",
@@ -91,6 +99,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"notebook": {
+						"referenceName": "F_PLANNING_BOOK_GOLD_PY",
+						"type": "NotebookReference"
+					},
 					"snapshot": true,
 					"sparkPool": {
 						"referenceName": "sparkpool32",

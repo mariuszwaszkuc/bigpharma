@@ -15,6 +15,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"notebook": {
+						"referenceName": "D_CUSTOMERS_SILVER_SQL",
+						"type": "NotebookReference"
+					},
 					"snapshot": true,
 					"sparkPool": {
 						"referenceName": "sparkpool32",
@@ -53,6 +57,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"notebook": {
+						"referenceName": "D_PRODUCT_SILVER_SQL",
+						"type": "NotebookReference"
+					},
 					"snapshot": true,
 					"sparkPool": {
 						"referenceName": "sparkpool32",
@@ -91,6 +99,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"notebook": {
+						"referenceName": "F_FORCAST_SILVER_SQL",
+						"type": "NotebookReference"
+					},
 					"snapshot": true,
 					"sparkPool": {
 						"referenceName": "sparkpool32",
@@ -129,6 +141,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"notebook": {
+						"referenceName": "F_SALES_SILVER_SQL",
+						"type": "NotebookReference"
+					},
 					"snapshot": true,
 					"sparkPool": {
 						"referenceName": "sparkpool32",
@@ -167,6 +183,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"notebook": {
+						"referenceName": "F_POS_SILVER_SQL",
+						"type": "NotebookReference"
+					},
 					"snapshot": true,
 					"sparkPool": {
 						"referenceName": "sparkpool32",
@@ -205,6 +225,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"notebook": {
+						"referenceName": "F_WH_DATA_SILVER_SQL",
+						"type": "NotebookReference"
+					},
 					"snapshot": true,
 					"sparkPool": {
 						"referenceName": "sparkpool32",

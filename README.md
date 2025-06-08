@@ -1,4 +1,4 @@
-# 💊 Pharma Data Lakehouse ETL/ELT in Azure Synapse
+# 💊 Pharmaceutical Data Lakehouse: ETL and ELT in Azure Synapse Analytics
 
 This project implements an automated ETL/ELT pipeline in Azure Synapse Analytics for a pharmaceutical company Big Pharma XYZ operating in the EU. It standardizes data processing across multiple sources: ERP system, distributors, and pharmacy market sales.
 

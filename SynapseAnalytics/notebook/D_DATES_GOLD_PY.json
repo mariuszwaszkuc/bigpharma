@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "de67bb86-5cd5-49b7-93d4-642b97bee900"
+				"spark.autotune.trackingId": "40726a69-6fab-4cdd-a08c-a8393f78170f"
 			}
 		},
 		"metadata": {
@@ -64,7 +64,7 @@
 					"\n",
 					"# Define the date range for the calendar table\n",
 					"start_year = 2020\n",
-					"end_year = 2025\n",
+					"end_year = 2026\n",
 					"\n",
 					"# Create a list of dates from start_date to end_date using pandas\n",
 					"start_date = datetime(start_year, 1, 1)\n",

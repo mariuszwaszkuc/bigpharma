@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "bfc43b79-2d1e-4619-b149-694e2f985175"
+				"spark.autotune.trackingId": "aca692a9-eb8e-4b30-a074-05f69c42e400"
 			}
 		},
 		"metadata": {
@@ -29,7 +29,7 @@
 			"enableDebugMode": false,
 			"kernelspec": {
 				"name": "synapse_pyspark",
-				"display_name": "python"
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "python"
@@ -56,6 +56,21 @@
 				"cell_type": "code",
 				"metadata": {
 					"microsoft": {
+						"language": "sparksql"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%sql\n",
+					"\n",
+					"delete from silver.f_wh_data"
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"microsoft": {
 						"language": "python"
 					}
 				},
@@ -67,14 +82,15 @@
 					")\n",
 					"df_bronze.createOrReplaceTempView(\"bronze_inventory\")"
 				],
-				"execution_count": null
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
 					"microsoft": {
 						"language": "sparksql"
-					}
+					},
+					"collapsed": false
 				},
 				"source": [
 					"%%sql\n",
@@ -240,7 +256,7 @@
 					"  );\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 4
 			}
 		]
 	}

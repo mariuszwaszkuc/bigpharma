@@ -2410,12 +2410,16 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "2d0fabc1-004c-4924-8c7c-c5cf4545d57e"
+						"spark.autotune.trackingId": "5fa0f26e-0ae4-43bf-860b-306289d98528"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_sparksql",
+						"display_name": "sql"
+					},
 					"language_info": {
 						"name": "sql"
 					},
@@ -2424,6 +2428,7 @@
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"CREATE DATABASE IF NOT EXISTS silver;\n",
 							"\n",
@@ -2486,7 +2491,7 @@
 							"        pos_open_quantity,\n",
 							"        pos_end_quantity,\n",
 							"        unit_price,\n",
-							"        MAX(update_date) OVER (PARTITION BY product_id, country_id, TRUNC(forecast_date, 'MM'), TRUNC(forecast_snapshot, 'MM')) AS max_update_date\n",
+							"        MAX(update_date) OVER (PARTITION BY product_id, country_id, forecast_date, forecast_snapshot) AS max_update_date\n",
 							"    FROM bronze_forecast\n",
 							")\n",
 							"SELECT \n",
@@ -2592,7 +2597,8 @@
 							"  );\n",
 							""
 						],
-						"outputs": []
+						"outputs": [],
+						"execution_count": null
 					}
 				]
 			},
@@ -2984,7 +2990,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "ee598ef6-7e93-4835-a936-8d22261f2a49"
+						"spark.autotune.trackingId": "0600ac78-0403-42b4-ba2b-d3e8781bd6c6"
 					}
 				},
 				"metadata": {
@@ -3009,8 +3015,7 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},

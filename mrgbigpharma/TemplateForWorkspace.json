@@ -2410,7 +2410,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "5fa0f26e-0ae4-43bf-860b-306289d98528"
+						"spark.autotune.trackingId": "e1b8d6d8-5baa-4e58-82ab-558a904294a4"
 					}
 				},
 				"metadata": {
@@ -2491,7 +2491,7 @@
 							"        pos_open_quantity,\n",
 							"        pos_end_quantity,\n",
 							"        unit_price,\n",
-							"        MAX(update_date) OVER (PARTITION BY product_id, country_id, forecast_date, forecast_snapshot) AS max_update_date\n",
+							"        MAX(update_date) OVER (PARTITION BY product_id, country_id,TRUNC(forecast_date,'MM'),TRUNC(forecast_snapshot,'MM')) AS max_update_date\n",
 							"    FROM bronze_forecast\n",
 							")\n",
 							"SELECT \n",

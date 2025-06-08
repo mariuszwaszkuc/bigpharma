@@ -2628,12 +2628,16 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "684edc80-852f-49a9-8d85-c0d8afe00edb"
+						"spark.autotune.trackingId": "2728b3b0-9963-403c-b0c4-28c65334b7b4"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
 					"language_info": {
 						"name": "python"
 					},
@@ -2644,20 +2648,20 @@
 						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
 						"auth": {
 							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net",
-							"authHeader": null
+							"authResource": "https://dev.azuresynapse.net"
 						},
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
 						"memory": 28,
-						"extraHeader": null
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"from pyspark.sql import SparkSession\r\n",
 							"from pyspark.sql.functions import col, max, coalesce, trunc, lit, add_months\r\n",
@@ -2683,10 +2687,10 @@
 							"f_sales_path_gold = f\"{bucket_name_gold}/f_planning_book\"\r\n",
 							"\r\n",
 							"# Load data from ADLS (tables f_sales, f_forecast, f_pos_data, f_wh_data)\r\n",
-							"f_sales = spark.read.parquet(f_sales_path)\r\n",
-							"f_forecast = spark.read.parquet(f_forecast_path)\r\n",
-							"f_pos_data = spark.read.parquet(f_pos_data_path)\r\n",
-							"f_wh_data = spark.read.parquet(f_wh_data_path)\r\n",
+							"f_sales = spark.read.format(\"delta\").load(f_sales_path)\r\n",
+							"f_forecast = spark.read.format(\"delta\").load(f_forecast_path)\r\n",
+							"f_pos_data = spark.read.format(\"delta\").load(f_pos_data_path)\r\n",
+							"f_wh_data = spark.read.format(\"delta\").load(f_wh_data_path)\r\n",
 							"\r\n",
 							"# Get the maximum value of forecast_snapshot from f_forecast\r\n",
 							"current_month_snapshot = f_forecast.agg(F.max(\"forecast_snapshot\")).collect()[0][0]\r\n",
@@ -3403,7 +3407,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "bd77a9df-a616-4fc8-800c-5f2538612993"
+						"spark.autotune.trackingId": "3aa4823e-3269-42c9-a38c-0d43916daea9"
 					}
 				},
 				"metadata": {
@@ -3428,8 +3432,7 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},

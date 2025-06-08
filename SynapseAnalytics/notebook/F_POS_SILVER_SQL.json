@@ -6,6 +6,10 @@
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkpool32",
+			"type": "BigDataPoolReference"
+		},
 		"sessionProperties": {
 			"driverMemory": "28g",
 			"driverCores": 4,
@@ -17,14 +21,33 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f67d9330-3c2a-4ae4-b8c8-ea3a60bcc905"
+				"spark.autotune.trackingId": "0600ac78-0403-42b4-ba2b-d3e8781bd6c6"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_sparksql",
+				"display_name": "sql"
+			},
 			"language_info": {
 				"name": "sql"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/825011b4-60a2-4e32-a6f1-221c4bc009ef/resourceGroups/lakehouse/providers/Microsoft.Synapse/workspaces/mrgbigpharma/bigDataPools/sparkpool32",
+				"name": "sparkpool32",
+				"type": "Spark",
+				"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -44,7 +67,8 @@
 					")\n",
 					"df_bronze.createOrReplaceTempView(\"bronze_pos\")\n",
 					""
-				]
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -89,7 +113,7 @@
 					"        pos_open_quantity,\n",
 					"        pos_end_quantity,\n",
 					"        unit_price,\n",
-					"        MAX(update_date) OVER (PARTITION BY product_id, country_id, TRUNC(transaction_date, \"MM\")) AS max_update_date\n",
+					"        MAX(update_date) OVER (PARTITION BY product_id, country_id, transaction_date) AS max_update_date\n",
 					"    FROM bronze_pos\n",
 					")\n",
 					"SELECT \n",
@@ -179,7 +203,8 @@
 					"    source.pos_update_date \n",
 					"  );\n",
 					""
-				]
+				],
+				"execution_count": null
 			}
 		]
 	}

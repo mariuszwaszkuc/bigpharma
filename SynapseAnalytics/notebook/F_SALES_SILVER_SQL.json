@@ -21,12 +21,16 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c5138b6f-e6ed-4ac8-9d66-4f61e327c727"
+				"spark.autotune.trackingId": "cdbeb410-40c5-49d7-9fa9-87d51411d762"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_sparksql",
+				"display_name": "sql"
+			},
 			"language_info": {
 				"name": "sql"
 			},
@@ -37,14 +41,13 @@
 				"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
 				"auth": {
 					"type": "AAD",
-					"authResource": "https://dev.azuresynapse.net",
-					"authHeader": null
+					"authResource": "https://dev.azuresynapse.net"
 				},
 				"sparkVersion": "3.4",
 				"nodeCount": 3,
 				"cores": 4,
 				"memory": 28,
-				"extraHeader": null
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -89,50 +92,6 @@
 					"USING DELTA\n",
 					"LOCATION 'abfss://silver@bigpharma.dfs.core.windows.net/f_sales/';\n",
 					"\n",
-					"-- 2. Prepare data – latest update + monthly-level aggregation\n",
-					"\n",
-					"--CREATE OR REPLACE TEMP VIEW aggregated_bronze_orders AS\n",
-					"--WITH orders_trunc AS (\n",
-					"--    SELECT\n",
-					"--        order_id,\n",
-					"--        customer_id,\n",
-					"--        TRUNC(order_date, 'MM') AS order_date,\n",
-					"--        TRUNC(required_date, 'MM') AS required_date,\n",
-					"--        TRUNC(shipped_date, 'MM') AS shipped_date,\n",
-					"--        update_date AS order_update_date\n",
-					"--    FROM bronze_orders\n",
-					"--),\n",
-					"--joined_orders AS (\n",
-					"--    SELECT\n",
-					"--        o.order_id,\n",
-					"--        c.country_id,\n",
-					"--        od.product_id,\n",
-					"--        o.shipped_date,\n",
-					"--        od.unit_price,\n",
-					"--        od.quantity,\n",
-					"--        od.discount,\n",
-					"--        o.order_date,\n",
-					"--        od.update_date AS order_details_update_date,\n",
-					"--        o.order_update_date\n",
-					"--    FROM orders_trunc o\n",
-					"--    JOIN bronze_order_details od ON o.order_id = od.order_id\n",
-					"--    JOIN d_customers c ON o.customer_id = c.customer_id\n",
-					"--),\n",
-					"--final_orders AS (\n",
-					"--    SELECT\n",
-					"--        country_id,\n",
-					"--        product_id,\n",
-					"--        shipped_date,\n",
-					"--        MAX(order_details_update_date) AS order_details_update_date,\n",
-					"--        MAX(order_update_date) AS order_update_date,\n",
-					"--        SUM(quantity) AS quantity,\n",
-					"--        SUM(discount) AS discount,\n",
-					"--        ROUND(SUM(quantity * unit_price), 2) AS amount,\n",
-					"--        ROUND(SUM(quantity * unit_price) / NULLIF(SUM(quantity), 0), 2) AS unit_price\n",
-					"--    FROM joined_orders\n",
-					"--    GROUP BY country_id, product_id, shipped_date\n",
-					"--)\n",
-					"--SELECT * FROM final_orders;\n",
 					"\n",
 					"CREATE OR REPLACE TEMP VIEW aggregated_bronze_orders AS\n",
 					"WITH orders_trunc AS (\n",
@@ -172,8 +131,8 @@
 					"        quantity,\n",
 					"        discount,\n",
 					"        unit_price,\n",
-					"        MAX(order_details_update_date) OVER (PARTITION BY product_id, country_id, shipped_date) AS max_order_details_update_date,\n",
-					"        MAX(order_update_date) OVER (PARTITION BY product_id, country_id, shipped_date) AS max_order_update_date\n",
+					"        MAX(order_details_update_date) OVER (PARTITION BY   order_id,product_id, country_id, shipped_date) AS max_order_details_update_date,\n",
+					"        MAX(order_update_date) OVER (PARTITION BY  order_id, product_id, country_id, shipped_date) AS max_order_update_date\n",
 					"    FROM joined_orders\n",
 					")\n",
 					"SELECT\n",
@@ -229,7 +188,8 @@
 					"    source.quantity, source.discount, source.amount, source.unit_price, source.order_details_update_date, source.order_update_date\n",
 					"  );\n",
 					""
-				]
+				],
+				"execution_count": null
 			}
 		]
 	}

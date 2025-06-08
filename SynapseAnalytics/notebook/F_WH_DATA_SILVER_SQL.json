@@ -21,12 +21,16 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0690f6ab-fe6b-4337-bb2b-983b5e22e346"
+				"spark.autotune.trackingId": "bfc43b79-2d1e-4619-b149-694e2f985175"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
 			"language_info": {
 				"name": "python"
 			},
@@ -37,14 +41,13 @@
 				"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
 				"auth": {
 					"type": "AAD",
-					"authResource": "https://dev.azuresynapse.net",
-					"authHeader": null
+					"authResource": "https://dev.azuresynapse.net"
 				},
 				"sparkVersion": "3.4",
 				"nodeCount": 3,
 				"cores": 4,
 				"memory": 28,
-				"extraHeader": null
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -63,7 +66,8 @@
 					"    \"abfss://bronze@bigpharma.dfs.core.windows.net/MinIo_Distributors/*/*/*.csv\"\n",
 					")\n",
 					"df_bronze.createOrReplaceTempView(\"bronze_inventory\")"
-				]
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -153,24 +157,25 @@
 					"        product_id,\n",
 					"        country_id,\n",
 					"        update_date AS whrs_update_date,\n",
-					"        TRUNC(transaction_date, 'MM') AS transaction_date,\n",
+					"        transaction_date,\n",
 					"        unit_price,\n",
 					"        whrs_sell_in_quantity,\n",
 					"        whrs_open_quantity,\n",
-					"        whrs_end_quantity\n",
+					"        whrs_end_quantity,\n",
+					"        MAX( update_date) OVER (PARTITION BY product_id, country_id, transaction_date) AS max_whrs_update_date\n",
 					"    FROM join_wh\n",
 					"),\n",
 					"wh_with_max_update AS (\n",
 					"    SELECT\n",
 					"        product_id,\n",
 					"        country_id,\n",
-					"        transaction_date,\n",
+					"        TRUNC(transaction_date, 'MM') AS transaction_date,\n",
 					"        whrs_update_date,\n",
 					"        unit_price,\n",
 					"        whrs_sell_in_quantity,\n",
 					"        whrs_open_quantity,\n",
 					"        whrs_end_quantity,\n",
-					"        MAX(whrs_update_date) OVER (PARTITION BY product_id, country_id, transaction_date) AS max_whrs_update_date\n",
+					"        max_whrs_update_date\n",
 					"    FROM select_wh\n",
 					")\n",
 					"SELECT\n",
@@ -234,7 +239,8 @@
 					"    source.unit_price, source.whrs_update_date\n",
 					"  );\n",
 					""
-				]
+				],
+				"execution_count": null
 			}
 		]
 	}

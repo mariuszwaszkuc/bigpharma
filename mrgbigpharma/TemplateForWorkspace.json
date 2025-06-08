@@ -2410,7 +2410,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "e1b8d6d8-5baa-4e58-82ab-558a904294a4"
+						"spark.autotune.trackingId": "d4bda14d-c87b-4925-8fb5-cdd801750e06"
 					}
 				},
 				"metadata": {
@@ -2428,7 +2428,6 @@
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"CREATE DATABASE IF NOT EXISTS silver;\n",
 							"\n",
@@ -3205,7 +3204,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "443a6446-173b-44d7-9545-46c84d569079"
+						"spark.autotune.trackingId": "c3ff0553-731b-4404-82e9-1b0d3d7b40c8"
 					}
 				},
 				"metadata": {
@@ -3230,13 +3229,15 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"CREATE DATABASE IF NOT EXISTS silver;\n",
 							"\n",
@@ -3404,12 +3405,16 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "0690f6ab-fe6b-4337-bb2b-983b5e22e346"
+						"spark.autotune.trackingId": "40b3f826-9f43-4fb7-a631-9b9b9dbc6002"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
 					"language_info": {
 						"name": "python"
 					},
@@ -3420,14 +3425,13 @@
 						"endpoint": "https://mrgbigpharma.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool32",
 						"auth": {
 							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net",
-							"authHeader": null
+							"authResource": "https://dev.azuresynapse.net"
 						},
 						"sparkVersion": "3.4",
 						"nodeCount": 3,
 						"cores": 4,
 						"memory": 28,
-						"extraHeader": null
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -3447,7 +3451,8 @@
 							")\n",
 							"df_bronze.createOrReplaceTempView(\"bronze_inventory\")"
 						],
-						"outputs": []
+						"outputs": [],
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -3537,24 +3542,25 @@
 							"        product_id,\n",
 							"        country_id,\n",
 							"        update_date AS whrs_update_date,\n",
-							"        TRUNC(transaction_date, 'MM') AS transaction_date,\n",
+							"        transaction_date,\n",
 							"        unit_price,\n",
 							"        whrs_sell_in_quantity,\n",
 							"        whrs_open_quantity,\n",
-							"        whrs_end_quantity\n",
+							"        whrs_end_quantity,\n",
+							"        MAX( update_date) OVER (PARTITION BY product_id, country_id, transaction_date) AS max_whrs_update_date\n",
 							"    FROM join_wh\n",
 							"),\n",
 							"wh_with_max_update AS (\n",
 							"    SELECT\n",
 							"        product_id,\n",
 							"        country_id,\n",
-							"        transaction_date,\n",
+							"        TRUNC(transaction_date, 'MM') AS transaction_date,\n",
 							"        whrs_update_date,\n",
 							"        unit_price,\n",
 							"        whrs_sell_in_quantity,\n",
 							"        whrs_open_quantity,\n",
 							"        whrs_end_quantity,\n",
-							"        MAX(whrs_update_date) OVER (PARTITION BY product_id, country_id, transaction_date) AS max_whrs_update_date\n",
+							"        max_whrs_update_date\n",
 							"    FROM select_wh\n",
 							")\n",
 							"SELECT\n",
@@ -3619,7 +3625,8 @@
 							"  );\n",
 							""
 						],
-						"outputs": []
+						"outputs": [],
+						"execution_count": null
 					}
 				]
 			},

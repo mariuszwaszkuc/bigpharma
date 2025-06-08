@@ -3403,7 +3403,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "94e2e2c1-7f70-4a7a-bfc1-ffddb956988f"
+						"spark.autotune.trackingId": "b157cea0-8f99-4ba6-aa9b-1e82f8d4a044"
 					}
 				},
 				"metadata": {
@@ -3434,22 +3434,6 @@
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
-					{
-						"cell_type": "code",
-						"metadata": {
-							"microsoft": {
-								"language": "sparksql"
-							},
-							"collapsed": false
-						},
-						"source": [
-							"%%sql\n",
-							"\n",
-							"delete from silver.f_wh_data"
-						],
-						"outputs": [],
-						"execution_count": 2
-					},
 					{
 						"cell_type": "code",
 						"metadata": {

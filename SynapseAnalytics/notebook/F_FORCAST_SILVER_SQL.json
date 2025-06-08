@@ -17,12 +17,16 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2d0fabc1-004c-4924-8c7c-c5cf4545d57e"
+				"spark.autotune.trackingId": "ab6cebeb-e422-44c4-aa1c-645f45351c65"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_sparksql",
+				"display_name": "sql"
+			},
 			"language_info": {
 				"name": "sql"
 			},
@@ -93,7 +97,7 @@
 					"        pos_open_quantity,\n",
 					"        pos_end_quantity,\n",
 					"        unit_price,\n",
-					"        MAX(update_date) OVER (PARTITION BY product_id, country_id, TRUNC(forecast_date, 'MM'), TRUNC(forecast_snapshot, 'MM')) AS max_update_date\n",
+					"        MAX(update_date) OVER (PARTITION BY product_id, country_id, forecast_date, forecast_snapshot) AS max_update_date\n",
 					"    FROM bronze_forecast\n",
 					")\n",
 					"SELECT \n",
@@ -198,7 +202,8 @@
 					"    source.pos_sell_out_amount, source.pos_open_amount, source.pos_end_amount, source.unit_price, source.forecast_update_date\n",
 					"  );\n",
 					""
-				]
+				],
+				"execution_count": null
 			}
 		]
 	}

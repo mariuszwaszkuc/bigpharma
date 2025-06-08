@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cdbeb410-40c5-49d7-9fa9-87d51411d762"
+				"spark.autotune.trackingId": "443a6446-173b-44d7-9545-46c84d569079"
 			}
 		},
 		"metadata": {
@@ -72,7 +72,7 @@
 					");\n",
 					"\n",
 					"CREATE OR REPLACE TEMP VIEW d_customers\n",
-					"USING parquet\n",
+					"USING delta\n",
 					"OPTIONS (\n",
 					"  path 'abfss://silver@bigpharma.dfs.core.windows.net/d_customers'\n",
 					");\n",

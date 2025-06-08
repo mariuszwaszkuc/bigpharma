@@ -1,0 +1,234 @@
+{
+	"name": "Transform In Silver",
+	"properties": {
+		"activities": [
+			{
+				"name": "D_CUSTOMERS",
+				"type": "SynapseNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkpool32",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"conf": {
+						"spark.dynamicAllocation.enabled": false,
+						"spark.dynamicAllocation.minExecutors": 1,
+						"spark.dynamicAllocation.maxExecutors": 1
+					},
+					"driverSize": "Small",
+					"numExecutors": 1,
+					"authentication": {
+						"type": "MSI"
+					}
+				}
+			},
+			{
+				"name": "D_PRODUCTS",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "D_CUSTOMERS",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkpool32",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"conf": {
+						"spark.dynamicAllocation.enabled": false,
+						"spark.dynamicAllocation.minExecutors": 1,
+						"spark.dynamicAllocation.maxExecutors": 1
+					},
+					"driverSize": "Small",
+					"numExecutors": 1,
+					"authentication": {
+						"type": "MSI"
+					}
+				}
+			},
+			{
+				"name": "F_FORECAST",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "D_PRODUCTS",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkpool32",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"conf": {
+						"spark.dynamicAllocation.enabled": false,
+						"spark.dynamicAllocation.minExecutors": 1,
+						"spark.dynamicAllocation.maxExecutors": 1
+					},
+					"driverSize": "Small",
+					"numExecutors": 1,
+					"authentication": {
+						"type": "MSI"
+					}
+				}
+			},
+			{
+				"name": "F_SALES",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "F_FORECAST",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkpool32",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": 1,
+						"spark.dynamicAllocation.maxExecutors": 1
+					},
+					"driverSize": "Small",
+					"numExecutors": 1,
+					"authentication": {
+						"type": "MSI"
+					}
+				}
+			},
+			{
+				"name": "F_POS",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "F_SALES",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkpool32",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"conf": {
+						"spark.dynamicAllocation.enabled": false,
+						"spark.dynamicAllocation.minExecutors": 1,
+						"spark.dynamicAllocation.maxExecutors": 1
+					},
+					"driverSize": "Small",
+					"numExecutors": 1,
+					"authentication": {
+						"type": "MSI"
+					}
+				}
+			},
+			{
+				"name": "F_WH",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "F_POS",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkpool32",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"conf": {
+						"spark.dynamicAllocation.enabled": false,
+						"spark.dynamicAllocation.minExecutors": 1,
+						"spark.dynamicAllocation.maxExecutors": 1
+					},
+					"driverSize": "Small",
+					"numExecutors": 1,
+					"authentication": {
+						"type": "MSI"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "Silver"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-06-06T08:27:01Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

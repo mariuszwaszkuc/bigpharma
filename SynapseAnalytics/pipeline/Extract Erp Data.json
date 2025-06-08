@@ -1,0 +1,148 @@
+{
+	"name": "Extract Erp Data",
+	"properties": {
+		"activities": [
+			{
+				"name": "List of Tables",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "call Set_Initial_Dates_In_Tables();\n\nselect table_name, last_update_date,elt_last_update_date From serwer296707_pharma.logs;"
+					},
+					"dataset": {
+						"referenceName": "MySql_Erp_List_Tables",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Copy For Each Table",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "List of Tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('List of Tables').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Extract Table Copy To ADLS_copy1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "MySqlSource",
+									"query": {
+										"value": "@concat(\n    'SELECT * FROM ', \n    item().table_name,\n    ' WHERE update_date <= STR_TO_DATE(''', item().last_update_date, ''', ''%Y-%m-%dT%H:%i:%s'') ',\n    'AND update_date > STR_TO_DATE(''', item().elt_last_update_date, ''', ''%Y-%m-%dT%H:%i:%s'');'\n)\n",
+										"type": "Expression"
+									}
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings",
+										"copyBehavior": "FlattenHierarchy"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "MySql_Erp_Dynamic_Load",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "Bronze_Parquet",
+									"type": "DatasetReference",
+									"parameters": {
+										"filename": {
+											"value": "@if( equals(item().table_name, 'logs') , \n     concat(item().table_name,'.parquet'),\n     concat(item().table_name,'_',pipeline().TriggerTime,'.parquet'))",
+											"type": "Expression"
+										},
+										"foldername": "@item().table_name"
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "Set Last Update Date",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Copy For Each Table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "call serwer296707_pharma.Set_Last_Update_Date;\n\nselect last_update_date,elt_last_update_date From serwer296707_pharma.logs;"
+					},
+					"dataset": {
+						"referenceName": "MySql_Erp_List_Tables",
+						"type": "DatasetReference"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "Brozne"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-05-12T08:28:10Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}
